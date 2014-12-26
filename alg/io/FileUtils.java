@@ -127,6 +127,19 @@ public class FileUtils {
 
     }
 
+    public static boolean insertBeforeInFile (String filePath, String [] markerLines, String [] additionalLines, boolean onlyFirstInstance,
+                                             boolean fromTheStart) throws Exception {
+
+        List<String> fileLines = getLines(filePath);
+
+        boolean didIt = insertBefore(fileLines, markerLines, additionalLines, onlyFirstInstance, fromTheStart);
+
+        if (didIt)
+            putLines(fileLines, filePath);
+
+        return (didIt);
+    }
+
     public static boolean insertBefore (List<String> fileLines, String [] markerLines, String [] additionalLines, boolean onlyFirstInstance,
                                        boolean fromTheStart) throws Exception {
         boolean matched = false;
@@ -147,6 +160,50 @@ public class FileUtils {
                         fileLines.add(i, additionalLines [j]);
                     }
                     i += additionalLines.length + markerLines.length;
+                    if (onlyFirstInstance)
+                        break;
+                }
+            }
+        }
+        return (matched);
+    }
+
+    public static boolean replaceInFile (String filePath, String [] markerLines, String [] additionalLines, boolean onlyFirstInstance,
+                                              boolean fromTheStart) throws Exception {
+
+        List<String> fileLines = getLines(filePath);
+
+        boolean didIt = replace(fileLines, markerLines, additionalLines, onlyFirstInstance, fromTheStart);
+
+        if (didIt)
+            putLines(fileLines, filePath);
+
+        return (didIt);
+    }
+
+    public static boolean replace (List<String> fileLines, String [] markerLines, String [] additionalLines, boolean onlyFirstInstance,
+                                        boolean fromTheStart) throws Exception {
+        boolean matched = false;
+
+        if (markerLines.length <= fileLines.size()) {
+
+            for (int i = 0; i < fileLines.size(); i++) {
+
+                matched = true;
+                for (int j = 0; j < markerLines.length; j++) {
+                    if (i + j >= fileLines.size() || !markerLines [j].equals(fileLines.get(i))) {
+                        matched = false;
+                        break;
+                    }
+                }
+                if (matched) {
+                    for (int j = 0; j < additionalLines.length; j++) {
+                        fileLines.add(i, additionalLines [j]);
+                    }
+                    for (int j = 0; j < markerLines.length; j++) {
+                        fileLines.remove(i + additionalLines.length);
+                    }
+                    i += additionalLines.length - markerLines.length;
                     if (onlyFirstInstance)
                         break;
                 }
