@@ -1,5 +1,7 @@
 package alg.graph;
 
+import java.util.List;
+
 /**
  * Created with IntelliJ IDEA.
  * User: jsanchez
@@ -13,4 +15,13 @@ public class GraphUtils {
      * flow algorithms
      * clustering algorithms
      */
+
+
+    public static Graph minimumSpanningTree (Graph input) {
+        return (null); // TODO
+    }
+
+    public static List<Graph> separateIntoClusters (Graph input)  {
+        return (null); // TODO
+    }
 }

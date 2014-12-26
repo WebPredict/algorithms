@@ -62,7 +62,7 @@ public abstract class Generator {
          */
     }
 
-    public static void createAndGen(App app) throws Exception {
+    public static void createAndGen(App app, boolean clean) throws Exception {
 
         AppConfig appConfig = app.getAppConfig();
         ArrayList<Model> models = app.getModels();

@@ -84,22 +84,21 @@ public class WordUtil {
         return (ret);
     }
 
-    public static String    capitalizeAndSpace (String word) {
-
+    public static String    capitalizeAndSpace (String camelCaseWord) {
         ArrayList<Character> chars = new ArrayList<Character>();
         boolean sawLower = false;
-        for (int i = 0; i < word.length(); i++) {
-            char c = word.charAt(i);
+        for (int i = 0; i < camelCaseWord.length(); i++) {
+            char c = camelCaseWord.charAt(i);
             if (c >= 'a' && c <= 'z') {
-
                 if (!sawLower) {
                     sawLower = true;
-                    c = Character.toUpperCase(c);
+
+                    if (i == 0)  // should only need to capitalize first letter if word is camel case
+                        c = Character.toUpperCase(c);
                 }
             }
             else if (c >= 'A' && c <= 'Z') {
                 if (sawLower) {
-
                     chars.add(' ');
                     sawLower = false;
                 }

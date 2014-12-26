@@ -35,6 +35,18 @@ public class HTMLUtil {
         buf.append("<h2>" + content + "</h2>\n");
     }
 
+    public static void      addH3 (StringBuffer buf, String content) {
+        buf.append("<h3>" + content + "</h3>\n");
+    }
+
+    public static void      addH1 (StringBuffer buf, String content, String style) {
+        buf.append("<h1 style=\"" + style + "\">" + content + "</h1>\n");
+    }
+
+    public static void      addH2 (StringBuffer buf, String content, String style) {
+        buf.append("<h2 style=\"" + style + "\">" + content + "</h2>\n");
+    }
+
     public static void      addFormElement (StringBuffer buf, String fieldName, String fieldType) {
         addFormElement(buf, fieldName, fieldType, null);
     }

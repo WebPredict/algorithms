@@ -105,7 +105,7 @@ public class SequenceUtils {
             }
         }
         else if (xLen == 1 && yLen == 1) {
-            ret = needlemanWunsch(x, y);
+            //ret = needlemanWunsch(x, y);     TODO
         }
         else {
             int xlen = x.length();

@@ -28,9 +28,10 @@ public class GeneratorTest {
 
         app.setAppConfig(appConfig);
         app.addTopLevelModel(person);
+        app.setFrontPageListModel(item);
+        app.setFrontPageSearchModel(person);
 
-
-        Generator.createAndGen(app);
+        Generator.createAndGen(app, true);
         /**
          * End result: simple CRUD app where a person can manage a list of possessions
          */
@@ -46,6 +47,7 @@ public class GeneratorTest {
         app.setTechnologyStack(TechnologyStack.rails);
         app.setRootDir("C:/Users/jsanchez/Downloads/apps");
         app.setName("sales");
+        app.setTagLine("Sell Sell Sell");
 
         AppConfig appConfig = new AppConfig();
         appConfig.setColor1("blue");
@@ -70,9 +72,10 @@ public class GeneratorTest {
         app.setAppConfig(appConfig);
         app.addTopLevelModel(user);
         app.addTopLevelModel(contact);
+        app.setFrontPageListModel(contact);
         app.addModel(company);
 
-        Generator.createAndGen(app);
+        Generator.createAndGen(app, true);
         /**
          * End result: simple CRUD app with the following pages:
          * splash intro page with login / signup and footer with about us, etc. pages

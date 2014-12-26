@@ -26,6 +26,42 @@ public class App {
     private String jumbotronImageUrl;
     private HashMap<String, Model> nameToModelMap = new HashMap<String, Model>();
     private Model userModel;
+    private String  tagLine;
+    private Model   frontPageSearchModel;
+    private Model   frontPageListModel;
+    private String  title;
+
+    public String getTitle() {
+        return title == null ? name : title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getTagLine() {
+        return tagLine;
+    }
+
+    public void setTagLine(String tagLine) {
+        this.tagLine = tagLine;
+    }
+
+    public Model getFrontPageSearchModel() {
+        return frontPageSearchModel;
+    }
+
+    public void setFrontPageSearchModel(Model frontPageSearchModel) {
+        this.frontPageSearchModel = frontPageSearchModel;
+    }
+
+    public Model getFrontPageListModel() {
+        return frontPageListModel;
+    }
+
+    public void setFrontPageListModel(Model frontPageListModel) {
+        this.frontPageListModel = frontPageListModel;
+    }
 
     private ArrayList<Blurb>    newsBlurbs = new ArrayList<Blurb>();
 

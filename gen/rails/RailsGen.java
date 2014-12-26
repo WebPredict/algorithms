@@ -43,7 +43,6 @@ public class RailsGen extends Generator {
             if (app.getAppConfig().isNeedsAuth())
                 generateLoginSignupPages();
 
-            generateHomePage();
             generateStaticPages();
             generateHelperMethods();
             generateAssets();
@@ -66,13 +65,13 @@ public class RailsGen extends Generator {
         Model userModel = app.getUserModel();
         String  userModelName = userModel.getName();
 
-        HTMLUtil.addParagraph(buf, "Thank you for registering <%= @" + userModelName + ".name %> with " + app.getAppConfig().getTitle());
+        HTMLUtil.addParagraph(buf, "Thank you for registering <%= @" + userModelName + ".name %> with " + app.getTitle());
         HTMLUtil.addLineBreak(buf);
         HTMLUtil.addParagraph(buf, "You can view or change your account details <%= link_to \"here\", edit_" + userModelName + "_url(@" + userModelName + ") %>.");
         HTMLUtil.addParagraph(buf, "You can get started <%= link_to \"here\", edit_" + userModelName + "_url(@" + userModelName + ") %>.");
         HTMLUtil.addLineBreak(buf);
         HTMLUtil.addParagraph(buf, "Regards,");
-        HTMLUtil.addParagraph(buf, "The " + app.getAppConfig().getTitle() + " Team");
+        HTMLUtil.addParagraph(buf, "The " + WordUtil.capitalize(app.getTitle()) + " Team");
         FileUtils.write(buf, app.getWebAppDir() + "/app/views/" + userModelName + "_mailer/registration_confirmation.html.erb", true);
 
         buf = new StringBuffer();
@@ -138,40 +137,63 @@ public class RailsGen extends Generator {
          * when logged in, default is a dashboard of some sort showing main model
          */
 
-        /**
-         *
-         * in bootstrap override:
-         *
-         * .hero-unit {
-         background-image: url('bgimage.jpg');
-         }
+        StringBuffer buf = new StringBuffer();
 
+        if (app.getUserModel() != null) {
+            HTMLUtil.addRuby(buf, "if signed_in?");
+            Model userModel = app.getUserModel();
+            HTMLUtil.addH3(buf, WordUtil.capitalize(userModel.getName()) + " Dashboard for <%= current_" +userModel.getName() + ".name %>");
+        }
 
-         * <% if signed_in? %>
-         <h3>Breeder Dashboard for <%= current_breeder.name %></h3>
+        HTMLUtil.addRuby(buf, "else");
+        StringUtils.addLine(buf, "<div class=\"center hero-unit\">");
+        HTMLUtil.addH1(buf, "Welcome to " + app.getTitle(), "color: #9999ff");
 
-         // TODO
+        HTMLUtil.addH2(buf, app.getTagLine(), "color: #9999ff");
 
-         * <% else %>
-         <div class="center hero-unit">
-         <h1 style="color: #9999ff">Welcome to Exotic Birds Plus</h1>
+        Model  frontSearchModel = app.getFrontPageSearchModel();
 
-         <h2 style="color: #9999ff">Spread the word, buy a bird.</h2>
-         <%= link_to "Search Birds", listings_path, class: "btn btn-large btn-primary" %>
-         <%= link_to "Breeders Signup!", signup_path, class: "btn btn-large" %>
-         </div>
-         </br>
-         <% if @listings.any? %>
-         <table class="table table-striped">
-         <tr><th>Image</th><th><%= sortable "title" %></th><th><%= sortable "bird_type", "Species" %></th><th><%= sortable "sex" %></th><th><%= sortable "age", "Age" %></th><th><%= sortable "price", "Price" %><th><%= sortable "state", "State" %></th></th><th><%= sortable "description", "Details" %></th><th><%= sortable "created_at", "Time" %></th><th>Actions</th></tr>
-         <%= render @listings %>
-         </table>
-         <%= will_paginate @listings %>
-         <% end %>
+        if (frontSearchModel != null) {
+            String plural =  WordUtil.pluralize(frontSearchModel.getName());
+            HTMLUtil.addRubyOutput(buf, "<%= link_to \"Search " + plural + "\", " + plural + "_path, class: \"btn btn-large btn-primary\"");
+        }
+        HTMLUtil.addRubyOutput(buf, "<%= link_to \"Signup!\", signup_path, class: \"btn btn-large\"");
+        StringUtils.addLine(buf, "</div>");
+        HTMLUtil.addLineBreak(buf);
 
-         <% end %>
+         Model  frontPageModelList = app.getFrontPageListModel();
 
-         */
+         if (frontPageModelList != null)
+             generateTableFor(buf, frontPageModelList);
+
+        HTMLUtil.addRuby(buf, "end");
+        FileUtils.write(buf, app.getWebAppDir() + "/app/views/static_pages/home.html.erb", true);
+    }
+
+    public void generateTableFor(StringBuffer buf, Model model) {
+        String pluralModelList = WordUtil.pluralize(model.getName());
+
+        HTMLUtil.addRuby(buf, "if @" + pluralModelList + ".any?");
+        StringUtils.addLine(buf, "<table class=\"table table-striped\">");
+
+        StringUtils.addLine(buf, "</table>");
+
+        ArrayList<Field> fields = model.getFields();
+
+        // TODO: this should probably get pushed in to the render for a table view of the model
+        if (fields != null) {
+            String line = "<tr>";
+
+            for (Field f : fields) {
+                line += "<th><%= sortable \"" + f.getName() + "\", \"" + WordUtil.capitalizeAndSpace(f.getName()) + "\" %></th>";
+            }
+            line += "</tr>";
+            StringUtils.addLine(buf, line);
+        }
+        HTMLUtil.addRubyOutput(buf, "render @" + pluralModelList);
+
+        HTMLUtil.addRubyOutput(buf, "will_paginate @" + WordUtil.pluralize(model.getName()));
+        HTMLUtil.addRuby(buf, "end");
     }
 
     public void generateLoginSignupPages () throws Exception {

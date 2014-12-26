@@ -1,11 +1,20 @@
 package alg.trees;
 
 /**
- * Created with IntelliJ IDEA.
- * User: jsanchez
- * Date: 12/5/14
- * Time: 5:43 PM
- * To change this template use File | Settings | File Templates.
+ * Self-balancing binary tree. search, insert, delete all in O(log n) time
  */
-public class RedBlackTree {
+public class RedBlackTree<T> {
+
+
+    public void insert (T data) {
+
+    }
+
+    public RedBlackTreeNode<T>  search (T data) {
+        return (null); // TODO
+    }
+
+    public boolean delete (T data) {
+        return (false); // TODO
+    }
 }
