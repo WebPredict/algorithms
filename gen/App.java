@@ -27,6 +27,16 @@ public class App {
     private HashMap<String, Model> nameToModelMap = new HashMap<String, Model>();
     private Model userModel;
 
+    private ArrayList<Blurb>    newsBlurbs = new ArrayList<Blurb>();
+
+    public ArrayList<Blurb> getNewsBlurbs() {
+        return newsBlurbs;
+    }
+
+    public void setNewsBlurbs(ArrayList<Blurb> newsBlurbs) {
+        this.newsBlurbs = newsBlurbs;
+    }
+
     public List<String> doPreprocessing () {
         ArrayList<String> errors = new ArrayList<String>();
 
@@ -56,6 +66,10 @@ public class App {
     public void addTopLevelModel (Model m) {
         topLevelModels.add(m);
         models.add(m);
+    }
+
+    public void addNewsBlurb (Blurb blurb) {
+        newsBlurbs.add(blurb);
     }
 
     public String getJumbotronText() {

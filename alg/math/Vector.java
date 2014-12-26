@@ -39,6 +39,34 @@ public class Vector {
         }
     }
 
+    public double   dot (Vector other) {
+        double sum = 0;
+        for (int i = 0; i < other.size(); i++) {
+            sum += get(i) * other.get(i);
+        }
+        return (sum);
+    }
+
+    public Vector   cross3D (Vector other) {
+        if (other.size() != 3 || size() != 3)
+            throw new RuntimeException("Unimplemented: cross product on vectors of size = " + other.size());
+
+        double first = get(1) * other.get(2) - get(2) * other.get(1);
+        double second = get(2) * other.get(0) - get(0) * other.get(2);
+        double third = get(0) * other.get(1) - get(1) * other.get(0);
+        set(0, first);
+        set(1, second);
+        set(2, third);
+        return (this);
+    }
+
+    public double   cross2d (Vector other) {
+        if (size() != 2 || other.size() != 2)
+            throw new RuntimeException("Unimplemented: cross product on vectors of size = " + other.size());
+
+        return (get(0) * other.get(1) - other.get(0) * get(1));
+    }
+
     public int size () {
         return (data == null ? 0 : data.length);
     }

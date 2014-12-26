@@ -1,9 +1,6 @@
 package alg.io;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -206,6 +203,26 @@ public class FileUtils {
             for (String dir : dirs) {
                 mkdir(root, dir);
             }
+        }
+    }
+
+    public static void      append (String file, String [] lines) throws Exception {
+        PrintWriter pw = null;
+
+        try {
+            pw = new PrintWriter(new FileOutputStream(new File(file), true));
+
+            for (String line : lines) {
+                pw.append(line);
+                pw.append("\n");
+            }
+
+            pw.flush();
+            pw.close();
+        }
+        finally {
+            if (pw != null)
+                pw.close();
         }
     }
 

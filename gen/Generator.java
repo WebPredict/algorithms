@@ -1,5 +1,8 @@
 package gen;
 
+import gen.mean.MeanGen;
+import gen.rails.RailsGen;
+
 import java.io.*;
 import java.util.ArrayList;
 

@@ -24,6 +24,16 @@ public class AppConfig {
     private boolean includeAuditInfo = false; //
     private boolean includeCreatedUpdatedBy = true;
 
+    private ModelLayout complexModelLayout = ModelLayout.TABS;
+
+    public ModelLayout getComplexModelLayout() {
+        return complexModelLayout;
+    }
+
+    public void setComplexModelLayout(ModelLayout complexModelLayout) {
+        this.complexModelLayout = complexModelLayout;
+    }
+
     public boolean isIncludeAuditInfo() {
         return includeAuditInfo;
     }

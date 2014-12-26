@@ -90,4 +90,12 @@ public class MatrixUtils {
         }
         return (m);
     }
+
+
+    public static Matrix    rotate (Matrix m, Axis axis, double degrees) {
+
+        double radians = Math.toRadians(degrees);
+
+        return (m); // TODO
+    }
 }

@@ -6,11 +6,8 @@ import alg.words.WordUtil;
 import java.util.Stack;
 
 /**
- * Created with IntelliJ IDEA.
- * User: jsanchez
- * Date: 12/23/14
- * Time: 8:51 AM
- * To change this template use File | Settings | File Templates.
+ *
+ * At the moment, uses Bootstrap
  */
 public class HTMLUtil {
 
@@ -22,12 +19,20 @@ public class HTMLUtil {
         buf.append("<% " + content + " %>\n");
     }
 
+    public static void      addLineBreak (StringBuffer buf) {
+        buf.append("</br>\n");
+    }
+
     public static void      addRubyOutput (StringBuffer buf, String content) {
         buf.append("<%= " + content + " %>\n");
     }
 
     public static void      addH1 (StringBuffer buf, String content) {
         buf.append("<h1>" + content + "</h1>\n");
+    }
+
+    public static void      addH2 (StringBuffer buf, String content) {
+        buf.append("<h2>" + content + "</h2>\n");
     }
 
     public static void      addFormElement (StringBuffer buf, String fieldName, String fieldType) {
@@ -46,11 +51,11 @@ public class HTMLUtil {
 
     public static void      addRow (StringBuffer buf, String span, String offset) {
         buf.append("<div class=\"row\">\n");
-        buf.append("<div class=\"" + span + "\" " + offset + "\">\n");
+        buf.append("\t<div class=\"" + span + "\" " + offset + "\">\n");
     }
 
     public static void      closeRow (StringBuffer buf) {
-        buf.append("</div>\n");
+        buf.append("\t</div>\n");
         buf.append("</div>\n");
     }
 
