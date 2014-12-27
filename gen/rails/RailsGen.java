@@ -98,52 +98,47 @@ public class RailsGen extends Generator {
     }
 
     public void generateHeader () throws Exception {
-        /**
-         * For example:
-         *
-         * <div class="navbar navbar-inverse navbar-fixed-top">
-         <div class="navbar-inner">
-         <div class="container">
-         <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-         <span class="icon-bar"></span>
-         <span class="icon-bar"></span>
-         <span class="icon-bar"></span>
-         </a>
-         <%= link_to raw("<span style='color: #9999ff'>The Title</span>"), root_path, id: "logo" %>
-         <div class="nav-collapse">
-         <ul class="nav pull-right">
-         <% if signed_in? %>
-         <% if current_user.inquiries.any? %>
-         <li><%= link_to current_user.render_num_inquiries, root_path %></li>
-         <% else %>
-         <li><%= link_to "Dashboard", root_path %></li>
-         <% end %>
-         <% end %>
-         <% if !signed_in? %>
-         <form action="/listings" class="navbar-search pull-right">
-         <input type="text" class="search-query" id="search" name="search" placeholder="Search">
-         </form>
-         <li><%= link_to "Articles", articles_path %></li>
-         <% end %>
-         <li><%= link_to "Users", users_path %></li>
-         <% if signed_in? %>
-         <li><%= link_to "Edit Profile", edit_user_path(current_user) %></li>
-         <li class="divider"></li>
-         <li><%= link_to "Sign out", signout_path, method: "delete" %></li>
-         <% else %>
-         <li><%= link_to "Sign In", signin_path %></li>
-         <% end %>
-         <li><%= link_to "Help", help_path %></li>
-         </ul>
-         </div>
-         </div>
-         </div>
-         </div>
-
-         */
 
         StringBuffer buf = new StringBuffer();
-        // TODO
+         StringUtils.addLine(buf, "<div class=\"navbar navbar-inverse navbar-fixed-top\">");
+         StringUtils.addLine(buf, "<div class=\"navbar-inner\">");
+         StringUtils.addLine(buf, "<div class=\"container\">");
+         StringUtils.addLine(buf, "<a class=\"btn btn-navbar\" data-toggle=\"collapse\" data-target=\".nav-collapse\">");
+         StringUtils.addLine(buf, "<span class=\"icon-bar\"></span>");
+         StringUtils.addLine(buf, "<span class=\"icon-bar\"></span>");
+         StringUtils.addLine(buf, "<span class=\"icon-bar\"></span>");
+         StringUtils.addLine(buf, "</a>");
+         StringUtils.addLine(buf, "<%= link_to raw(\"<span style='color: #9999ff'>The Title</span>\"), root_path, id: \"logo\" %>");
+         StringUtils.addLine(buf, "<div class=\"nav-collapse\">");
+         StringUtils.addLine(buf, "<ul class=\"nav pull-right\">");
+         StringUtils.addLine(buf, "<% if signed_in? %>");
+         StringUtils.addLine(buf, "<% if current_user.inquiries.any? %>");
+         StringUtils.addLine(buf, "<li><%= link_to current_user.render_num_inquiries, root_path %></li>");
+         StringUtils.addLine(buf, "<% else %>");
+         StringUtils.addLine(buf, "<li><%= link_to \"Dashboard\", root_path %></li>");
+         StringUtils.addLine(buf, "<% end %>");
+         StringUtils.addLine(buf, "<% end %>");
+         StringUtils.addLine(buf, "<% if !signed_in? %>");
+         StringUtils.addLine(buf, "<form action=\"/listings\" class=\"navbar-search pull-right\">");
+         StringUtils.addLine(buf, "<input type=\"text\" class=\"search-query\" id=\"search\" name=\"search\" placeholder=\"Search\">");
+         StringUtils.addLine(buf, "</form>");
+         StringUtils.addLine(buf, "<li><%= link_to \"Articles\", articles_path %></li>");
+         StringUtils.addLine(buf, "<% end %>");
+         StringUtils.addLine(buf, "<li><%= link_to \"Users\", users_path %></li>");
+         StringUtils.addLine(buf, "<% if signed_in? %>");
+         StringUtils.addLine(buf, "<li><%= link_to \"Edit Profile\", edit_user_path(current_user) %></li>");
+         StringUtils.addLine(buf, "<li class=\"divider\"></li>");
+         StringUtils.addLine(buf, "<li><%= link_to \"Sign out\", signout_path, method: \"delete\" %></li>");
+         StringUtils.addLine(buf, "<% else %>");
+         StringUtils.addLine(buf, "<li><%= link_to \"Sign In\", signin_path %></li>");
+         StringUtils.addLine(buf, "<% end %>");
+         StringUtils.addLine(buf, "<li><%= link_to \"Help\", help_path %></li>");
+         StringUtils.addLine(buf, "</ul>");
+         StringUtils.addLine(buf, "</div>");
+         StringUtils.addLine(buf, "</div>");
+         StringUtils.addLine(buf, "</div>");
+         StringUtils.addLine(buf, "</div>");
+
         FileUtils.write(buf, app.getWebAppDir() + "/app/views/layouts/_header.html.erb", true);
 
         buf = new StringBuffer();
@@ -169,7 +164,7 @@ public class RailsGen extends Generator {
         StringUtils.addLine(buf, "<small>");
 
         String siteName = app.getName();
-        StringUtils.addLine(buf, "<a href=\"http://" + siteName + ".com\">© 2015 " + siteName + ".com. All Rights Reserved.</a>");
+        StringUtils.addLine(buf, "<a href=\"http://" + siteName + ".com\">@ 2015 " + siteName + ".com. All Rights Reserved.</a>");
         StringUtils.addLine(buf, "<nav>");
         StringUtils.addLine(buf, "<ul>");
         StringUtils.addLine(buf, "<li><%= link_to \"About\", about_path %></li>");
