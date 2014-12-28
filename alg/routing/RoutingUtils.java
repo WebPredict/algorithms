@@ -1,8 +1,6 @@
 package alg.routing;
 
-import java.util.List;
 import java.util.HashMap;
-import java.util.LinkedList;
 
 import alg.graph.Graph;
 import alg.queues.MinPriorityQueue;
@@ -20,11 +18,11 @@ public class RoutingUtils {
     /**
      * Traveling salesman
      * Vehicle routing problem
-     *
+     * Dijkstra's
      */
 	
 	/**
-	 * 
+	 * Single source shortest path, with non-negative integer value distances
 	 * @param g
 	 * @param source
 	 * @return
@@ -35,7 +33,6 @@ public class RoutingUtils {
 		HashMap<Vertex, Vertex> vertexPathMap = new HashMap<Vertex, Vertex>();
 		vertexDistanceMap.put(source, 0);
 		
-		// TODO: change to priority queue
 		MinPriorityQueue<Vertex> 	queue = new MinPriorityQueue<Vertex>();
 		
 		for (Vertex v : g.getVertices()) {

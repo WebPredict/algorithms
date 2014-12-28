@@ -24,6 +24,16 @@ public class ProbUtils {
     
     public static int []	randomIntegers (int [] list, int randomSize) {
     	// returns a random subset of size randomSize from list
-    	return (null); // TODO
+    	
+    	int []	randomList = new int [randomSize];
+    	// one approach: shuffle list, then just pick first randomSize from it
+    	// but we don't want to modify list, nor take up a lot of space
+    	// issue is how to avoid duplicates
+    	
+    	for (int i = 0; i < randomList.length; i++) {
+    		int nextIdx = MathUtils.generateRandom(list.length);
+    		
+    	}
+    	return (randomList); 
     }
 }

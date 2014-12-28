@@ -10,7 +10,7 @@ import java.util.List;
  * Time: 4:31 PM
  * To change this template use File | Settings | File Templates.
  */
-public class WebUtil {
+public class WebUtils {
     /**
     * fetch N pages
     * Determine most common words, N-grams
