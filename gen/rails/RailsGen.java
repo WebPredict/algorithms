@@ -2,8 +2,8 @@ package gen.rails;
 
 import alg.io.FileUtils;
 import alg.strings.StringUtils;
-import alg.web.HTMLUtil;
-import alg.words.WordUtil;
+import alg.web.HTMLUtils;
+import alg.words.WordUtils;
 import gen.*;
 
 import java.util.ArrayList;
@@ -65,19 +65,19 @@ public class RailsGen extends Generator {
         Model userModel = app.getUserModel();
         String  userModelName = userModel.getName();
 
-        HTMLUtil.addParagraph(buf, "Thank you for registering <%= @" + userModelName + ".name %> with " + app.getTitle());
-        HTMLUtil.addLineBreak(buf);
-        HTMLUtil.addParagraph(buf, "You can view or change your account details <%= link_to \"here\", edit_" + userModelName + "_url(@" + userModelName + ") %>.");
-        HTMLUtil.addParagraph(buf, "You can get started <%= link_to \"here\", edit_" + userModelName + "_url(@" + userModelName + ") %>.");
-        HTMLUtil.addLineBreak(buf);
-        HTMLUtil.addParagraph(buf, "Regards,");
-        HTMLUtil.addParagraph(buf, "The " + WordUtil.capitalize(app.getTitle()) + " Team");
+        HTMLUtils.addParagraph(buf, "Thank you for registering <%= @" + userModelName + ".name %> with " + app.getTitle());
+        HTMLUtils.addLineBreak(buf);
+        HTMLUtils.addParagraph(buf, "You can view or change your account details <%= link_to \"here\", edit_" + userModelName + "_url(@" + userModelName + ") %>.");
+        HTMLUtils.addParagraph(buf, "You can get started <%= link_to \"here\", edit_" + userModelName + "_url(@" + userModelName + ") %>.");
+        HTMLUtils.addLineBreak(buf);
+        HTMLUtils.addParagraph(buf, "Regards,");
+        HTMLUtils.addParagraph(buf, "The " + WordUtils.capitalize(app.getTitle()) + " Team");
         FileUtils.write(buf, app.getWebAppDir() + "/app/views/" + userModelName + "_mailer/registration_confirmation.html.erb", true);
 
         buf = new StringBuffer();
-        HTMLUtil.addParagraph(buf, "<%= @name %> with email <%= @email %> has the following comment/question: <%= @comment %>.");
-        HTMLUtil.addLineBreak(buf);
-        HTMLUtil.addLineBreak(buf);
+        HTMLUtils.addParagraph(buf, "<%= @name %> with email <%= @email %> has the following comment/question: <%= @comment %>.");
+        HTMLUtils.addLineBreak(buf);
+        HTMLUtils.addLineBreak(buf);
         FileUtils.write(buf, app.getWebAppDir() + "/app/views/" + userModelName + "_mailer/contact_admin.html.erb", true);
 
     }
@@ -99,62 +99,64 @@ public class RailsGen extends Generator {
 
     public void generateHeader () throws Exception {
 
-        StringBuffer buf = new StringBuffer();
-         StringUtils.addLine(buf, "<div class=\"navbar navbar-inverse navbar-fixed-top\">");
-         StringUtils.addLine(buf, "<div class=\"navbar-inner\">");
-         StringUtils.addLine(buf, "<div class=\"container\">");
-         StringUtils.addLine(buf, "<a class=\"btn btn-navbar\" data-toggle=\"collapse\" data-target=\".nav-collapse\">");
-         StringUtils.addLine(buf, "<span class=\"icon-bar\"></span>");
-         StringUtils.addLine(buf, "<span class=\"icon-bar\"></span>");
-         StringUtils.addLine(buf, "<span class=\"icon-bar\"></span>");
-         StringUtils.addLine(buf, "</a>");
-         StringUtils.addLine(buf, "<%= link_to raw(\"<span style='color: #9999ff'>The Title</span>\"), root_path, id: \"logo\" %>");
-         StringUtils.addLine(buf, "<div class=\"nav-collapse\">");
-         StringUtils.addLine(buf, "<ul class=\"nav pull-right\">");
-         StringUtils.addLine(buf, "<% if signed_in? %>");
-//         StringUtils.addLine(buf, "<% if current_user.inquiries.any? %>");
-//         StringUtils.addLine(buf, "<li><%= link_to current_user.render_num_inquiries, root_path %></li>");
-//         StringUtils.addLine(buf, "<% else %>");
-         StringUtils.addLine(buf, "<li><%= link_to \"Dashboard\", root_path %></li>");
-//         StringUtils.addLine(buf, "<% end %>");
-         StringUtils.addLine(buf, "<% end %>");
-         StringUtils.addLine(buf, "<% if !signed_in? %>");
-         StringUtils.addLine(buf, "<form action=\"/listings\" class=\"navbar-search pull-right\">");
-         StringUtils.addLine(buf, "<input type=\"text\" class=\"search-query\" id=\"search\" name=\"search\" placeholder=\"Search\">");
-         StringUtils.addLine(buf, "</form>");
-         StringUtils.addLine(buf, "<li><%= link_to \"Articles\", articles_path %></li>");
-         StringUtils.addLine(buf, "<% end %>");
-         StringUtils.addLine(buf, "<li><%= link_to \"Users\", users_path %></li>");
-         StringUtils.addLine(buf, "<% if signed_in? %>");
-         StringUtils.addLine(buf, "<li><%= link_to \"Edit Profile\", edit_user_path(current_user) %></li>");
-         StringUtils.addLine(buf, "<li class=\"divider\"></li>");
-         StringUtils.addLine(buf, "<li><%= link_to \"Sign out\", signout_path, method: \"delete\" %></li>");
-         StringUtils.addLine(buf, "<% else %>");
-         StringUtils.addLine(buf, "<li><%= link_to \"Sign In\", signin_path %></li>");
-         StringUtils.addLine(buf, "<% end %>");
-         StringUtils.addLine(buf, "<li><%= link_to \"Help\", help_path %></li>");
-         StringUtils.addLine(buf, "</ul>");
-         StringUtils.addLine(buf, "</div>");
-         StringUtils.addLine(buf, "</div>");
-         StringUtils.addLine(buf, "</div>");
-         StringUtils.addLine(buf, "</div>");
+    	StringBuffer buf = new StringBuffer();
+    	StringUtils.addLine(buf, "<div class=\"navbar navbar-inverse navbar-fixed-top\">");
+    	StringUtils.addLine(buf, "<div class=\"navbar-inner\">");
+    	StringUtils.addLine(buf, "<div class=\"container\">");
+    	StringUtils.addLine(buf, "<a class=\"btn btn-navbar\" data-toggle=\"collapse\" data-target=\".nav-collapse\">");
+    	StringUtils.addLine(buf, "<span class=\"icon-bar\"></span>");
+    	StringUtils.addLine(buf, "<span class=\"icon-bar\"></span>");
+    	StringUtils.addLine(buf, "<span class=\"icon-bar\"></span>");
+    	StringUtils.addLine(buf, "</a>");
+    	StringUtils.addLine(buf, "<%= link_to raw(\"<span style='color: #9999ff'>" + app.getTitle() + "</span>\"), root_path, id: \"logo\" %>");
+    	StringUtils.addLine(buf, "<div class=\"nav-collapse\">");
+    	StringUtils.addLine(buf, "<ul class=\"nav pull-right\">");
+    	StringUtils.addLine(buf, "<% if signed_in? %>");
+    	//         StringUtils.addLine(buf, "<% if current_user.inquiries.any? %>");
+    	//         StringUtils.addLine(buf, "<li><%= link_to current_user.render_num_inquiries, root_path %></li>");
+    	//         StringUtils.addLine(buf, "<% else %>");
+    	StringUtils.addLine(buf, "<li><%= link_to \"Dashboard\", root_path %></li>");
+    	//         StringUtils.addLine(buf, "<% end %>");
+    	StringUtils.addLine(buf, "<% end %>");
+    	StringUtils.addLine(buf, "<% if !signed_in? %>");
+    	StringUtils.addLine(buf, "<form action=\"/listings\" class=\"navbar-search pull-right\">");
+    	StringUtils.addLine(buf, "<input type=\"text\" class=\"search-query\" id=\"search\" name=\"search\" placeholder=\"Search\">");
+    	StringUtils.addLine(buf, "</form>");
+    	// TODO: needs to be configurable
+    	StringUtils.addLine(buf, "<li><%= link_to \"About\", about_path %></li>");
+    	StringUtils.addLine(buf, "<% end %>");
+    	// TODO: needs to be configurable
+    	StringUtils.addLine(buf, "<li><%= link_to \"Users\", users_path %></li>");
+    	StringUtils.addLine(buf, "<% if signed_in? %>");
+    	StringUtils.addLine(buf, "<li><%= link_to \"Edit Profile\", edit_user_path(current_user) %></li>");
+    	StringUtils.addLine(buf, "<li class=\"divider\"></li>");
+    	StringUtils.addLine(buf, "<li><%= link_to \"Sign out\", signout_path, method: \"delete\" %></li>");
+    	StringUtils.addLine(buf, "<% else %>");
+    	StringUtils.addLine(buf, "<li><%= link_to \"Sign In\", signin_path %></li>");
+    	StringUtils.addLine(buf, "<% end %>");
+    	StringUtils.addLine(buf, "<li><%= link_to \"Help\", help_path %></li>");
+    	StringUtils.addLine(buf, "</ul>");
+    	StringUtils.addLine(buf, "</div>");
+    	StringUtils.addLine(buf, "</div>");
+    	StringUtils.addLine(buf, "</div>");
+    	StringUtils.addLine(buf, "</div>");
 
-        FileUtils.write(buf, app.getWebAppDir() + "/app/views/layouts/_header.html.erb", true);
+    	FileUtils.write(buf, app.getWebAppDir() + "/app/views/layouts/_header.html.erb", true);
 
-        buf = new StringBuffer();
+    	buf = new StringBuffer();
 
-        HTMLUtil.addRubyOutput(buf, "render 'layouts/header'");
+    	HTMLUtils.addRubyOutput(buf, "render 'layouts/header'");
 
-        StringUtils.addLine(buf, "<div class=\"container\"> ");
-        HTMLUtil.addRuby(buf, "flash.each do |key, value|");
-        StringUtils.addLine(buf, "<div class=\"alert alert-<%= key %>\"><%= value %></div>  ");
-        HTMLUtil.addRuby(buf, "end");
-        HTMLUtil.addRubyOutput(buf, "yield");
-        StringUtils.addLine(buf, "</div> ");
-        HTMLUtil.addRubyOutput(buf, "render 'layouts/footer'");
+    	StringUtils.addLine(buf, "<div class=\"container\"> ");
+    	HTMLUtils.addRuby(buf, "flash.each do |key, value|");
+    	StringUtils.addLine(buf, "<div class=\"alert alert-<%= key %>\"><%= value %></div>  ");
+    	HTMLUtils.addRuby(buf, "end");
+    	HTMLUtils.addRubyOutput(buf, "yield");
+    	StringUtils.addLine(buf, "</div> ");
+    	HTMLUtils.addRubyOutput(buf, "render 'layouts/footer'");
 
-        FileUtils.replaceInFile(app.getWebAppDir() + "/app/views/layouts/application.html.erb", new String[]{"<%= yield %>"},
-        new String [] {buf.toString()}, true, true);
+    	FileUtils.replaceInFile(app.getWebAppDir() + "/app/views/layouts/application.html.erb", new String[]{"<%= yield %>"},
+    			new String [] {buf.toString()}, true, true);
 
     }
 
@@ -178,34 +180,34 @@ public class RailsGen extends Generator {
 
     public void generateAboutPage () throws Exception {
         StringBuffer buf = new StringBuffer();
-        HTMLUtil.addRuby(buf, "provide(:title, 'About')");
-        HTMLUtil.addH1(buf, "About " + WordUtil.capitalize(app.getName()));
-        HTMLUtil.addParagraph(buf, "This is the about section to be filled in.");
-        HTMLUtil.addParagraph(buf, "This is the about section second paragraph to be filled in.");
+        HTMLUtils.addRuby(buf, "provide(:title, 'About')");
+        HTMLUtils.addH1(buf, "About " + WordUtils.capitalize(app.getName()));
+        HTMLUtils.addParagraph(buf, "This is the about section to be filled in.");
+        HTMLUtils.addParagraph(buf, "This is the about section second paragraph to be filled in.");
 
         FileUtils.write(buf, app.getWebAppDir() + "/app/views/static_pages/about.html.erb", true);
     }
 
     public void generateHelpPage () throws Exception {
         StringBuffer buf = new StringBuffer();
-        HTMLUtil.addRuby(buf, "provide(:title, 'Help')");
-        HTMLUtil.addH1(buf, "Help for " + WordUtil.capitalize(app.getName()));
-        HTMLUtil.addParagraph(buf, "This is the help item to be filled in.");
-        HTMLUtil.addParagraph(buf, "This is the second help item to be filled in.");
+        HTMLUtils.addRuby(buf, "provide(:title, 'Help')");
+        HTMLUtils.addH1(buf, "Help for " + WordUtils.capitalize(app.getName()));
+        HTMLUtils.addParagraph(buf, "This is the help item to be filled in.");
+        HTMLUtils.addParagraph(buf, "This is the second help item to be filled in.");
 
         FileUtils.write(buf, app.getWebAppDir() + "/app/views/static_pages/help.html.erb", true);
     }
 
     public void generateNewsPage () throws Exception {
         StringBuffer buf = new StringBuffer();
-        HTMLUtil.addRuby(buf, "provide(:title, 'News')");
-        HTMLUtil.addH1(buf, "News about " + WordUtil.capitalize(app.getName()));
+        HTMLUtils.addRuby(buf, "provide(:title, 'News')");
+        HTMLUtils.addH1(buf, "News about " + WordUtils.capitalize(app.getName()));
 
         ArrayList<Blurb> blurbs = app.getNewsBlurbs();
 
         for (int i = 0; i < blurbs.size(); i++) {
-            HTMLUtil.addH2(buf, blurbs.get(i).getTitle());
-            HTMLUtil.addParagraph(buf, blurbs.get(i).getContent());
+            HTMLUtils.addH2(buf, blurbs.get(i).getTitle());
+            HTMLUtils.addParagraph(buf, blurbs.get(i).getContent());
         }
 
         FileUtils.write(buf, app.getWebAppDir() + "/app/views/static_pages/news.html.erb", true);
@@ -221,40 +223,40 @@ public class RailsGen extends Generator {
         StringBuffer buf = new StringBuffer();
 
         if (app.getUserModel() != null) {
-            HTMLUtil.addRuby(buf, "if signed_in?");
+            HTMLUtils.addRuby(buf, "if signed_in?");
             Model userModel = app.getUserModel();
-            HTMLUtil.addH3(buf, WordUtil.capitalize(userModel.getName()) + " Dashboard for <%= current_" +userModel.getName() + ".name %>");
+            HTMLUtils.addH3(buf, WordUtils.capitalize(userModel.getName()) + " Dashboard for <%= current_" +userModel.getName() + ".name %>");
         }
 
-        HTMLUtil.addRuby(buf, "else");
+        HTMLUtils.addRuby(buf, "else");
         StringUtils.addLine(buf, "<div class=\"center hero-unit\">");
-        HTMLUtil.addH1(buf, "Welcome to " + app.getTitle(), "color: #9999ff");
+        HTMLUtils.addH1(buf, "Welcome to " + app.getTitle(), "color: #9999ff");
 
-        HTMLUtil.addH2(buf, app.getTagLine(), "color: #9999ff");
+        HTMLUtils.addH2(buf, app.getTagLine(), "color: #9999ff");
 
         Model  frontSearchModel = app.getFrontPageSearchModel();
 
         if (frontSearchModel != null) {
-            String plural =  WordUtil.pluralize(frontSearchModel.getName());
-            HTMLUtil.addRubyOutput(buf, "<%= link_to \"Search " + plural + "\", " + plural + "_path, class: \"btn btn-large btn-primary\"");
+            String plural =  WordUtils.pluralize(frontSearchModel.getName());
+            HTMLUtils.addRubyOutput(buf, "<%= link_to \"Search " + plural + "\", " + plural + "_path, class: \"btn btn-large btn-primary\"");
         }
-        HTMLUtil.addRubyOutput(buf, "<%= link_to \"Signup!\", signup_path, class: \"btn btn-large\"");
+        HTMLUtils.addRubyOutput(buf, "<%= link_to \"Signup!\", signup_path, class: \"btn btn-large\"");
         StringUtils.addLine(buf, "</div>");
-        HTMLUtil.addLineBreak(buf);
+        HTMLUtils.addLineBreak(buf);
 
          Model  frontPageModelList = app.getFrontPageListModel();
 
          if (frontPageModelList != null)
              generateTableFor(buf, frontPageModelList);
 
-        HTMLUtil.addRuby(buf, "end");
+        HTMLUtils.addRuby(buf, "end");
         FileUtils.write(buf, app.getWebAppDir() + "/app/views/static_pages/home.html.erb", true);
     }
 
     public void generateTableFor(StringBuffer buf, Model model) {
-        String pluralModelList = WordUtil.pluralize(model.getName());
+        String pluralModelList = WordUtils.pluralize(model.getName());
 
-        HTMLUtil.addRuby(buf, "if @" + pluralModelList + ".any?");
+        HTMLUtils.addRuby(buf, "if @" + pluralModelList + ".any?");
         StringUtils.addLine(buf, "<table class=\"table table-striped\">");
 
         StringUtils.addLine(buf, "</table>");
@@ -266,15 +268,15 @@ public class RailsGen extends Generator {
             String line = "<tr>";
 
             for (Field f : fields) {
-                line += "<th><%= sortable \"" + f.getName() + "\", \"" + WordUtil.capitalizeAndSpace(f.getName()) + "\" %></th>";
+                line += "<th><%= sortable \"" + f.getName() + "\", \"" + WordUtils.capitalizeAndSpace(f.getName()) + "\" %></th>";
             }
             line += "</tr>";
             StringUtils.addLine(buf, line);
         }
-        HTMLUtil.addRubyOutput(buf, "render @" + pluralModelList);
+        HTMLUtils.addRubyOutput(buf, "render @" + pluralModelList);
 
-        HTMLUtil.addRubyOutput(buf, "will_paginate @" + WordUtil.pluralize(model.getName()));
-        HTMLUtil.addRuby(buf, "end");
+        HTMLUtils.addRubyOutput(buf, "will_paginate @" + WordUtils.pluralize(model.getName()));
+        HTMLUtils.addRuby(buf, "end");
     }
 
     public void generateLoginSignupPages () throws Exception {
@@ -283,52 +285,52 @@ public class RailsGen extends Generator {
         String userModelName = userModel.getName();
 
         StringBuffer buf = new StringBuffer();
-        HTMLUtil.addRuby(buf, "provide(:title, \"Sign in\")");
-        HTMLUtil.addH1(buf, "Sign In");
+        HTMLUtils.addRuby(buf, "provide(:title, \"Sign in\")");
+        HTMLUtils.addH1(buf, "Sign In");
         generateFormForStart(buf, "session");
 
-        HTMLUtil.addRubyOutput(buf, "f.label :email");
-        HTMLUtil.addRubyOutput(buf, "f.text_field :email");
+        HTMLUtils.addRubyOutput(buf, "f.label :email");
+        HTMLUtils.addRubyOutput(buf, "f.text_field :email");
 
-        HTMLUtil.addRubyOutput(buf, "f.label :password");
-        HTMLUtil.addRubyOutput(buf, "f.password_field :password");
+        HTMLUtils.addRubyOutput(buf, "f.label :password");
+        HTMLUtils.addRubyOutput(buf, "f.password_field :password");
 
         generateFormEnd(buf, "Sign in");
-        HTMLUtil.addParagraph(buf, "New " + userModelName + "? <%= link_to \"Sign up now!\", signup_path %>");
-        HTMLUtil.addParagraph(buf, "Forgot password? <%= link_to \"Reset password\",  send_password_path %>");
+        HTMLUtils.addParagraph(buf, "New " + userModelName + "? <%= link_to \"Sign up now!\", signup_path %>");
+        HTMLUtils.addParagraph(buf, "Forgot password? <%= link_to \"Reset password\",  send_password_path %>");
 
         FileUtils.write(buf, app.getWebAppDir() + "/app/views/sessions/new.html.erb", true);
     }
 
     private void generateFormForStart (StringBuffer buf, String modelName) {
-        HTMLUtil.addRow(buf, "span6", "offset3");
-        HTMLUtil.addRubyOutput(buf, "form_for(:" + modelName + ", url: " + WordUtil.pluralize(modelName) + "_path) do |f|");
+        HTMLUtils.addRow(buf, "span6", "offset3");
+        HTMLUtils.addRubyOutput(buf, "form_for(:" + modelName + ", url: " + WordUtils.pluralize(modelName) + "_path) do |f|");
     }
 
     private void generateFormEnd (StringBuffer buf, String buttonText) {
-        HTMLUtil.addRubyOutput(buf, "f.submit \"" + buttonText + "\", class: \"btn btn-large btn-primary\" ");
-        HTMLUtil.addRuby(buf, "end");
-        HTMLUtil.closeRow(buf);
+        HTMLUtils.addRubyOutput(buf, "f.submit \"" + buttonText + "\", class: \"btn btn-large btn-primary\" ");
+        HTMLUtils.addRuby(buf, "end");
+        HTMLUtils.closeRow(buf);
     }
 
     public void generateContactPage () throws Exception {
 
         StringBuffer buf = new StringBuffer();
-        HTMLUtil.addRuby(buf, "provide(:title, 'Contact')");
-        HTMLUtil.addH1(buf, "Contact Us");
+        HTMLUtils.addRuby(buf, "provide(:title, 'Contact')");
+        HTMLUtils.addH1(buf, "Contact Us");
 
-        HTMLUtil.addRow(buf, "span6", "offset3");
-        HTMLUtil.addForm(buf, "submitcontact");
+        HTMLUtils.addRow(buf, "span6", "offset3");
+        HTMLUtils.addForm(buf, "submitcontact");
 
         StringUtils.addLine(buf, "<%= hidden_field_tag :authenticity_token, form_authenticity_token %>");
 
-        HTMLUtil.addFormElement(buf, "email", "string", "Your Email");
-        HTMLUtil.addFormElement(buf, "name", "string", "Your Name");
-        HTMLUtil.addFormElement(buf, "comment", "long_string", "Your Message");
+        HTMLUtils.addFormElement(buf, "email", "string", "Your Email");
+        HTMLUtils.addFormElement(buf, "name", "string", "Your Name");
+        HTMLUtils.addFormElement(buf, "comment", "long_string", "Your Message");
 
-        HTMLUtil.addSubmitButton(buf, "commit", "Send Message");
+        HTMLUtils.addSubmitButton(buf, "commit", "Send Message");
         StringUtils.addLine(buf, "</form>");
-        HTMLUtil.closeRow(buf);
+        HTMLUtils.closeRow(buf);
 
         FileUtils.write(buf, app.getWebAppDir() + "/app/views/static_pages/contact.html.erb", true);
     }
@@ -343,7 +345,7 @@ public class RailsGen extends Generator {
 
         Model userModel = app.getUserModel();
         String  name = userModel.getName();
-        String  capName = WordUtil.capitalize(name);
+        String  capName = WordUtils.capitalize(name);
 
         StringBuffer buf = new StringBuffer();
         StringUtils.addLine(buf, "module SessionsHelper");
@@ -408,7 +410,7 @@ public class RailsGen extends Generator {
         StringBuffer buf = new StringBuffer();
 
         Model       userModel = app.getUserModel();
-        String      pluralName = WordUtil.pluralize(userModel.getName());
+        String      pluralName = WordUtils.pluralize(userModel.getName());
         List<Model> models = app.getModels();
 
         for (Model model : models) {
@@ -421,7 +423,7 @@ public class RailsGen extends Generator {
                 for (int i = 0; i < rels.size(); i++) {
                     Rel rel = rels.get(i);
                     if (rel.getRelType().equals(RelType.ONE_TO_MANY)) {
-                        s += ":" + WordUtil.pluralize(rel.getModel().getName());
+                        s += ":" + WordUtils.pluralize(rel.getModel().getName());
                         if (i < rels.size() - 1)
                             s += ", ";
                     }
@@ -478,7 +480,7 @@ public class RailsGen extends Generator {
         tabbed(buf, "end");
         StringUtils.addLineBreak(buf);
         tabbed(buf, "def full_title(page_title)");
-        tabbed(buf, "base_title = \"" + WordUtil.capitalize(app.getName()) + "\" ", 2);
+        tabbed(buf, "base_title = \"" + WordUtils.capitalize(app.getName()) + "\" ", 2);
         tabbed(buf, "if page_title.empty? ", 2);
         tabbed(buf, "base_title  ", 3);
         tabbed(buf, "else  ", 2);
@@ -522,7 +524,7 @@ public class RailsGen extends Generator {
         if (models != null) {
             for (Model model : models) {
                 String name = model.getName();
-                String              capName = WordUtil.capitalize(name);
+                String              capName = WordUtils.capitalize(name);
                 ArrayList<Field>    fields = model.getFields();
                 ArrayList<Rel>      rels = model.getRelationships();
 
@@ -562,19 +564,19 @@ public class RailsGen extends Generator {
                         RelType relType = rel.getRelType();
                         Model   relModel = rel.getModel();
                         if (relType.equals(RelType.ONE_TO_MANY)) {
-                            String  toAdd =  "has_many :" + WordUtil.pluralize(relModel.getName());
+                            String  toAdd =  "has_many :" + WordUtils.pluralize(relModel.getName());
                             if (rel.isDependent())
                                 toAdd += ", dependent: :destroy";
 
                             StringUtils.addTabbedLine(buf, toAdd);
                         }
                         else if (relType.equals(RelType.MANY_TO_ONE)) {
-                            tabbed(buf, "belongs_to :" + WordUtil.pluralize(relModel.getName()));
+                            tabbed(buf, "belongs_to :" + WordUtils.pluralize(relModel.getName()));
                         }
                         else if (relType.equals(RelType.MANY_TO_MANY)) {
-                            String  toAdd =  "has_many :" + WordUtil.pluralize(relModel.getName());
+                            String  toAdd =  "has_many :" + WordUtils.pluralize(relModel.getName());
                             if (rel.getThrough() != null) {
-                                toAdd += ", through: " + WordUtil.pluralize(rel.getThrough().getName());
+                                toAdd += ", through: " + WordUtils.pluralize(rel.getThrough().getName());
                             }
                             tabbed(buf, toAdd);
                         }
@@ -686,7 +688,7 @@ public class RailsGen extends Generator {
         if (models != null) {
             for (Model model : models) {
                 String name = model.getName();
-                String names = WordUtil.pluralize(name);
+                String names = WordUtils.pluralize(name);
                 ArrayList<Field>    fields = model.getFields();
                 ArrayList<Rel>      rels = model.getRelationships();
 
@@ -694,6 +696,23 @@ public class RailsGen extends Generator {
 
                 ModelLayout modelLayout = app.getAppConfig().getComplexModelLayout();
 
+                
+                StringBuffer bodyContent = new StringBuffer();
+                
+                if (app.getAppConfig().getLayout().equals(Layout.TWO_COL_THIN_LEFT)) {
+                	HTMLUtils.addDiv(buf, "container-fluid");
+                	HTMLUtils.addDiv(buf, "row-fluid");
+                	HTMLUtils.addDiv(buf, "span2");
+                	buf.append(getSidebarContent(model));
+                	HTMLUtils.closeDiv(buf);
+                	
+                	HTMLUtils.addDiv(buf, "span10");
+                	buf.append(bodyContent);
+                	HTMLUtils.closeDiv(buf);
+                	HTMLUtils.closeDiv(buf);
+                	HTMLUtils.closeDiv(buf);                	
+                }
+             
                 // have it configurable, and/or determined by # of collections ( > 2 means tabs)
 
                 /**
@@ -724,9 +743,11 @@ public class RailsGen extends Generator {
 
                  *
                  */
-
-                // TODO: generate partials too?
                 FileUtils.write(buf, app.getWebAppDir() + "/app/views/" + names + "/show.html.erb", true);
+                
+                buf = new StringBuffer();
+
+                FileUtils.write(buf, app.getWebAppDir() + "/app/views/" + names + "/_" + name + "_as_row.html.erb", true);
 
                 buf = new StringBuffer();
                 FileUtils.write(buf, app.getWebAppDir() + "/app/views/" + names + "/new.html.erb", true);
@@ -741,6 +762,10 @@ public class RailsGen extends Generator {
         }
     }
 
+    protected String	getSidebarContent (Model m) {
+    	return ("");// TODO
+    }
+    
     protected void addMethod (StringBuffer buf, String name, String [] contentLines) {
         buf.append("\tdef " + name + "\n");
         if (contentLines != null) {
@@ -776,12 +801,12 @@ public class RailsGen extends Generator {
         if (models != null) {
             for (Model model : models) {
                 String              name = model.getName();
-                String              capName = WordUtil.capitalize(name);
-                String              names = WordUtil.pluralize(name);
+                String              capName = WordUtils.capitalize(name);
+                String              names = WordUtils.pluralize(name);
                 ArrayList<Rel>      rels = model.getRelationships();
 
                 StringBuffer buf = new StringBuffer();
-                String  className = WordUtil.capitalizeAndJoin(names, "controller");
+                String  className = WordUtils.capitalizeAndJoin(names, "controller");
                 StringUtils.addLine(buf, "class " + className + " < ApplicationController");
                 tabbed(buf, "before_filter :signed_in_" + name + ", only: [:edit, :update, :destroy]");
                 tabbed(buf, "before_filter :correct_" + name + ", only: [:edit, :update]");
@@ -809,7 +834,7 @@ public class RailsGen extends Generator {
 
                         switch (relType) {
                             case ONE_TO_MANY:
-                                showMethod.add("@" + WordUtil.pluralize(relModelName) + " = @" + name + "." + WordUtil.pluralize(relModelName) + ".paginate(page: params[:page])");
+                                showMethod.add("@" + WordUtils.pluralize(relModelName) + " = @" + name + "." + WordUtils.pluralize(relModelName) + ".paginate(page: params[:page])");
                                 break;
 
                             case ONE_TO_ONE:
@@ -817,8 +842,8 @@ public class RailsGen extends Generator {
                                 break;
 
                             case MANY_TO_MANY:
-                                showMethod.add("@" + WordUtil.pluralize(relModelName) + " = @" + name +
-                                        "." + WordUtil.pluralize(relModelName) + ".paginate(page: params[:page])");  // TODO: verify this
+                                showMethod.add("@" + WordUtils.pluralize(relModelName) + " = @" + name +
+                                        "." + WordUtils.pluralize(relModelName) + ".paginate(page: params[:page])");  // TODO: verify this
                                 break;
                         }
                     }
@@ -929,12 +954,12 @@ public class RailsGen extends Generator {
 
                 StringBuffer buf = new StringBuffer();
 
-                String upperPluralName = WordUtil.pluralize(WordUtil.capitalize(name));
+                String upperPluralName = WordUtils.pluralize(WordUtils.capitalize(name));
                 String className = "Create" + upperPluralName;
                 StringUtils.addLine(buf, "class " + className + " < ActiveRecord::Migration");
 
                 tabbed(buf, "def create");
-                tabbed(buf, "create_table :" + WordUtil.pluralize(name) + " do |t|", 2);
+                tabbed(buf, "create_table :" + WordUtils.pluralize(name) + " do |t|", 2);
 
                 if (fields != null) {
                     for (Field field : fields) {
