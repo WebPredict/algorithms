@@ -14,7 +14,13 @@ public class Edge<T> {
     private Vertex  start;
     private Vertex end;
 
-
+    public Edge (boolean directed, T value, Vertex start, Vertex end) {
+    	this.directed = directed;
+    	this.value = value;
+    	this.start = start;
+    	this.end = end;
+    }
+    
     public Vertex getStart() {
         return start;
     }
@@ -45,5 +51,9 @@ public class Edge<T> {
 
     public void setValue(T value) {
         this.value = value;
+    }
+    
+    public String toString () {
+    	return ("Edge: " + value);
     }
 }
