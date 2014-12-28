@@ -197,7 +197,6 @@ public class TreeUtils {
         // indentation at each row, and separation between nodes, some power of 2
 
 
-
         TreeMap<Integer, TreeMap<Integer, String>> output = new TreeMap<Integer, TreeMap<Integer, String>>();
 
         int height = height(tree);
@@ -252,11 +251,26 @@ public class TreeUtils {
             int idx = pathOffset; // TODO
             lineInfo.put(pathOffset, tree.getData().toString());
         }
-
-
     }
 
     public static int compareTrees (BinaryNode tree1, BinaryNode tree2) {
-          return (0);
+          return (0); // TODO
+    }
+    
+    public static BinaryNode firstCommonAncestor (BinaryNode node1, BinaryNode node2) {
+    	return (null); // TODO
+    }
+    
+    public static BinaryNode findNextInOrder (BinaryNode node) {
+    	// TODO needs parent pointers?
+    	return (null); // TODO
+    }
+    
+    public static boolean	isValidBinarySearchTree (BinaryNode node) {
+    	return (false); // TODO
+    }
+    
+    public static BinaryNode	createBinarySearchTreeWithMinHeight (int [] values) {
+    	 return (null); // TODO
     }
 }

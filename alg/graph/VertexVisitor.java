@@ -1,5 +1,8 @@
 package alg.graph;
 
-public class VertexVisitor {
+import alg.util.Vertex;
 
+public interface VertexVisitor {
+	void	visit (Vertex v);
+	
 }

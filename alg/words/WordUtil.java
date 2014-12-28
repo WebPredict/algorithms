@@ -163,4 +163,8 @@ public class WordUtil {
         // * matches any sequence of characters including empty
         return (false); // TODO
     }
+    
+    public static String	toEnglish (int value) {
+    	return (null); // TODO
+    }
 }

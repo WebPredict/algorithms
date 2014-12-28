@@ -270,4 +270,12 @@ public class StringUtils {
         else
             return (Integer.parseInt(s.substring(started, ended)));
     }
+    
+    public static String	basicCompression (String s) {
+    	return (s); // TODO
+    }
+    
+    public static int		shortestDistanceBetweenWords (String text, String word1, String word2) {
+    	return (0); // TODO
+    }
 }

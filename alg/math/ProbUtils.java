@@ -21,4 +21,9 @@ public class ProbUtils {
     public double   bayesTheorem (double probA, double probB, double probBGivenA) {
         return (probBGivenA * probA / probB);
     }
+    
+    public static int []	randomIntegers (int [] list, int randomSize) {
+    	// returns a random subset of size randomSize from list
+    	return (null); // TODO
+    }
 }

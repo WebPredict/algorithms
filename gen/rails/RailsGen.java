@@ -112,11 +112,11 @@ public class RailsGen extends Generator {
          StringUtils.addLine(buf, "<div class=\"nav-collapse\">");
          StringUtils.addLine(buf, "<ul class=\"nav pull-right\">");
          StringUtils.addLine(buf, "<% if signed_in? %>");
-         StringUtils.addLine(buf, "<% if current_user.inquiries.any? %>");
-         StringUtils.addLine(buf, "<li><%= link_to current_user.render_num_inquiries, root_path %></li>");
-         StringUtils.addLine(buf, "<% else %>");
+//         StringUtils.addLine(buf, "<% if current_user.inquiries.any? %>");
+//         StringUtils.addLine(buf, "<li><%= link_to current_user.render_num_inquiries, root_path %></li>");
+//         StringUtils.addLine(buf, "<% else %>");
          StringUtils.addLine(buf, "<li><%= link_to \"Dashboard\", root_path %></li>");
-         StringUtils.addLine(buf, "<% end %>");
+//         StringUtils.addLine(buf, "<% end %>");
          StringUtils.addLine(buf, "<% end %>");
          StringUtils.addLine(buf, "<% if !signed_in? %>");
          StringUtils.addLine(buf, "<form action=\"/listings\" class=\"navbar-search pull-right\">");
@@ -1006,8 +1006,10 @@ public class RailsGen extends Generator {
         /**
          * run: rails new 'app name'
          */
-
-        String result = runCommand(app.getRootDir(), "C:/RailsInstaller/Ruby2.1.0/bin/rails.bat", "new", app.getName());
+    	boolean windows = false;
+    	String 	railsCmd = windows ? "C:/RailsInstaller/Ruby2.1.0/bin/rails.bat" : "rails";
+    	
+        String result = runCommand(app.getRootDir(), railsCmd, "new", app.getName());
         System.out.println(result);
     }
 

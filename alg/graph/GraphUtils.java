@@ -24,4 +24,13 @@ public class GraphUtils {
     public static List<Graph> separateIntoClusters (Graph input)  {
         return (null); // TODO
     }
+    
+    public static void depthFirstSearch (Graph input, VertexVisitor visitor) {
+    	// TODO
+    }
+    
+    public static void breadthFirstSearch (Graph input, VertexVisitor visitor) {
+    	// TODO
+    }
+    
 }
