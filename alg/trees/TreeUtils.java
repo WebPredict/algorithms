@@ -267,10 +267,28 @@ public class TreeUtils {
     }
     
     public static boolean	isValidBinarySearchTree (BinaryNode node) {
-    	return (false); // TODO
+
+        boolean isValid = true;
+        if (node != null) {
+            if (node.getLeft() != null) {
+                isValid = isValidBinarySearchTree(node.getLeft());
+                if (isValid)
+                    isValid = node.getData().compareTo(node.getLeft().getData()) < 0;
+            }
+
+            if (isValid && node.getRight() != null) {
+                isValid = isValidBinarySearchTree(node.getRight());
+                if (isValid)
+                    isValid = node.getData().compareTo(node.getLeft().getData()) > 0;
+            }
+        }
+
+        return (isValid);
     }
     
     public static BinaryNode	createBinarySearchTreeWithMinHeight (int [] values) {
+
+        // One approach: sort the list, then binary search for node creation
     	 return (null); // TODO
     }
 }

@@ -1,4 +1,4 @@
-package alg.trees;
+package test.util;
 
 import alg.util.BinaryNode;
 

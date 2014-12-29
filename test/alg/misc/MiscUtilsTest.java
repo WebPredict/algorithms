@@ -1,4 +1,6 @@
-package alg.misc;
+package test.alg.misc;
+
+import alg.misc.MiscUtils;
 
 /**
  * Created with IntelliJ IDEA.
