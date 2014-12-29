@@ -11,6 +11,8 @@ public class Bitmap {
 
     private byte [][]   data;
 
+    // TODO: rewrite to use individual bits, not bytes
+
     public Bitmap (int width, int height) {
         data = new byte[height][width];
     }

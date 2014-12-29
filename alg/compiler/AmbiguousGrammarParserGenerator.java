@@ -8,4 +8,6 @@ package alg.compiler;
  * To change this template use File | Settings | File Templates.
  */
 public class AmbiguousGrammarParserGenerator {
+
+    // If grammar is ambiguous, be able to generate all possible parsings for a particular valid sentence in the language
 }

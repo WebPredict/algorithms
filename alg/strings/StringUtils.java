@@ -270,7 +270,12 @@ public class StringUtils {
         else
             return (Integer.parseInt(s.substring(started, ended)));
     }
-    
+
+    /**
+     *
+     * @param s
+     * @return if s == "aaaabbbccccd" return "a4b3c4d" or original string if compressed will be longer
+     */
     public static String	basicCompression (String s) {
     	return (s); // TODO
     }

@@ -1,13 +1,11 @@
 package alg.sort;
 
 import alg.arrays.ArrayUtils;
+import alg.math.MathUtils;
 import alg.misc.MiscUtils;
 import alg.misc.RecursionDepthExceeded;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -289,7 +287,35 @@ public class SortUtils {
     }
 
     public static void    radixSort (int [] values) {
-    	// TODO
+    	if (values == null || values.length < 2)
+            return;
+
+        int     numDigits = (int)Math.ceil(Math.log10(MathUtils.max(values)));
+
+        for (int i = 0; i < numDigits; i++) {
+            ArrayList<Integer> []    lists = new ArrayList[10];
+            int divisor = (int)Math.pow(10, i);
+
+            for (int j = 0; j < values.length; j++) {
+                int remainder = (values [j] / divisor) % 10;
+                ArrayList<Integer> list = lists [remainder];
+                if (list == null) {
+                    list = new ArrayList<Integer>();
+                    lists [remainder] = list;
+                }
+                list.add(values [j]);
+            }
+
+            int idx = 0;
+            for (int j = 0; j < lists.length; j++) {
+                ArrayList<Integer> list = lists[j];
+                if (list != null) {
+                    for (int k = 0; k < list.size(); k++) {
+                        values [idx++] = list.get(k);
+                    }
+                }
+            }
+        }
     }
     
     /**
@@ -299,5 +325,6 @@ public class SortUtils {
     public static void		externalSort (String inputLargeDataListFileName, String outputSortedDataListFileName) {
         // load blocks into memory one by one, sort them, then merge sorted blocks in pairs?
     	// TODO
+        // issues: how to know size of items to be sorted, and how this relates to loaded block size. Try to avoid loading half an item
     }
 }

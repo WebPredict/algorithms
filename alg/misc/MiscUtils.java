@@ -66,6 +66,11 @@ public class MiscUtils {
         return (ret);
     }
 
+    /**
+     *
+     * @param index of column header
+     * @return Excel column header
+     */
     public static String    excelColumn (int index) {
         /**
          * 1 -> A
@@ -103,10 +108,16 @@ public class MiscUtils {
         return (0);
     }
 
+    // compares version numbers of the form 1.0.0
     public static int       compareVersions (String v1, String v2) {
          return (0); // TODO
     }
 
+    /**
+     *
+     * @param numbers
+     * @return A peak element is higher than its neighbors. Returns first one.
+     */
     public static int       findPeakElement (List<Integer> numbers) {
         return (0); // TODO
     }
@@ -136,5 +147,13 @@ public class MiscUtils {
         list.set(firstIdx, list.get(secondIdx));
 
         list.set(secondIdx, tmp);
+    }
+
+    public static void swap (Object [] list, int firstIdx, int secondIdx) {
+        Object tmp = list [firstIdx];
+
+        list [firstIdx] = list [secondIdx];
+
+        list [secondIdx] = tmp;
     }
 }

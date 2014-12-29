@@ -8,7 +8,10 @@ package alg.math;
  * To change this template use File | Settings | File Templates.
  */
 public class Matrix {
+
     private Vector []   data;
+
+    // TODO: support for sparse matrices? some other data structure?
 
     /**
      * Support add, multiply, eigenvalues, normalize, rotational?

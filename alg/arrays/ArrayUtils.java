@@ -35,6 +35,12 @@ public class ArrayUtils {
         return (ret);
     }
 
+    /**
+     *
+     * @param array1
+     * @param array2
+     * @return  Sorted array of array1 + array2's contents
+     */
     public static Comparable [] mergeSortedArrays (Comparable [] array1, Comparable [] array2) {
         if (array1 == null)
             return (array2);
@@ -96,6 +102,9 @@ public class ArrayUtils {
     }
 
     public static List<Interval>    merge(List<Interval> intervalList) {
+        // sort intervals by start time
+        // then merge overlaps
+
         return (null); // TODO
     }
 

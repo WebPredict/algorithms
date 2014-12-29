@@ -76,7 +76,32 @@ public class MathUtils {
     }
 
     public static int   nChooseK (int n, int k) {
-        return (0); // TODO
+        // n! / k! (n - k)!
+
+        /**
+         * 8 7 6 5 4 3 2 1 / (3 2 1) (5 4 3 2 1)
+         */
+
+        int nMinusK = n - k;
+        int nFactorialNeeded = 1;
+
+        if (nMinusK >= k) {
+            for (int i = nMinusK + 1; i <= n; i++) {
+                nFactorialNeeded *= i;
+            }
+            for (int i = 1; i <= k; i++) {
+                nFactorialNeeded /= i;
+            }
+        }
+        else {
+            for (int i = k + 1; i <= n; i++) {
+                nFactorialNeeded *= i;
+            }
+            for (int i = 1; i <= nMinusK; i++) {
+                nFactorialNeeded /= i;
+            }
+        }
+        return (nFactorialNeeded);
     }
 
     public static double [] quadraticSolve (double a, double b, double y) {
