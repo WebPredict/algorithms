@@ -154,11 +154,65 @@ public class MathUtils {
     }
 
     public static int  atoi (String asciiNum) {
-        return (0); // TODO
+        if (asciiNum == null || asciiNum.length() == 0)
+            throw new RuntimeException("atoi undefined for: " + asciiNum);
+
+        int total = 0;
+        boolean negate = false;
+        for (int i = 0; i < asciiNum.length(); i++) {
+            char c = asciiNum.charAt(i);
+            if (c >= '0' && c <= '9') {
+                 total += Math.pow(10, asciiNum.length() - (1 + i)) * -('0' - c);
+            }
+            else if (c == '-' && i == 0) {
+                negate = true;
+            }
+            else
+                throw new RuntimeException("atoi undefined for " + asciiNum);
+        }
+
+        return (negate ? -total : total);
     }
 
 
     public static String itoa (int num) {
-        return (null); // TODO
+        if (num == 0)
+            return ("0");
+
+        boolean negate = false;
+        if (num < 0) {
+            negate = true;
+            num =- num;
+        }
+        String ret = "";
+        while (num > 0) {
+
+            int remainder = num % 10;
+            ret = remainder + ret;
+            num /= 10;
+        }
+        return (negate ? "-" + ret : ret);
+    }
+
+    /**
+     * greatest common divisor
+     * @param num1
+     * @param num2
+     * @return    greatest common divisor
+     */
+    public static int gcd (int num1, int num2) {
+        if (num2 == 0)
+            return (num1);
+        return (gcd(num2, num1 % num2));
+    }
+
+    /**
+     * Least common multiple
+     * @param num1
+     * @param num2
+     * @return
+     */
+    public static int lcm (int num1, int num2) {
+         return (num1 * num2 / gcd(num1, num2));
     }
 }
