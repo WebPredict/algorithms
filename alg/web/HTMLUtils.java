@@ -11,75 +11,75 @@ import java.util.Stack;
  */
 public class HTMLUtils {
 
-    public static void    addParagraph (StringBuffer buf, String content) {
+    public static void    addParagraph (StringBuilder buf, String content) {
           buf.append("<p>" + content + "</p>\n");
     }
 
-    public static void      addRuby (StringBuffer buf, String content) {
+    public static void      addRuby (StringBuilder buf, String content) {
         buf.append("<% " + content + " %>\n");
     }
 
-    public static void      addLineBreak (StringBuffer buf) {
+    public static void      addLineBreak (StringBuilder buf) {
         buf.append("</br>\n");
     }
 
-    public static void      addRubyOutput (StringBuffer buf, String content) {
+    public static void      addRubyOutput (StringBuilder buf, String content) {
         buf.append("<%= " + content + " %>\n");
     }
 
-    public static void      addH1 (StringBuffer buf, String content) {
+    public static void      addH1 (StringBuilder buf, String content) {
         buf.append("<h1>" + content + "</h1>\n");
     }
 
-    public static void      addH2 (StringBuffer buf, String content) {
+    public static void      addH2 (StringBuilder buf, String content) {
         buf.append("<h2>" + content + "</h2>\n");
     }
 
-    public static void      addH3 (StringBuffer buf, String content) {
+    public static void      addH3 (StringBuilder buf, String content) {
         buf.append("<h3>" + content + "</h3>\n");
     }
 
-    public static void      addH1 (StringBuffer buf, String content, String style) {
+    public static void      addH1 (StringBuilder buf, String content, String style) {
         buf.append("<h1 style=\"" + style + "\">" + content + "</h1>\n");
     }
 
-    public static void      addH2 (StringBuffer buf, String content, String style) {
+    public static void      addH2 (StringBuilder buf, String content, String style) {
         buf.append("<h2 style=\"" + style + "\">" + content + "</h2>\n");
     }
 
-    public static void      addFormElement (StringBuffer buf, String fieldName, String fieldType) {
+    public static void      addFormElement (StringBuilder buf, String fieldName, String fieldType) {
         addFormElement(buf, fieldName, fieldType, null);
     }
 
-    public static void      addSubmitButton (StringBuffer buf, String fieldName, String fieldLabel) {
+    public static void      addSubmitButton (StringBuilder buf, String fieldName, String fieldLabel) {
 
         buf.append("<input class=\"btn btn-large btn-primary\" name=\"commit\" type=\"submit\" value=\"" + fieldLabel + "\" />\n");
     }
 
-    public static void      addForm (StringBuffer buf, String action) {
+    public static void      addForm (StringBuilder buf, String action) {
 
         buf.append("<form action=\"/" + action + "\" method=\"post\">\n");
     }
 
-    public static void      addRow (StringBuffer buf, String span, String offset) {
+    public static void      addRow (StringBuilder buf, String span, String offset) {
         buf.append("<div class=\"row\">\n");
         buf.append("\t<div class=\"" + span + "\" " + offset + "\">\n");
     }
 
-    public static void      closeRow (StringBuffer buf) {
+    public static void      closeRow (StringBuilder buf) {
         buf.append("\t</div>\n");
         buf.append("</div>\n");
     }
 
-    public static void		addDiv (StringBuffer buf, String divClass) {
+    public static void		addDiv (StringBuilder buf, String divClass) {
     	buf.append("<div class=\"" + divClass + "\">\n");
     }
     
-    public static void		closeDiv (StringBuffer buf) {
+    public static void		closeDiv (StringBuilder buf) {
     	buf.append("</div>\n");
     }
     
-    public static void      addFormElement (StringBuffer buf, String fieldName, String fieldType, String fieldLabel) {
+    public static void      addFormElement (StringBuilder buf, String fieldName, String fieldType, String fieldLabel) {
         buf.append("<label for=\"" + fieldName + "\">");
         if (fieldLabel != null)
             buf.append(fieldLabel);
@@ -101,7 +101,7 @@ public class HTMLUtils {
         }
     }
 
-    public static void      addFormElementDropdown (StringBuffer buf, String fieldName, String [] fieldValues, String fieldLabel) {
+    public static void      addFormElementDropdown (StringBuilder buf, String fieldName, String [] fieldValues, String fieldLabel) {
         buf.append("<label for=\"" + fieldName + "\">");
         if (fieldLabel != null)
             buf.append(fieldLabel);
@@ -114,7 +114,7 @@ public class HTMLUtils {
     }
 
     // renders a table where cell values are computed with a formula
-    public static void      addTable (StringBuffer buf, String fieldName, String [] colNames, String [] colValueFormulas) {
+    public static void      addTable (StringBuilder buf, String fieldName, String [] colNames, String [] colValueFormulas) {
         // TODO
     }
 

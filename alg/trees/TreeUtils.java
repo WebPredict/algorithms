@@ -208,7 +208,7 @@ public class TreeUtils {
 
     }
 
-    public static void printTreeLineByLine (BinaryNode root, StringBuffer buf) {
+    public static void printTreeLineByLine (BinaryNode root, StringBuilder buf) {
 
         LinkedList<BinaryNode> currentLine = new LinkedList<BinaryNode>();
         currentLine.add(root);

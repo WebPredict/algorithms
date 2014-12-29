@@ -44,7 +44,7 @@ public class MeanGen extends Generator {
     }
 
     public void generatePackageJson (String rootDir) throws Exception {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
 
         buf.append("{");
         StringUtils.addedQuoted(buf, "name", app.getName());

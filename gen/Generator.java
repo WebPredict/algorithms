@@ -45,7 +45,7 @@ public abstract class Generator {
 //        InputStream is = process.getInputStream();
 //        InputStreamReader isr = new InputStreamReader(is);
 //        BufferedReader br = new BufferedReader(isr);
-//        StringBuffer buf = new StringBuffer();
+//        StringBuilder buf = new StringBuilder();
 //
 //        String line;
 //        while ((line = br.readLine()) != null) {

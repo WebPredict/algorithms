@@ -60,7 +60,7 @@ public class RailsGen extends Generator {
          notify_admin.html.erb  send_password.html.erb ??
          */
 
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
 
         Model userModel = app.getUserModel();
         String  userModelName = userModel.getName();
@@ -74,7 +74,7 @@ public class RailsGen extends Generator {
         HTMLUtils.addParagraph(buf, "The " + WordUtils.capitalize(app.getTitle()) + " Team");
         FileUtils.write(buf, app.getWebAppDir() + "/app/views/" + userModelName + "_mailer/registration_confirmation.html.erb", true);
 
-        buf = new StringBuffer();
+        buf = new StringBuilder();
         HTMLUtils.addParagraph(buf, "<%= @name %> with email <%= @email %> has the following comment/question: <%= @comment %>.");
         HTMLUtils.addLineBreak(buf);
         HTMLUtils.addLineBreak(buf);
@@ -99,7 +99,7 @@ public class RailsGen extends Generator {
 
     public void generateHeader () throws Exception {
 
-    	StringBuffer buf = new StringBuffer();
+    	StringBuilder buf = new StringBuilder();
     	StringUtils.addLine(buf, "<div class=\"navbar navbar-inverse navbar-fixed-top\">");
     	StringUtils.addLine(buf, "<div class=\"navbar-inner\">");
     	StringUtils.addLine(buf, "<div class=\"container\">");
@@ -143,7 +143,7 @@ public class RailsGen extends Generator {
 
     	FileUtils.write(buf, app.getWebAppDir() + "/app/views/layouts/_header.html.erb", true);
 
-    	buf = new StringBuffer();
+    	buf = new StringBuilder();
 
     	HTMLUtils.addRubyOutput(buf, "render 'layouts/header'");
 
@@ -161,7 +161,7 @@ public class RailsGen extends Generator {
     }
 
     public void generateFooter () throws Exception {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         StringUtils.addLine(buf, "<footer class=\"footer\"> ");
         StringUtils.addLine(buf, "<small>");
 
@@ -179,7 +179,7 @@ public class RailsGen extends Generator {
     }
 
     public void generateAboutPage () throws Exception {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         HTMLUtils.addRuby(buf, "provide(:title, 'About')");
         HTMLUtils.addH1(buf, "About " + WordUtils.capitalize(app.getName()));
         HTMLUtils.addParagraph(buf, "This is the about section to be filled in.");
@@ -189,7 +189,7 @@ public class RailsGen extends Generator {
     }
 
     public void generateHelpPage () throws Exception {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         HTMLUtils.addRuby(buf, "provide(:title, 'Help')");
         HTMLUtils.addH1(buf, "Help for " + WordUtils.capitalize(app.getName()));
         HTMLUtils.addParagraph(buf, "This is the help item to be filled in.");
@@ -199,7 +199,7 @@ public class RailsGen extends Generator {
     }
 
     public void generateNewsPage () throws Exception {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         HTMLUtils.addRuby(buf, "provide(:title, 'News')");
         HTMLUtils.addH1(buf, "News about " + WordUtils.capitalize(app.getName()));
 
@@ -220,7 +220,7 @@ public class RailsGen extends Generator {
          * when logged in, default is a dashboard of some sort showing main model
          */
 
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
 
         if (app.getUserModel() != null) {
             HTMLUtils.addRuby(buf, "if signed_in?");
@@ -253,7 +253,7 @@ public class RailsGen extends Generator {
         FileUtils.write(buf, app.getWebAppDir() + "/app/views/static_pages/home.html.erb", true);
     }
 
-    public void generateTableFor(StringBuffer buf, Model model) {
+    public void generateTableFor(StringBuilder buf, Model model) {
         String pluralModelList = WordUtils.pluralize(model.getName());
 
         HTMLUtils.addRuby(buf, "if @" + pluralModelList + ".any?");
@@ -284,7 +284,7 @@ public class RailsGen extends Generator {
         Model userModel = app.getUserModel();
         String userModelName = userModel.getName();
 
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         HTMLUtils.addRuby(buf, "provide(:title, \"Sign in\")");
         HTMLUtils.addH1(buf, "Sign In");
         generateFormForStart(buf, "session");
@@ -302,12 +302,12 @@ public class RailsGen extends Generator {
         FileUtils.write(buf, app.getWebAppDir() + "/app/views/sessions/new.html.erb", true);
     }
 
-    private void generateFormForStart (StringBuffer buf, String modelName) {
+    private void generateFormForStart (StringBuilder buf, String modelName) {
         HTMLUtils.addRow(buf, "span6", "offset3");
         HTMLUtils.addRubyOutput(buf, "form_for(:" + modelName + ", url: " + WordUtils.pluralize(modelName) + "_path) do |f|");
     }
 
-    private void generateFormEnd (StringBuffer buf, String buttonText) {
+    private void generateFormEnd (StringBuilder buf, String buttonText) {
         HTMLUtils.addRubyOutput(buf, "f.submit \"" + buttonText + "\", class: \"btn btn-large btn-primary\" ");
         HTMLUtils.addRuby(buf, "end");
         HTMLUtils.closeRow(buf);
@@ -315,7 +315,7 @@ public class RailsGen extends Generator {
 
     public void generateContactPage () throws Exception {
 
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         HTMLUtils.addRuby(buf, "provide(:title, 'Contact')");
         HTMLUtils.addH1(buf, "Contact Us");
 
@@ -347,7 +347,7 @@ public class RailsGen extends Generator {
         String  name = userModel.getName();
         String  capName = WordUtils.capitalize(name);
 
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         StringUtils.addLine(buf, "module SessionsHelper");
         StringUtils.addLineBreak(buf);
         tabbed(buf, "def sign_in(" + name + ")");
@@ -407,7 +407,7 @@ public class RailsGen extends Generator {
 
 
     public void generateRoutes () throws Exception {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
 
         Model       userModel = app.getUserModel();
         String      pluralName = WordUtils.pluralize(userModel.getName());
@@ -468,7 +468,7 @@ public class RailsGen extends Generator {
     }
 
     public void generateApplicationHelper () throws Exception {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
 
         StringUtils.addLine(buf, "module ApplicationHelper ");
         StringUtils.addLineBreak(buf);
@@ -528,7 +528,7 @@ public class RailsGen extends Generator {
                 ArrayList<Field>    fields = model.getFields();
                 ArrayList<Rel>      rels = model.getRelationships();
 
-                StringBuffer buf = new StringBuffer();
+                StringBuilder buf = new StringBuilder();
                 StringUtils.addLine(buf, "class " + capName + " < ActiveRecord::Base");
                 String attrs = "attr_accessible ";
 
@@ -675,11 +675,11 @@ public class RailsGen extends Generator {
         }
     }
 
-    private void tabbed (StringBuffer buf, String content) {
+    private void tabbed (StringBuilder buf, String content) {
         StringUtils.addTabbedLine(buf, content);
     }
 
-    private void tabbed (StringBuffer buf, String content, int tabs) {
+    private void tabbed (StringBuilder buf, String content, int tabs) {
         StringUtils.addTabbedLine(buf, content, tabs);
     }
 
@@ -692,12 +692,12 @@ public class RailsGen extends Generator {
                 ArrayList<Field>    fields = model.getFields();
                 ArrayList<Rel>      rels = model.getRelationships();
 
-                StringBuffer buf = new StringBuffer();
+                StringBuilder buf = new StringBuilder();
 
                 ModelLayout modelLayout = app.getAppConfig().getComplexModelLayout();
 
                 
-                StringBuffer bodyContent = new StringBuffer();
+                StringBuilder bodyContent = new StringBuilder();
                 
                 if (app.getAppConfig().getLayout().equals(Layout.TWO_COL_THIN_LEFT)) {
                 	HTMLUtils.addDiv(buf, "container-fluid");
@@ -745,17 +745,17 @@ public class RailsGen extends Generator {
                  */
                 FileUtils.write(buf, app.getWebAppDir() + "/app/views/" + names + "/show.html.erb", true);
                 
-                buf = new StringBuffer();
+                buf = new StringBuilder();
 
                 FileUtils.write(buf, app.getWebAppDir() + "/app/views/" + names + "/_" + name + "_as_row.html.erb", true);
 
-                buf = new StringBuffer();
+                buf = new StringBuilder();
                 FileUtils.write(buf, app.getWebAppDir() + "/app/views/" + names + "/new.html.erb", true);
 
-                buf = new StringBuffer();
+                buf = new StringBuilder();
                 FileUtils.write(buf, app.getWebAppDir() + "/app/views/" + names + "/edit.html.erb", true);
 
-                buf = new StringBuffer();
+                buf = new StringBuilder();
                 generateTableFor(buf, model);
                 FileUtils.write(buf, app.getWebAppDir() + "/app/views/" + names + "/index.html.erb", true);
             }
@@ -766,7 +766,7 @@ public class RailsGen extends Generator {
     	return ("");// TODO
     }
     
-    protected void addMethod (StringBuffer buf, String name, String [] contentLines) {
+    protected void addMethod (StringBuilder buf, String name, String [] contentLines) {
         buf.append("\tdef " + name + "\n");
         if (contentLines != null) {
             for (String line : contentLines) {
@@ -776,7 +776,7 @@ public class RailsGen extends Generator {
         buf.append("\tend\n");
     }
 
-    protected void addMethodTabbed (StringBuffer buf, String name, String [] contentLines) {
+    protected void addMethodTabbed (StringBuilder buf, String name, String [] contentLines) {
         buf.append("\t\tdef " + name + "\n");
         if (contentLines != null) {
             for (String line : contentLines) {
@@ -786,7 +786,7 @@ public class RailsGen extends Generator {
         buf.append("\t\tend\n");
     }
 
-    protected void addMethod (StringBuffer buf, String name, List<String> contentLines) {
+    protected void addMethod (StringBuilder buf, String name, List<String> contentLines) {
         buf.append("\tdef " + name + "\n");
         if (contentLines != null) {
             for (String line : contentLines) {
@@ -805,7 +805,7 @@ public class RailsGen extends Generator {
                 String              names = WordUtils.pluralize(name);
                 ArrayList<Rel>      rels = model.getRelationships();
 
-                StringBuffer buf = new StringBuffer();
+                StringBuilder buf = new StringBuilder();
                 String  className = WordUtils.capitalizeAndJoin(names, "controller");
                 StringUtils.addLine(buf, "class " + className + " < ApplicationController");
                 tabbed(buf, "before_filter :signed_in_" + name + ", only: [:edit, :update, :destroy]");
@@ -878,7 +878,7 @@ public class RailsGen extends Generator {
 
             if (app.getAppConfig().isNeedsAuth()) {
 
-                StringBuffer buf = new StringBuffer();
+                StringBuilder buf = new StringBuilder();
                 StringUtils.addLine(buf, "class SessionsController < ApplicationController");
 
                 addMethod(buf, "new", new String[] {});
@@ -952,7 +952,7 @@ public class RailsGen extends Generator {
                 ArrayList<Field>    fields = model.getFields();
                 ArrayList<Rel>      rels = model.getRelationships();
 
-                StringBuffer buf = new StringBuffer();
+                StringBuilder buf = new StringBuilder();
 
                 String upperPluralName = WordUtils.pluralize(WordUtils.capitalize(name));
                 String className = "Create" + upperPluralName;

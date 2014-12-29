@@ -283,7 +283,7 @@ public class FileUtils {
         }
     }
 
-    public static void      write (StringBuffer buf, String file, boolean createSubdirsIfNeeded) throws Exception {
+    public static void      write (StringBuilder buf, String file, boolean createSubdirsIfNeeded) throws Exception {
         PrintWriter pw = null;
 
         try {

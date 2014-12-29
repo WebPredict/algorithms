@@ -200,7 +200,7 @@ public class StringUtils {
 
     // TODO: need a version of this for lines, not individual characters
     // TODO: optimize by detecting any initial similarities and end similarities in the strings/lines
-    public static void printDiff (StringBuffer buf, int [][] longest, String s1, String s2, int i, int j) {
+    public static void printDiff (StringBuilder buf, int [][] longest, String s1, String s2, int i, int j) {
         if (i > 0 && j > 0 && s1.charAt(i) == s2.charAt(j)) {
             printDiff(buf, longest, s1, s2, i - 1, j - 1);
             buf.append("  " + s1.charAt(i));
@@ -217,7 +217,7 @@ public class StringUtils {
 //            buf.append(""); // pointless?
     }
 
-    public static void addedQuoted (StringBuffer buf, String prop, String val) {
+    public static void addedQuoted (StringBuilder buf, String prop, String val) {
         buf.append("\"" + prop + "\"\t:\"" + safe(val) + "\"\n");
     }
 
@@ -226,19 +226,19 @@ public class StringUtils {
         return s == null ? "" : s;
     }
 
-    public static void addLine (StringBuffer buf, String text) {
+    public static void addLine (StringBuilder buf, String text) {
         buf.append(text + "\n");
     }
 
-    public static void addTabbedLine (StringBuffer buf, String text) {
+    public static void addTabbedLine (StringBuilder buf, String text) {
         buf.append("\t" + text + "\n");
     }
 
-    public static void addLineBreak (StringBuffer buf) {
+    public static void addLineBreak (StringBuilder buf) {
         buf.append("\n");
     }
 
-    public static void addTabbedLine (StringBuffer buf, String text, int tabs) {
+    public static void addTabbedLine (StringBuilder buf, String text, int tabs) {
         for (int i = 0; i < tabs; i++) {
             buf.append("\t");
         }
