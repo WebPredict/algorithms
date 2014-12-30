@@ -13,6 +13,7 @@ public class DataStructureVisualizationUtils {
      * pretty print tree
      * layout graph
      *
+     * pretty print sets, arrays, graphs, component diagrams, etc.
      * layout components for web app based on data model
      *
      * generate UML diagram from data model

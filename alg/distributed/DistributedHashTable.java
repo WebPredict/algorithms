@@ -18,4 +18,6 @@ public class DistributedHashTable<K, V> {
     }
 
     // TODO: how to indicate how this is distributed across machines, and across which machines?
+
+    // Error detection, failover, etc.
 }

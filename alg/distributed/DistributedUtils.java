@@ -8,4 +8,6 @@ package alg.distributed;
  * To change this template use File | Settings | File Templates.
  */
 public class DistributedUtils {
+
+    // Utils for breaking up a problem across machines, then commbining results... Map/Reduce?
 }

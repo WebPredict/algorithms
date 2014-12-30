@@ -25,4 +25,12 @@ public class Crossword {
     }
 
 
+    public void setDictionary (List<String> dictionary) {
+        this.dictionary = dictionary;
+    }
+
+    public void generate () {
+        // TODO
+    }
+
 }

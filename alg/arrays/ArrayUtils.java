@@ -2,10 +2,7 @@ package alg.arrays;
 
 import alg.misc.MiscUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -102,10 +99,51 @@ public class ArrayUtils {
     }
 
     public static List<Interval>    merge(List<Interval> intervalList) {
-        // sort intervals by start time
-        // then merge overlaps
+        if (intervalList == null)
+            return (null);
 
-        return (null); // TODO
+        // sort intervals by start time
+        Collections.sort(intervalList, new Comparator<Interval>() {
+
+            public int compare (Interval first, Interval second) {
+                if (first.start < second.start)
+                    return (-1);
+                else if (first.start == second.start)
+                    return (0);
+                else
+                    return (1);
+            }
+        });
+
+        ArrayList<Interval> merged = new ArrayList<Interval>();
+        // then merge overlaps
+        for (int i = 0; i < intervalList.size(); i++) {
+
+            Interval interval = intervalList.get(i);
+            int next = i + 1;
+            while (next < intervalList.size()) {
+
+                Interval nextInterval = intervalList.get(next);
+                if (nextInterval.start >= interval.start && nextInterval.start <= interval.end) {
+                     // they overlap.
+                    // could be: completely contained, or actually overlapping:
+                    if (nextInterval.end <= interval.end) {
+                        // we don't need this one
+                        //i++;
+                    }
+                    else {
+                        interval =  new Interval(interval.start, nextInterval.end);
+                    }
+                }
+                else {
+                    merged.add(interval);
+                    break;
+                }
+                next++;
+            }
+        }
+
+        return (merged);
     }
 
     public static int median (List<Integer> list) {
