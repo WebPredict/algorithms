@@ -30,6 +30,24 @@ public class App {
     private Model   frontPageSearchModel;
     private Model   frontPageListModel;
     private String  title;
+    private SidebarContent  leftSidebarContent;
+    private SidebarContent  rightSidebarContent;
+
+    public SidebarContent getLeftSidebarContent() {
+        return leftSidebarContent;
+    }
+
+    public void setLeftSidebarContent(SidebarContent leftSidebarContent) {
+        this.leftSidebarContent = leftSidebarContent;
+    }
+
+    public SidebarContent getRightSidebarContent() {
+        return rightSidebarContent;
+    }
+
+    public void setRightSidebarContent(SidebarContent rightSidebarContent) {
+        this.rightSidebarContent = rightSidebarContent;
+    }
 
     public String getTitle() {
         return title == null ? name : title;

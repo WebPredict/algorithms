@@ -83,7 +83,7 @@ public class RailsGen extends Generator {
     }
 
     public void generateImageUploaders () throws Exception {
-
+        // Hmm carrierwave or paperclip?
     }
 
     public void generateStaticPages () throws Exception {
@@ -169,6 +169,8 @@ public class RailsGen extends Generator {
         StringUtils.addLine(buf, "<a href=\"http://" + siteName + ".com\">@ 2015 " + siteName + ".com. All Rights Reserved.</a>");
         StringUtils.addLine(buf, "<nav>");
         StringUtils.addLine(buf, "<ul>");
+
+        // TODO make configurable list of footer items
         StringUtils.addLine(buf, "<li><%= link_to \"About\", about_path %></li>");
         StringUtils.addLine(buf, "<li><%= link_to \"Contact\", contact_path %></li>");
         StringUtils.addLine(buf, "<li><%= link_to \"News\", news_path %></li>");
@@ -182,6 +184,8 @@ public class RailsGen extends Generator {
         StringBuilder buf = new StringBuilder();
         HTMLUtils.addRuby(buf, "provide(:title, 'About')");
         HTMLUtils.addH1(buf, "About " + WordUtils.capitalize(app.getName()));
+
+        // TODO make configurable
         HTMLUtils.addParagraph(buf, "This is the about section to be filled in.");
         HTMLUtils.addParagraph(buf, "This is the about section second paragraph to be filled in.");
 
@@ -192,6 +196,8 @@ public class RailsGen extends Generator {
         StringBuilder buf = new StringBuilder();
         HTMLUtils.addRuby(buf, "provide(:title, 'Help')");
         HTMLUtils.addH1(buf, "Help for " + WordUtils.capitalize(app.getName()));
+
+        // TODO make configurable
         HTMLUtils.addParagraph(buf, "This is the help item to be filled in.");
         HTMLUtils.addParagraph(buf, "This is the second help item to be filled in.");
 
@@ -687,85 +693,204 @@ public class RailsGen extends Generator {
         ArrayList<Model>  models = app.getModels();
         if (models != null) {
             for (Model model : models) {
-                String name = model.getName();
-                String names = WordUtils.pluralize(name);
-                ArrayList<Field>    fields = model.getFields();
-                ArrayList<Rel>      rels = model.getRelationships();
-
-                StringBuilder buf = new StringBuilder();
-
-                ModelLayout modelLayout = app.getAppConfig().getComplexModelLayout();
-
-                
-                StringBuilder bodyContent = new StringBuilder();
-                
-                if (app.getAppConfig().getLayout().equals(Layout.TWO_COL_THIN_LEFT)) {
-                	HTMLUtils.addDiv(buf, "container-fluid");
-                	HTMLUtils.addDiv(buf, "row-fluid");
-                	HTMLUtils.addDiv(buf, "span2");
-                	buf.append(getSidebarContent(model));
-                	HTMLUtils.closeDiv(buf);
-                	
-                	HTMLUtils.addDiv(buf, "span10");
-                	buf.append(bodyContent);
-                	HTMLUtils.closeDiv(buf);
-                	HTMLUtils.closeDiv(buf);
-                	HTMLUtils.closeDiv(buf);                	
-                }
-             
-                // have it configurable, and/or determined by # of collections ( > 2 means tabs)
-
-                /**
-                 * in app/views, show.html.erb example:
-                 * <%- model_class = Contact -%>
-                 <div class="page-header">
-                 <h1><%=t '.title', :default => model_class.model_name.human.titleize %></h1>
-                 </div>
-
-                 <dl class="dl-horizontal">
-                 <dt><strong><%= model_class.human_attribute_name(:name) %>:</strong></dt>
-                 <dd><%= @contact.name %></dd>
-                 <dt><strong><%= model_class.human_attribute_name(:phone) %>:</strong></dt>
-                 <dd><%= @contact.phone %></dd>
-                 </dl>
-
-                 <div class="form-actions">
-                 <%= link_to t('.back', :default => t("helpers.links.back")),
-                 contacts_path, :class => 'btn'  %>
-                 <%= link_to t('.edit', :default => t("helpers.links.edit")),
-                 edit_contact_path(@contact), :class => 'btn' %>
-                 <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
-                 contact_path(@contact),
-                 :method => 'delete',
-                 :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
-                 :class => 'btn btn-danger' %>
-                 </div>
-
-                 *
-                 */
-                FileUtils.write(buf, app.getWebAppDir() + "/app/views/" + names + "/show.html.erb", true);
-                
-                buf = new StringBuilder();
-
-                FileUtils.write(buf, app.getWebAppDir() + "/app/views/" + names + "/_" + name + "_as_row.html.erb", true);
-
-                buf = new StringBuilder();
-                FileUtils.write(buf, app.getWebAppDir() + "/app/views/" + names + "/new.html.erb", true);
-
-                buf = new StringBuilder();
-                FileUtils.write(buf, app.getWebAppDir() + "/app/views/" + names + "/edit.html.erb", true);
-
-                buf = new StringBuilder();
-                generateTableFor(buf, model);
-                FileUtils.write(buf, app.getWebAppDir() + "/app/views/" + names + "/index.html.erb", true);
+                generateShowView(model);
+                generateListView(model);
+                generateEditView(model);
             }
         }
     }
 
-    protected String	getSidebarContent (Model m) {
+    public void generateShowView (Model model) throws Exception {
+
+        String name = model.getName();
+        String names = WordUtils.pluralize(name);
+        ArrayList<Field>    fields = model.getFields();
+        ArrayList<Rel>      rels = model.getRelationships();
+
+        StringBuilder buf = new StringBuilder();
+
+        ModelLayout modelLayout = app.getAppConfig().getComplexModelLayout();
+
+        StringBuilder bodyContent = new StringBuilder();
+
+        Layout layout = app.getAppConfig().getLayout();
+
+        if (layout == null)
+            layout = Layout.ONE_COL;
+
+        switch (layout) {
+            case TWO_COL_THIN_LEFT: {
+                String left = inDiv(getLeftSidebarContent(model), "span2");
+                String body = inDiv(bodyContent.toString(), "span10");
+                buf.append(inDiv(inDiv(left + body, "row-fluid"), "container-fluid"));
+            }
+            break;
+
+            case ONE_COL: {
+                String body = inDiv(bodyContent.toString(), "span10"); // TODO
+                buf.append(inDiv(inDiv(body, "row-fluid"), "container-fluid"));
+            }
+            break;
+
+            case ONE_COL_FIXED_WIDTH: {
+                String body = inDiv(bodyContent.toString(), "span10");
+                buf.append(inDiv(inDiv(body, "row-fluid"), "container-fluid"));
+            }
+            break;
+
+            case TWO_COL_THIN_RIGHT: {
+                String right = inDiv(getRightSidebarContent(model), "span2");
+                String body = inDiv(bodyContent.toString(), "span10");
+                buf.append(inDiv(inDiv(body + right, "row-fluid"), "container-fluid"));
+            }
+            break;
+
+            case THREE_COL: {
+                String left = inDiv(getRightSidebarContent(model), "span2");
+                String body = inDiv(bodyContent.toString(), "span8");
+                String right = inDiv(getRightSidebarContent(model), "span2");
+                buf.append(inDiv(inDiv(left + body + right, "row-fluid"), "container-fluid"));
+            }
+            break;
+        }
+
+        FileUtils.write(buf, app.getWebAppDir() + "/app/views/" + names + "/show.html.erb", true);
+    }
+
+    public void generateListView (Model model) throws Exception {
+
+        String name = model.getName();
+        String names = WordUtils.pluralize(name);
+        ArrayList<Field>    fields = model.getFields();
+        ArrayList<Rel>      rels = model.getRelationships();
+
+        StringBuilder buf = new StringBuilder();
+
+        ModelLayout modelLayout = app.getAppConfig().getComplexModelLayout();
+
+        StringBuilder bodyContent = new StringBuilder();
+
+        switch (app.getAppConfig().getLayout()) {
+            case TWO_COL_THIN_LEFT: {
+                String left = inDiv(getLeftSidebarContent(model), "span2");
+                String body = inDiv(bodyContent.toString(), "span10");
+                buf.append(inDiv(inDiv(left + body, "row-fluid"), "container-fluid"));
+            }
+            break;
+
+            case ONE_COL: {
+                String body = inDiv(bodyContent.toString(), "span10"); // TODO
+                buf.append(inDiv(inDiv(body, "row-fluid"), "container-fluid"));
+            }
+            break;
+
+            case ONE_COL_FIXED_WIDTH: {
+                String body = inDiv(bodyContent.toString(), "span10");
+                buf.append(inDiv(inDiv(body, "row-fluid"), "container-fluid"));
+            }
+            break;
+
+            case TWO_COL_THIN_RIGHT: {
+                String right = inDiv(getRightSidebarContent(model), "span2");
+                String body = inDiv(bodyContent.toString(), "span10");
+                buf.append(inDiv(inDiv(body + right, "row-fluid"), "container-fluid"));
+            }
+            break;
+
+            case THREE_COL: {
+                String left = inDiv(getRightSidebarContent(model), "span2");
+                String body = inDiv(bodyContent.toString(), "span8");
+                String right = inDiv(getRightSidebarContent(model), "span2");
+                buf.append(inDiv(inDiv(left + body + right, "row-fluid"), "container-fluid"));
+            }
+            break;
+        }
+
+        FileUtils.write(buf, app.getWebAppDir() + "/app/views/" + names + "/_" + name + "_as_row.html.erb", true);
+
+        buf = new StringBuilder();
+        generateTableFor(buf, model);
+        FileUtils.write(buf, app.getWebAppDir() + "/app/views/" + names + "/index.html.erb", true);
+
+    }
+
+    public void generateEditView (Model model) throws Exception {
+
+        String name = model.getName();
+        String names = WordUtils.pluralize(name);
+        ArrayList<Field>    fields = model.getFields();
+        ArrayList<Rel>      rels = model.getRelationships();
+
+        StringBuilder buf = new StringBuilder();
+
+        ModelLayout modelLayout = app.getAppConfig().getComplexModelLayout();
+
+        StringBuilder bodyContent = new StringBuilder();
+
+        switch (app.getAppConfig().getLayout()) {
+            case TWO_COL_THIN_LEFT: {
+                String left = inDiv(getLeftSidebarContent(model), "span2");
+                String body = inDiv(bodyContent.toString(), "span10");
+                buf.append(inDiv(inDiv(left + body, "row-fluid"), "container-fluid"));
+            }
+            break;
+
+            case ONE_COL: {
+                String body = inDiv(bodyContent.toString(), "span10"); // TODO
+                buf.append(inDiv(inDiv(body, "row-fluid"), "container-fluid"));
+            }
+            break;
+
+            case ONE_COL_FIXED_WIDTH: {
+                String body = inDiv(bodyContent.toString(), "span10");
+                buf.append(inDiv(inDiv(body, "row-fluid"), "container-fluid"));
+            }
+            break;
+
+            case TWO_COL_THIN_RIGHT: {
+                String right = inDiv(getRightSidebarContent(model), "span2");
+                String body = inDiv(bodyContent.toString(), "span10");
+                buf.append(inDiv(inDiv(body + right, "row-fluid"), "container-fluid"));
+            }
+            break;
+
+            case THREE_COL: {
+                String left = inDiv(getRightSidebarContent(model), "span2");
+                String body = inDiv(bodyContent.toString(), "span8");
+                String right = inDiv(getRightSidebarContent(model), "span2");
+                buf.append(inDiv(inDiv(left + body + right, "row-fluid"), "container-fluid"));
+            }
+            break;
+        }
+
+        FileUtils.write(buf, app.getWebAppDir() + "/app/views/" + names + "/new.html.erb", true);
+
+       // buf = new StringBuilder();
+        FileUtils.write(buf, app.getWebAppDir() + "/app/views/" + names + "/edit.html.erb", true);
+    }
+
+    public static String inDiv (String content, String divClass) {
+        content = "<" + divClass + ">\n\t" + content + "</" + divClass + ">\n";
+
+        return (content);
+    }
+
+    protected String	getLeftSidebarContent (Model m) {
+
+        // Hmm what is this typically? either an expandable tree of some sort, or a vertical list of options
+
+        // Make it configurable in the app
     	return ("");// TODO
     }
-    
+
+    protected String	getRightSidebarContent (Model m) {
+
+        // Hmm what is this typically? often ad space
+
+        // Make it configurable in the app
+        return ("");// TODO
+    }
+
     protected void addMethod (StringBuilder buf, String name, String [] contentLines) {
         buf.append("\tdef " + name + "\n");
         if (contentLines != null) {
@@ -1031,7 +1156,7 @@ public class RailsGen extends Generator {
         /**
          * run: rails new 'app name'
          */
-    	boolean windows = false;
+    	boolean windows = true;
     	String 	railsCmd = windows ? "C:/RailsInstaller/Ruby2.1.0/bin/rails.bat" : "rails";
     	
         String result = runCommand(app.getRootDir(), railsCmd, "new", app.getName());

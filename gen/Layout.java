@@ -9,6 +9,7 @@ package gen;
  */
 public enum Layout {
     ONE_COL,
+    ONE_COL_FIXED_WIDTH,
     TWO_COL_THIN_LEFT,
     TWO_COL_THIN_RIGHT,
     TWO_COL_EVEN,

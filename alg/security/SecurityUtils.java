@@ -9,7 +9,24 @@ package alg.security;
  */
 public class SecurityUtils {
 
-    public static String    shaHash (String s) {
-           return (null);
+    public static String    sha1Hash (String s) {
+        return (null);  // TODO
+    }
+
+    public static String    md5Hash (String s) {
+        return (null); // TODO
+    }
+
+    public static byte []   encode (String original, String publicKey, String privateKey) {
+        return (null); // TODO
+    }
+
+
+    public static String    decode (byte [] encoded, String publicKey, String privateKey) {
+        return (null); // TODO
+    }
+
+    public static String    salt (String password) {
+        return (null); // TODO
     }
 }

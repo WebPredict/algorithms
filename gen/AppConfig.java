@@ -9,7 +9,7 @@ package gen;
  */
 public class AppConfig {
 
-    private Layout layout;
+    private Layout layout = Layout.ONE_COL;
     private String title;
     private String color1;
     private String color2;
