@@ -17,6 +17,7 @@ public class App {
     private TechnologyStack technologyStack;
     private String rootDir;
     private boolean generateCRUDByDefault = true;
+    private boolean needsAddressModel = false;
     private String name;
     private ArrayList<Model> models = new ArrayList<Model>();
     private ArrayList<Model> topLevelModels = new ArrayList<Model>();
@@ -32,6 +33,15 @@ public class App {
     private String  title;
     private SidebarContent  leftSidebarContent;
     private SidebarContent  rightSidebarContent;
+    private ArrayList<Blurb>    newsBlurbs = new ArrayList<Blurb>();
+
+    public boolean isNeedsAddressModel() {
+        return needsAddressModel;
+    }
+
+    public void setNeedsAddressModel(boolean needsAddressModel) {
+        this.needsAddressModel = needsAddressModel;
+    }
 
     public SidebarContent getLeftSidebarContent() {
         return leftSidebarContent;
@@ -81,9 +91,7 @@ public class App {
         this.frontPageListModel = frontPageListModel;
     }
 
-    private ArrayList<Blurb>    newsBlurbs = new ArrayList<Blurb>();
-
-    public ArrayList<Blurb> getNewsBlurbs() {
+   public ArrayList<Blurb> getNewsBlurbs() {
         return newsBlurbs;
     }
 
@@ -105,6 +113,15 @@ public class App {
             List<String> modelErrors = model.doPreprocessing(this);
             if (modelErrors != null)
                 errors.addAll(modelErrors);
+        }
+
+        if (errors.isEmpty()) {
+            if (needsAddressModel) {
+                Model addressModel = Model.parseModel("address: adddressLine1, addressLine2, addressLine3, city, state, zip, country");
+                addressModel.setDependent(true);
+                errors.addAll(addressModel.doPreprocessing(this));
+                nameToModelMap.put(addressModel.getName(), addressModel);
+            }
         }
         return (errors);
     }

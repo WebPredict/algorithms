@@ -707,11 +707,9 @@ public class RailsGen extends Generator {
         ArrayList<Field>    fields = model.getFields();
         ArrayList<Rel>      rels = model.getRelationships();
 
-        StringBuilder buf = new StringBuilder();
-
-        ModelLayout modelLayout = app.getAppConfig().getComplexModelLayout();
-
-        StringBuilder bodyContent = new StringBuilder();
+        StringBuilder       buf = new StringBuilder();
+        ModelLayout         modelLayout = app.getAppConfig().getComplexModelLayout();
+        StringBuilder       bodyContent = new StringBuilder();
 
         Layout layout = app.getAppConfig().getLayout();
 
@@ -754,7 +752,7 @@ public class RailsGen extends Generator {
             break;
         }
 
-        FileUtils.write(buf, app.getWebAppDir() + "/app/views/" + names + "/show.html.erb", true);
+        writeViewFile(buf, names, "show");
     }
 
     public void generateListView (Model model) throws Exception {
@@ -806,12 +804,16 @@ public class RailsGen extends Generator {
             break;
         }
 
-        FileUtils.write(buf, app.getWebAppDir() + "/app/views/" + names + "/_" + name + "_as_row.html.erb", true);
+        writeViewFile(buf, names, "_" + name + "_as_row");
 
         buf = new StringBuilder();
         generateTableFor(buf, model);
-        FileUtils.write(buf, app.getWebAppDir() + "/app/views/" + names + "/index.html.erb", true);
 
+        writeViewFile(buf, names, "index");
+    }
+
+    private void writeViewFile(StringBuilder buf, String subdir, String fileName) throws Exception {
+        FileUtils.write(buf, app.getWebAppDir() + "/app/views/" + subdir + "/" + fileName + ".html.erb", true);
     }
 
     public void generateEditView (Model model) throws Exception {
@@ -863,20 +865,24 @@ public class RailsGen extends Generator {
             break;
         }
 
-        FileUtils.write(buf, app.getWebAppDir() + "/app/views/" + names + "/new.html.erb", true);
+        writeViewFile(buf, names, "new");
 
-       // buf = new StringBuilder();
-        FileUtils.write(buf, app.getWebAppDir() + "/app/views/" + names + "/edit.html.erb", true);
+        writeViewFile(buf, names, "edit");
     }
 
     public static String inDiv (String content, String divClass) {
-        content = "<" + divClass + ">\n\t" + content + "</" + divClass + ">\n";
+        content = "<" + divClass + ">\n" + content + "</" + divClass + ">\n";
 
         return (content);
     }
 
     protected String	getLeftSidebarContent (Model m) {
 
+        SidebarContent content = app.getLeftSidebarContent();
+
+        if (content != null) {
+            // TODO
+        }
         // Hmm what is this typically? either an expandable tree of some sort, or a vertical list of options
 
         // Make it configurable in the app
@@ -884,7 +890,11 @@ public class RailsGen extends Generator {
     }
 
     protected String	getRightSidebarContent (Model m) {
+        SidebarContent content = app.getRightSidebarContent();
 
+        if (content != null) {
+            // TODO
+        }
         // Hmm what is this typically? often ad space
 
         // Make it configurable in the app

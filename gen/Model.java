@@ -19,16 +19,15 @@ public class Model extends Type {
     private boolean secure;  // can only be viewed when logged in when true, otherwise publicly viewable?
     private boolean email;
     private boolean URL;
+    private boolean dependent;
 
-//    private boolean publiclyViewable; // How does this relate to secure?
-//
-//    public boolean isPubliclyViewable() {
-//        return publiclyViewable;
-//    }
-//
-//    public void setPubliclyViewable(boolean publiclyViewable) {
-//        this.publiclyViewable = publiclyViewable;
-//    }
+    public boolean isDependent() {
+        return dependent;
+    }
+
+    public void setDependent(boolean dependent) {
+        this.dependent = dependent;
+    }
 
     private ArrayList<Field> imageFields = new ArrayList<Field>();
 
@@ -64,17 +63,21 @@ public class Model extends Type {
         boolean sawDisabled = false;
         for (int i = 0; i < fields.size(); i++) {
             Field f = fields.get(i);
-            if (f.getName().equals("password")) {
+            String fieldName = f.getName();
+            if (fieldName.equals("password")) {
                 secure = true;
             }
             else if (f.getTheType().getName().equals("image")) {
                 imageFields.add(f);
             }
-            else if (f.getName().equals("disabled")) {
+            else if (fieldName.equals("disabled")) {
                 sawDisabled = true;
             }
-            else if (f.getName().equals("password_confirmation")) {
+            else if (fieldName.equals("password_confirmation")) {
                 sawPWConf = true;
+            }
+            else if (fieldName.equals("address")) {
+                app.setNeedsAddressModel(true);
             }
         }
         if (secure && !sawPWConf) {
