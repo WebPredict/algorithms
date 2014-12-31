@@ -66,6 +66,8 @@ public class GraphicsUtils {
     }
 
     public Point2D []   smooth (Point2D [] line) {
+        // Ramer-Douglas-Peucker
+        // rectangular smooth
         return (line); // TODO
     }
 

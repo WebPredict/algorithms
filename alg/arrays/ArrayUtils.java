@@ -188,8 +188,6 @@ public class ArrayUtils {
      * @return
      */
     public static Integer majorityElement (int [] numbers) {
-        Integer ret = null;
-
         if (numbers != null) {
             int     threshhold = numbers.length / 2 + 1;
 
@@ -207,7 +205,7 @@ public class ArrayUtils {
                 numToCountMap.put(numbers[i], seen);
             }
         }
-        return (ret);
+        return (null);
     }
 
     /**
