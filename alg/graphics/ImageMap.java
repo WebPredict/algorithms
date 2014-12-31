@@ -164,4 +164,64 @@ public class ImageMap {
         }
         return (this);
     }
+
+    public ImageMap threshold (int threshhold) {
+
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                if (data[i][j] > threshhold)
+                    data[i][j] = threshhold;
+            }
+        }
+
+        return (this);
+    }
+
+    public int      getAverageColorAround (int i, int j) {
+
+        if (rows == 1 && cols == 1)
+            return (0);
+        else if (i >= rows || j >= cols)
+            throw new RuntimeException("out of range call to getAverageColorAround: " + i + ", " + j);
+
+        int total = 0;
+        int ctr = 0;
+        if (i - 1 > 0) {
+            if (j - 1 > 0) {
+                total += data [i - 1][j - 1];
+                ctr++;
+            }
+            total += data [i - 1][j];
+            ctr++;
+
+            if (j + 1 < cols) {
+                total += data [i - 1][j + 1];
+                ctr++;
+            }
+        }
+        if (j - 1 > 0) {
+            total += data [i][j - 1];
+            ctr++;
+        }
+        if (j + 1 < cols) {
+            total += data [i][j + 1];
+            ctr++;
+        }
+        if (i + 1 < rows) {
+            if (j - 1 > 0) {
+                total += data [i + 1][j - 1];
+                ctr++;
+            }
+            total += data [i + 1][j];
+            ctr++;
+
+            if (j + 1 < cols) {
+                total += data [i + 1][j + 1];
+                ctr++;
+            }
+        }
+
+        return (total / ctr);
+    }
+
 }
