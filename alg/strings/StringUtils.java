@@ -25,6 +25,25 @@ public class StringUtils {
         return (true);
     }
 
+    public static String repeat (char c, int num) {
+        char []     repeated = new char[num];
+        for (int i = 0; i < num; i++) {
+            repeated [i] = c;
+        }
+        return (new String(repeated));
+    }
+
+    public static String join (String [] lines) {
+        StringBuilder builder = new StringBuilder();
+
+        if (lines != null) {
+            for (int i = 0; i < lines.length; i++) {
+                builder.append(lines [i]);
+                builder.append("\n");
+            }
+        }
+        return (builder.toString());
+    }
 
     public static void reverseInPlace (char [] chars, int startIdx, int endIdxInclusive) {
         for (int i = 0; i < (endIdxInclusive - startIdx) / 2; i++) {

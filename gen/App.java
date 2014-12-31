@@ -119,7 +119,9 @@ public class App {
             if (needsAddressModel) {
                 Model addressModel = Model.parseModel("address: adddressLine1, addressLine2, addressLine3, city, state, zip, country");
                 addressModel.setDependent(true);
-                errors.addAll(addressModel.doPreprocessing(this));
+                List<String> addressModelErrors =  addressModel.doPreprocessing(this);
+                if (addressModelErrors != null)
+                    errors.addAll(addressModelErrors);
                 nameToModelMap.put(addressModel.getName(), addressModel);
             }
         }

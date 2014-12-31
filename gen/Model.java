@@ -89,9 +89,9 @@ public class Model extends Type {
 
         if (app.getAppConfig().isIncludeCreatedUpdatedBy()) {
             fields.add(new Field("createdBy", Type.SHORT_STRING));
-            fields.add(new Field("created", Type.DATETIME));
+            fields.add(new Field("createdAt", Type.DATETIME));
             fields.add(new Field("updatedBy", Type.SHORT_STRING));
-            fields.add(new Field("updated", Type.DATETIME));
+            fields.add(new Field("updatedAt", Type.DATETIME));
         }
 
         // TODO: make sure all references to models are existing models

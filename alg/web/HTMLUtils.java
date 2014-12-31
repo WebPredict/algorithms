@@ -130,61 +130,66 @@ public class HTMLUtils {
 
                 int unbalanced = unbalancedTags(line);
                 if (unbalanced > 0) {
+                    lines [i] = StringUtils.repeat(' ', indent) + lines [i];
                     indent += tabSize;
                 }
                 else if (unbalanced < 0) {
                     if (indent >= tabSize)
                         indent -= tabSize;
+                    lines [i] = StringUtils.repeat(' ', indent) + lines [i];
                 }
-
-                if (indent > 0)
-                    lines [i] = String.copyValueOf(new char [] {' '}, 0, indent) + lines [i];
+                else
+                    lines [i] = StringUtils.repeat(' ', indent) + lines [i];
 
             }
         }
-        return (content);
+
+        return (StringUtils.join(lines));
     }
 
     public static int   unbalancedTags (String line) {
         if (line == null || line.trim().equals(""))
             return (0);
 
+        int startTags = 0;
+        int endTags = 0;
         boolean startTag = false;
         boolean startedEndTag = false;
-        boolean needEndTag = false;
+       // boolean needEndTag = false;
         for (int i = 0; i < line.length(); i++) {
             char c = line.charAt(i);
             if (c == '<') {
-                if (i >= line.length() - 1 || line.charAt(i + 1) != '/')
-                    startTag = true;
-                else
-                    startedEndTag = true;
+                if (i < line.length() - 1 && line.charAt(i + 1) != '%') {
+                    if (i >= line.length() - 1 || line.charAt(i + 1) != '/')
+                        startTag = true;
+                    else
+                        startedEndTag = true;
+                }
             }
             else if (c == ' ') {
                 if (startTag) {
 
                     startTag = false;
-                    needEndTag = true;
+                    //needEndTag = true;
                 }
             }
             else if (c == '>') {
-                if (startTag) {
-                    startTag = false;
-                    needEndTag = true;
-                }
-                else if (needEndTag && startedEndTag) {
-                    startedEndTag = false;
-                    needEndTag = false;
+                if (i > 0 && line.charAt(i - 1) != '%') {
+                    if (startTag) {
+                        startTag = false;
+                        //needEndTag = true;
+                        startTags++;
+                    }
+                    else if (startedEndTag) {
+                        startedEndTag = false;
+                        //needEndTag = false;
+                        endTags++;
+                    }
                 }
             }
         }
-        if (!startTag && !startedEndTag)
-            return (0);
-        else if (needEndTag) {
-             return (1);
-        }
-        else
-            return (-1);
+
+        return (startTags - endTags);
     }
 
 }

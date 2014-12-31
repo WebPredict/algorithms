@@ -284,6 +284,10 @@ public class FileUtils {
     }
 
     public static void      write (StringBuilder buf, String file, boolean createSubdirsIfNeeded) throws Exception {
+        write(buf.toString(), file, createSubdirsIfNeeded);
+    }
+
+    public static void      write (String buf, String file, boolean createSubdirsIfNeeded) throws Exception {
         PrintWriter pw = null;
 
         try {

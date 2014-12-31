@@ -276,13 +276,71 @@ public class RailsGen extends Generator {
             for (Field f : fields) {
                 line += "<th><%= sortable \"" + f.getName() + "\", \"" + WordUtils.capitalizeAndSpace(f.getName()) + "\" %></th>";
             }
-            line += "</tr>";
+            line += "<th>Actions</th></tr>";
             StringUtils.addLine(buf, line);
         }
-        HTMLUtils.addRubyOutput(buf, "render @" + pluralModelList);
+        HTMLUtils.addRubyOutput(buf, "render @" + pluralModelList + "_rows");
 
         HTMLUtils.addRubyOutput(buf, "will_paginate @" + WordUtils.pluralize(model.getName()));
         HTMLUtils.addRuby(buf, "end");
+    }
+
+    public void generateTablePartial(StringBuilder buf, Model model) {
+        String pluralModelList = WordUtils.pluralize(model.getName());
+        String modelName = model.getName();
+
+        ArrayList<Field> fields = model.getFields();
+
+        if (fields != null) {
+            String line = "<tr>";
+
+            for (Field f : fields) {
+                String fieldName = f.getName();
+                Type    fType = f.getTheType();
+
+                if (fType.equals(Type.BOOLEAN))
+                    line += "<td><%= yesno(" + modelName + "." + fieldName + ") %></td>";
+                else if (fType.equals(Type.CURRENCY))
+                    line += "<td><%= number_to_currency(" + modelName + "." + fieldName + ", :unit => \"$\") %></td>";
+                else if (fType.equals(Type.PHOTO)) {
+                    StringBuilder imgBuilder = new StringBuilder("<td>");
+                    HTMLUtils.addRuby(imgBuilder, "if " + modelName + ".image_url.nil?"); // TODO remove hardcoding
+                    HTMLUtils.addRubyOutput(imgBuilder, "image_tag(\"ImagePlaceholderSmall.png\")");
+                    HTMLUtils.addRuby(imgBuilder, "else");
+                    HTMLUtils.addRubyOutput(imgBuilder, "image_tag(listing.image_url, :size => \"50x50\", :style => \"width: 50px; height: 50px\")");
+                    HTMLUtils.addRuby(imgBuilder, "end");
+                    imgBuilder.append("</td>");
+                }
+                else if (fType.equals(Type.URL))
+                    line += "<td><%= " + modelName + "." + fieldName + " %></td>";
+                else if (fieldName.equals("createdAt"))
+                    line += "<td><%= time_ago_in_words(" + modelName + "." + fieldName + ") %></td>";
+                else if (fieldName.equals("name"))
+                    line += "<td><%= link_to " + modelName + "." + fieldName + ", " + modelName + " %></td>";
+                else
+                    line += "<td><%= " + modelName + "." + fieldName + " %></td>";
+            }
+
+            StringUtils.addLine(buf, line);
+
+            // Actions:
+            StringUtils.addLine(buf, "<td>");
+            HTMLUtils.addRuby(buf, "if current_user?(" + modelName + ".user) || (current_user != nil && current_user.admin?)");
+            HTMLUtils.addRubyOutput(buf, "link_to \"edit\", edit_" + modelName + "_path(" + modelName + "), :class => 'btn btn-mini'");
+            HTMLUtils.addRuby(buf, "if " + modelName + ".disabled");
+            HTMLUtils.addRubyOutput(buf, "link_to \"enable\", enable_" + modelName + "_path(" + modelName + "), :class => 'btn btn-mini'");
+            HTMLUtils.addRuby(buf, "else");
+            HTMLUtils.addRubyOutput(buf, "link_to \"disable\", disable_" + modelName + "_path(" + modelName + "), :class => 'btn btn-mini'");
+            HTMLUtils.addRuby(buf, "end");
+            HTMLUtils.addRubyOutput(buf, "link_to \"delete\", " + modelName + ", :class => 'btn btn-mini btn-danger', method: :delete, " +
+             "confirm: \"You sure you want to delete this " + modelName + "?\"," +
+             "title: " + modelName + ".title");
+            HTMLUtils.addRuby(buf, "end");
+
+            StringUtils.addLine(buf, "</td>");
+            StringUtils.addLine(buf, "</tr>");
+
+        }
     }
 
     public void generateLoginSignupPages () throws Exception {
@@ -711,6 +769,22 @@ public class RailsGen extends Generator {
         ModelLayout         modelLayout = app.getAppConfig().getComplexModelLayout();
         StringBuilder       bodyContent = new StringBuilder();
 
+        if (fields != null) {
+            for (Field f : fields) {
+                String  fName = f.getName();
+                Type    fType = f.getTheType();
+
+                if (fName.equals("name")) {
+                    HTMLUtils.addH3(bodyContent, "<%= @" + name + "." + fName + " %>");
+                }
+                else {
+                    StringUtils.addLine(bodyContent, "<section><h4>" + WordUtils.capitalizeAndSpace(fName) + "</h4>");
+                    HTMLUtils.addRubyOutput(bodyContent, "@" + name + "." + fName);
+                    StringUtils.addLine(bodyContent, "</section>");
+                }
+            }
+        }
+
         Layout layout = app.getAppConfig().getLayout();
 
         if (layout == null)
@@ -767,6 +841,7 @@ public class RailsGen extends Generator {
         ModelLayout modelLayout = app.getAppConfig().getComplexModelLayout();
 
         StringBuilder bodyContent = new StringBuilder();
+        generateTableFor(bodyContent, model);
 
         switch (app.getAppConfig().getLayout()) {
             case TWO_COL_THIN_LEFT: {
@@ -804,16 +879,16 @@ public class RailsGen extends Generator {
             break;
         }
 
-        writeViewFile(buf, names, "_" + name + "_as_row");
+        writeViewFile(buf, names, "index");
 
         buf = new StringBuilder();
-        generateTableFor(buf, model);
-
-        writeViewFile(buf, names, "index");
+        generateTablePartial(buf, model);
+        writeViewFile(buf, names, "_" + name + "_rows");
     }
 
     private void writeViewFile(StringBuilder buf, String subdir, String fileName) throws Exception {
-        FileUtils.write(buf, app.getWebAppDir() + "/app/views/" + subdir + "/" + fileName + ".html.erb", true);
+
+        FileUtils.write(HTMLUtils.formatHTML(buf.toString(), 2), app.getWebAppDir() + "/app/views/" + subdir + "/" + fileName + ".html.erb", true);
     }
 
     public void generateEditView (Model model) throws Exception {
@@ -1145,15 +1220,17 @@ public class RailsGen extends Generator {
         // if using AWS for images:
         addGem(gemfileLines, "fog");
 
-        addGem(gemfileLines, "carrierwave");
+        //addGem(gemfileLines, "carrierwave")
+        addGem(gemfileLines, "actionmailer");
+        addGem(gemfileLines, "tabs_on_rails");
+        addGem(gemfileLines, "paperclip");
         addGem(gemfileLines, "twitter-bootstrap-rails");
         addGem(gemfileLines, "bcrypt-ruby", "3.0.0", false);
         addGem(gemfileLines, "will-paginate", "3.0.3", true);
         addGem(gemfileLines, "bootstrap-will-paginate", "0.0.6", true);
         addGem(gemfileLines, "faker", "1.0.1", true);
 
-        //String result = runCommand("dir.exe", app.getWebAppDir());
-
+        FileUtils.putLines(gemfileLines, app.getWebAppDir() + "/Gemfile");
         /**
          * TODO:
          * test data support
