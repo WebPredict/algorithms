@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 import alg.graph.Graph;
 import alg.queues.MinPriorityQueue;
-import alg.util.Vertex;
+import alg.graph.Vertex;
 
 /**
  * Created with IntelliJ IDEA.

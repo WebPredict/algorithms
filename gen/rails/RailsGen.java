@@ -44,6 +44,7 @@ public class RailsGen extends Generator {
                 generateLoginSignupPages();
 
             generateStaticPages();
+            generateSharedPages();
             generateHelperMethods();
             generateAssets();
             generateUpgrades();
@@ -95,6 +96,24 @@ public class RailsGen extends Generator {
         generateHelpPage();
         generateContactPage();
         generateNewsPage();
+    }
+
+    public void generateSharedPages () throws Exception {
+        StringBuilder buf = new StringBuilder();
+        HTMLUtils.addRuby(buf, "if object.errors.any?");
+        HTMLUtils.addDivId(buf, "error_explanation");
+        HTMLUtils.addDiv(buf, "alert alert-error");
+        StringUtils.addLine(buf, "Please correct the following <%= pluralize(object.errors.count, \"error\") %>.");
+        HTMLUtils.closeDiv(buf);
+        StringUtils.addLine(buf, "<ul>");
+        StringUtils.addLine(buf, "<% object.errors.full_messages.each do |msg| %>");
+        StringUtils.addLine(buf, "<li>* <%= msg %></li>");
+        StringUtils.addLine(buf, "<% end %>");
+        StringUtils.addLine(buf, "</ul>");
+        HTMLUtils.closeDiv(buf);
+        StringUtils.addLine(buf, "<% end %>");
+
+        writeViewFile(buf, "shared", "_error_messages");
     }
 
     public void generateHeader () throws Exception {
@@ -302,7 +321,7 @@ public class RailsGen extends Generator {
                     line += "<td><%= yesno(" + modelName + "." + fieldName + ") %></td>";
                 else if (fType.equals(Type.CURRENCY))
                     line += "<td><%= number_to_currency(" + modelName + "." + fieldName + ", :unit => \"$\") %></td>";
-                else if (fType.equals(Type.PHOTO)) {
+                else if (fType.equals(Type.IMAGE)) {
                     StringBuilder imgBuilder = new StringBuilder("<td>");
                     HTMLUtils.addRuby(imgBuilder, "if " + modelName + ".image_url.nil?"); // TODO remove hardcoding
                     HTMLUtils.addRubyOutput(imgBuilder, "image_tag(\"ImagePlaceholderSmall.png\")");
@@ -771,17 +790,28 @@ public class RailsGen extends Generator {
 
         if (fields != null) {
             for (Field f : fields) {
+
                 String  fName = f.getName();
                 Type    fType = f.getTheType();
 
+                if (fName.startsWith("password"))
+                    continue;
+
                 if (fName.equals("name")) {
                     HTMLUtils.addH3(bodyContent, "<%= @" + name + "." + fName + " %>");
+                }
+                else if (fType.getName().equals(Type.IMAGE.getName())) {
+                    StringUtils.addLine(bodyContent, "<section><h4>" + WordUtils.capitalizeAndSpace(fName) + "</h4>");
+                    rubyout(bodyContent, "image_for(@" + fName + ")");
+                    StringUtils.addLine(bodyContent, "</section>");
                 }
                 else {
                     StringUtils.addLine(bodyContent, "<section><h4>" + WordUtils.capitalizeAndSpace(fName) + "</h4>");
                     HTMLUtils.addRubyOutput(bodyContent, "@" + name + "." + fName);
                     StringUtils.addLine(bodyContent, "</section>");
                 }
+
+                StringUtils.addLineBreak(bodyContent);
             }
         }
 
@@ -898,12 +928,140 @@ public class RailsGen extends Generator {
         ArrayList<Field>    fields = model.getFields();
         ArrayList<Rel>      rels = model.getRelationships();
 
-        StringBuilder buf = new StringBuilder();
+        StringBuilder   buf = new StringBuilder();
 
-        ModelLayout modelLayout = app.getAppConfig().getComplexModelLayout();
+        ModelLayout     modelLayout = app.getAppConfig().getComplexModelLayout();
 
-        StringBuilder bodyContent = new StringBuilder();
+        StringBuilder   bodyContent = new StringBuilder();
 
+
+        if (fields != null) {
+
+             HTMLUtils.addRubyOutput(bodyContent, "form_for @" + name + ", :html => {:multipart => true} do |f|");
+             HTMLUtils.addRubyOutput(bodyContent, "render 'shared/error_messages', object: f.object");
+
+             for (Field f : fields) {
+                 String fName = f.getName();
+                 if (fName.equals("createdAt") || fName.equals("createdBy") || fName.equals("updatedAt") || fName.equals("updatedBy"))
+                     continue; // TODO don't hardcode this list here
+
+                 Type fType = f.getTheType();
+                 String capitalized = WordUtils.capitalizeAndSpace(fName);
+
+                 if (fType.equals(Type.BOOLEAN)) {
+                    StringUtils.addLine(bodyContent, "<label class=\"checkbox line\">");
+                    StringUtils.addLine(bodyContent, "<%= f.check_box :" + fName + "%>" + capitalized + "?");
+                    StringUtils.addLine(bodyContent, "</label></br>"); // TODO change so we don't have to use line breaks
+                 }
+                 else if (fType.equals(Type.SHORT_STRING)) {
+                     HTMLUtils.addRubyOutput(bodyContent, "f.label :" + fName);
+                     HTMLUtils.addRubyOutput(bodyContent, "f.text_field :" + fName);
+                 }
+                 else if (fType.equals(Type.LONG_STRING)) {
+                     HTMLUtils.addRubyOutput(bodyContent, "f.label :" + fName);
+                     HTMLUtils.addRubyOutput(bodyContent, "f.text_area :" + fName + ", :rows => \"5\"");
+                 }
+                 else if (fType.equals(Type.STRING)) {
+                     HTMLUtils.addRubyOutput(bodyContent, "f.label :" + fName);
+                     HTMLUtils.addRubyOutput(bodyContent, "f.text_field :" + fName);
+                 }
+                 else if (fType.equals(Type.IMAGE)) {
+                     rubyout(bodyContent, "f.label :" + fName + ", \"Your " + WordUtils.capitalize(fName) + " Image\"");
+                     rubyout(bodyContent, "image_for(@" + fName + ")");
+                     HTMLUtils.addDiv(bodyContent, "fileUpload btn");
+                     aline(bodyContent, "<span>Change Image</span>");
+                     rubyout(bodyContent, "f.file_field :" + fName + " :class => \"upload\"");
+                     HTMLUtils.closeDiv(bodyContent);
+                 }
+                 else if (fType.equals(Type.PHONE)) {
+                     HTMLUtils.addRubyOutput(bodyContent, "f.label :" + fName);
+                     HTMLUtils.addRubyOutput(bodyContent, "f.phone_field :" + fName);
+                 }
+                 else if (fType.equals(Type.CURRENCY)) {
+                     HTMLUtils.addRubyOutput(bodyContent, "f.label :" + fName);
+                     HTMLUtils.addRubyOutput(bodyContent, "f.text_field :" + fName); // TODO: currency symbol?
+                 }
+                 else if (fType instanceof FixedList) {
+
+                     FixedList fl = (FixedList)fType;
+                     Object []  values = fl.getValues();
+
+                     HTMLUtils.addRubyOutput(bodyContent, "f.label :" + fName);
+
+                     StringUtils.addLine(bodyContent, "<select name=\"" + name + "[" + fName + "]\" id=\"" + name + "_" + fName + "\" class=\"input-medium\">");
+                     StringUtils.addLine(bodyContent, "<%= options_for_select ([");
+
+                     if (values != null) {
+                         for (int i = 0; i < values.length; i++) {
+                             StringUtils.addLine(bodyContent, "\"" + values [i].toString() + "\"" + (i < values.length - 1 ? ", " : ""));
+                         }
+                     }
+                     StringUtils.addLine(bodyContent, "], selected: @" + name + "." + fName + ") %>");
+                     HTMLUtils.close(bodyContent, "select");
+                 }
+                 else if (fType instanceof Collection) {
+
+                     Collection col = (Collection)fType;
+                     String     colName = col.getName();
+                     boolean    isOrdered = col.isOrdered();
+                     Type       subType = col.getSubtype();
+                     String     subTypeName = subType.getName();
+
+                     if (colName.equals(Type.SET_PICK_ONE.getName())) {
+                         aline(bodyContent, "<label>" + capitalized + "</label>");
+                         aline(bodyContent, "<select id=\"" + name + "_" + fName + "\" name=\"" + name + "[" + fName + "]\" >");
+                         aline(bodyContent, "<%= options_from_collection_for_select(" + WordUtils.capitalize(subType.getName()) + ".all, :name, :name, @" + name + "." + fName + ") %>");
+                     }
+                     else if (colName.equals(Type.SET_ONE_OR_MORE.getName())) {
+                         aline(bodyContent, "<fieldset>");
+                         aline(bodyContent, "<legend>" + WordUtils.capitalizeAndSpace(subTypeName) + "</legend>");
+                         rubyout(bodyContent, "<%= hidden_field_tag \"" + name + "[" + subTypeName + "_ids][]\", nil %>");
+                         ruby(bodyContent, WordUtils.capitalize(subTypeName) + ".all.each do |" + subTypeName + "|");
+                         aline(bodyContent, "<label class=\"checkbox inline\">");
+                         rubyout(bodyContent, "check_box_tag \"" + name + "[" + subType.getName() + "_ids][]\", " +
+                                 subTypeName + ".id, @" + name + "." + subTypeName + "_ids.include?(" + subTypeName + ".id), id: dom_id(" + subTypeName + ")");
+                         rubyout(bodyContent, subType.getName() + ".name");
+                         aline(bodyContent, "</label>");
+                         ruby(bodyContent, "end");
+                         aline(bodyContent, "</fieldset>");
+                     }
+                 }
+                 else if (fType.equals(Type.FILE)) {
+                     rubyout(bodyContent, "f.label :" + fName + ", \"Your " + WordUtils.capitalize(fName) + " File\"");
+                     rubyout(bodyContent, "file_for(@" + fName + ")");         // TODO support for file_for
+                     HTMLUtils.addDiv(bodyContent, "fileUpload btn");
+                     aline(bodyContent, "<span>Change File</span>");
+                     rubyout(bodyContent, "f.file_field :" + fName + " :class => \"upload\"");
+                     HTMLUtils.closeDiv(bodyContent);
+                 }
+
+                 else if (fType.equals(Type.SET_PICK_ONE)) {
+                     /**
+                      * <div class="form-group">
+                      <div class="controls-row"
+                      <label class="radio inline">Weaned <%= f.radio_button :weened, true %> Unweaned <%= f.radio_button :weened, false %></label>
+                      </div>
+
+                      </div>
+
+                      */
+                 }
+                 else if (fType.equals(Type.PASSWORD)) {
+                     HTMLUtils.addRubyOutput(bodyContent, "f.label :" + fName);
+                     HTMLUtils.addRubyOutput(bodyContent, "f.password_field :" + fName);
+                 }
+                 else {
+                    HTMLUtils.addRubyOutput(bodyContent, "f.label :" + fName);
+                    HTMLUtils.addRubyOutput(bodyContent, "f.text_field :" + fName);
+                 }
+
+                 aline(bodyContent, "");
+             }
+            ruby(bodyContent, "end");
+        }
+
+
+        // TODO: these side sections should be moved to the application.html.erb layout page ?
         switch (app.getAppConfig().getLayout()) {
             case TWO_COL_THIN_LEFT: {
                 String left = inDiv(getLeftSidebarContent(model), "span2");
@@ -943,6 +1101,18 @@ public class RailsGen extends Generator {
         writeViewFile(buf, names, "new");
 
         writeViewFile(buf, names, "edit");
+    }
+
+    public static void  aline (StringBuilder builder, String content) {
+        StringUtils.addLine(builder, content);
+    }
+
+    public static void  rubyout (StringBuilder builder, String content) {
+        HTMLUtils.addRubyOutput(builder, content);
+    }
+
+    public static void  ruby (StringBuilder builder, String content) {
+        HTMLUtils.addRuby(builder, content);
     }
 
     public static String inDiv (String content, String divClass) {

@@ -170,6 +170,8 @@ public class Model extends Type {
                     f = new Field(details [0], Type.EMAIL);
                 else if (details [0].equals("phone"))
                     f = new Field(details [0], Type.PHONE);
+                else if (details [0].equals("password"))
+                    f = new Field(details [0], Type.PASSWORD);
                 else if (details [0].equals("url"))
                     f = new Field(details [0], Type.URL);
                 else if (details [0].equals("address"))

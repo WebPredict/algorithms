@@ -167,4 +167,9 @@ public class WordUtils {
     public static String	toEnglish (int value) {
     	return (null); // TODO
     }
+
+    public static int       numWords (String s) {
+        return (0); // TODO
+    }
+
 }

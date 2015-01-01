@@ -61,12 +61,11 @@ public class ArrayUtils {
         return (ret);
     }
 
-    // TODO: improve to hand extreme large numbers / overflow
     public int []           equilibriumIndices (int [] array) {
         if (array == null)
             return (null);
 
-        int [] reversePartialSums = new int[array.length];
+        long [] reversePartialSums = new long[array.length];
 
         for (int i = array.length - 1; i >= 0; i--) {
             if (i == array.length - 1)
@@ -76,7 +75,7 @@ public class ArrayUtils {
         }
 
         ArrayList<Integer> indices = new ArrayList<Integer>();
-        int partialSum = 0;
+        long partialSum = 0;
         for (int i = 0; i < array.length; i++) {
             partialSum += array [i];
             if (partialSum == reversePartialSums [i])

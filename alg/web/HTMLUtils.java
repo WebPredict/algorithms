@@ -61,6 +61,7 @@ public class HTMLUtils {
         buf.append("<form action=\"/" + action + "\" method=\"post\">\n");
     }
 
+    // These are bootstrap specific:
     public static void      addRow (StringBuilder buf, String span, String offset) {
         buf.append("<div class=\"row\">\n");
         buf.append("\t<div class=\"" + span + "\" " + offset + "\">\n");
@@ -74,11 +75,19 @@ public class HTMLUtils {
     public static void		addDiv (StringBuilder buf, String divClass) {
     	buf.append("<div class=\"" + divClass + "\">\n");
     }
-    
+
+    public static void		addDivId (StringBuilder buf, String divClass) {
+        buf.append("<div id=\"" + divClass + "\">\n");
+    }
+
     public static void		closeDiv (StringBuilder buf) {
     	buf.append("</div>\n");
     }
-    
+
+    public static void		close (StringBuilder buf, String elementName) {
+        buf.append("</" + elementName + ">\n");
+    }
+
     public static void      addFormElement (StringBuilder buf, String fieldName, String fieldType, String fieldLabel) {
         buf.append("<label for=\"" + fieldName + "\">");
         if (fieldLabel != null)
@@ -155,7 +164,7 @@ public class HTMLUtils {
         int endTags = 0;
         boolean startTag = false;
         boolean startedEndTag = false;
-       // boolean needEndTag = false;
+
         for (int i = 0; i < line.length(); i++) {
             char c = line.charAt(i);
             if (c == '<') {
@@ -167,22 +176,18 @@ public class HTMLUtils {
                 }
             }
             else if (c == ' ') {
-                if (startTag) {
-
-                    startTag = false;
-                    //needEndTag = true;
-                }
+//                if (startTag) {
+//                    startTag = false;
+//                }
             }
             else if (c == '>') {
                 if (i > 0 && line.charAt(i - 1) != '%') {
                     if (startTag) {
                         startTag = false;
-                        //needEndTag = true;
                         startTags++;
                     }
                     else if (startedEndTag) {
                         startedEndTag = false;
-                        //needEndTag = false;
                         endTags++;
                     }
                 }

@@ -2,7 +2,7 @@ package alg.routing;
 
 import java.util.Map;
 
-import alg.util.Vertex;
+import alg.graph.Vertex;
 
 public class PathInfo {
 

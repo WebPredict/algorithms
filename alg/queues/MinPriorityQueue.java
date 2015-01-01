@@ -17,4 +17,19 @@ public class MinPriorityQueue<T> implements Queue {
     public boolean isEmpty () {
     	return (false);
     }
+
+    @Override
+    public Object getFirst() {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void insert(Object value) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public Object peekFirst() {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
 }

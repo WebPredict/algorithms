@@ -25,10 +25,12 @@ public class Type {
     public static final Type EMAIL = new Type("email");
     public static final Type PHONE = new Type("phone");
     public static final Type ADDRESS = new Type("address");
-    public static final Type PHOTO = new Type("photo");
+    public static final Type IMAGE = new Type("image");
     public static final Type FILE = new Type("file");
     public static final Type URL = new Type("url");
-    public static final Type SET = new Type("set");
+    public static final Type SET_ONE_OR_MORE = new Type("set");
+    public static final Type SET_PICK_ONE = new Type("setpickone");
+    public static final Type PASSWORD = new Type("password");
     public static final Type RANGE = new Type("range");
     public static final Type LIST = new Type("list");
     public static final Type FIXED_LIST = new Type("fixed_list");
@@ -57,14 +59,16 @@ public class Type {
             return (CURRENCY);
         else if (name.equals(EMAIL.name))
             return (EMAIL);
+        else if (name.equals(PASSWORD.name))
+            return (PASSWORD);
         else if (name.equals(PHONE.name))
             return (PHONE);
         else if (name.equals(TIME.name))
             return (TIME);
         else if (name.equals(ADDRESS.name))
             return (ADDRESS);
-        else if (name.equals(PHOTO.name))
-            return (PHOTO);
+        else if (name.equals(IMAGE.name))
+            return (IMAGE);
         else if (name.equals(FILE.name))
             return (FILE);
         else if (name.equals(URL.name))
@@ -77,8 +81,12 @@ public class Type {
             FixedList type = new FixedList(name.substring(FIXED_LIST.getName().length()));
             return (type);
         }
-        else if (name.startsWith(SET.name)) {
-            Collection type = new Collection(SET.name, findByName(SET.name.substring(SET.getName().length())), false);
+        else if (name.startsWith(SET_ONE_OR_MORE.name)) {
+            Collection type = new Collection(SET_ONE_OR_MORE.name, findByName(SET_ONE_OR_MORE.name.substring(SET_ONE_OR_MORE.getName().length())), false);
+            return (type);
+        }
+        else if (name.startsWith(SET_PICK_ONE.name)) {
+            Collection type = new Collection(SET_PICK_ONE.name, findByName(SET_PICK_ONE.name.substring(SET_PICK_ONE.getName().length())), false);
             return (type);
         }
         else if (name.equals(CODE.name))
@@ -106,5 +114,9 @@ public class Type {
 
     public String toString () {
         return (name);
+    }
+
+    public Type     getSubtype () {
+        return (subtype);
     }
 }

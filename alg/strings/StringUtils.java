@@ -102,6 +102,7 @@ public class StringUtils {
             }
         }
         else {
+            throw new RuntimeException("Unimplemented for larger strings");
             // Use hash tables for lower memory usage
         }
 

@@ -190,6 +190,16 @@ public class TreeUtils {
         else return (Math.max(1 + height(treeRoot.getLeft()), 1 + height(treeRoot.getRight())));
     }
 
+    public static int   minHeight (BinaryNode treeRoot) {
+       if (treeRoot == null)
+           return (0);
+        BinaryNode left = treeRoot.getLeft();
+
+        BinaryNode right = treeRoot.getRight();
+
+        return (Math.min(minHeight(left) + 1, minHeight(right) + 1));
+    }
+
     public static void printTree (BinaryNode tree) {
 
         // simple row-by-row or nicely printed tree?
