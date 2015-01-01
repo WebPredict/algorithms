@@ -166,6 +166,8 @@ public class WordUtils {
          */
         StringBuilder builder = new StringBuilder();
 
+        // TODO: debug and simplify... isn't correct for last word, plus it adds space at end of each line
+        // Also needs to break up words if necessary
         int     curLineSize = 0;
         int     lastWordIdx = 0;
         for (int i = 0; i < words.size(); i++) {
