@@ -165,6 +165,7 @@ public class HTMLUtils {
         boolean startTag = false;
         boolean startedEndTag = false;
 
+        // TODO: finish, as this doesn't actually verify the start + end tag names match
         for (int i = 0; i < line.length(); i++) {
             char c = line.charAt(i);
             if (c == '<') {

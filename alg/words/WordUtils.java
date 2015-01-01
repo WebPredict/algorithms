@@ -155,7 +155,97 @@ public class WordUtils {
 
 
     public static List<String>  textJustification (List<String> words, int lineLength) {
-        return (null); // TODO
+        if (words == null)
+            return (null);
+
+        ArrayList<String> lines = new ArrayList<String>();
+
+        /**
+         * cases: words are often/always longer than lineLength? split big words I guess
+         *
+         */
+        StringBuilder builder = new StringBuilder();
+
+        int     curLineSize = 0;
+        int     lastWordIdx = 0;
+        for (int i = 0; i < words.size(); i++) {
+            String curWord = words.get(i);
+
+            int curWordLen = curWord.length();
+            if (i < words.size() - 1)
+                curWordLen += 1; // need a space
+            if (curWordLen + curLineSize < lineLength - 1) {
+                curLineSize += curWordLen;
+
+                if (i == words.size() - 1) {
+                    int numWords = i + 1 - lastWordIdx;
+                    int extraSpace = lineLength - curLineSize;
+                    float extraSpacePerWord =  (float)extraSpace / (float)numWords;
+                    float extraSpaceGiven = 0;
+                    // interesting case: how to evenly space out the extra space
+                    for (int j = lastWordIdx; j < i + 1; j++) {
+                        builder.append(words.get(j));
+                        builder.append(" "); // TODO compute right amount of space
+
+                        extraSpaceGiven += extraSpacePerWord;
+
+                        if (((int)extraSpaceGiven) > 0) {
+                            for (int k = 0; k < (int)extraSpaceGiven; k++) {
+                                builder.append(" ");
+                            }
+                            extraSpaceGiven -= (int)extraSpaceGiven;
+                        }
+                    }
+
+                    lines.add(builder.toString());
+                    builder = new StringBuilder();
+                    lastWordIdx = i - 1;
+                    curLineSize = 0;
+                }
+            }
+            else if (curWordLen + curLineSize == lineLength - 1) { // a perfect fit
+                // TODO: add all words to curLine with a single space
+                for (int j = lastWordIdx; j < i; j++) {
+                    builder.append(words.get(j));
+                    if (i < words.size() - 1)
+                        builder.append(" ");
+                }
+
+                lines.add(builder.toString());
+                builder = new StringBuilder();
+                lastWordIdx = i;
+                curLineSize = 0;
+            }
+            else {
+                int numWords = i - lastWordIdx;
+                int extraSpace = lineLength - curLineSize;
+                float extraSpacePerWord =  (float)extraSpace / (float)numWords;
+                float extraSpaceGiven = 0;
+                // interesting case: how to evenly space out the extra space
+                for (int j = lastWordIdx; j < i; j++) {
+                    builder.append(words.get(j));
+                    builder.append(" "); // TODO compute right amount of space
+
+                    extraSpaceGiven += extraSpacePerWord;
+
+                    if (((int)extraSpaceGiven) > 0) {
+                        for (int k = 0; k < (int)extraSpaceGiven; k++) {
+                            builder.append(" ");
+                        }
+                        extraSpaceGiven -= (int)extraSpaceGiven;
+                    }
+                }
+
+                lines.add(builder.toString());
+                builder = new StringBuilder();
+                //builder.append(words.get(i));
+                lastWordIdx = i;
+                curLineSize = words.get(i).length();
+            }
+
+        }
+
+        return (lines);
     }
 
     public static boolean isMatch (String s, String pattern) {
@@ -169,7 +259,30 @@ public class WordUtils {
     }
 
     public static int       numWords (String s) {
-        return (0); // TODO
+        if (s == null)
+            return (0);
+
+        boolean startedWord = false;
+        int     numWords = 0;
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+
+            if (c == ' ' || c == '\t') {
+                if (startedWord) {
+                    startedWord = false;
+                    numWords++;
+                }
+            }
+            else {
+                if (!startedWord)
+                    startedWord = true;
+            }
+
+        }
+        if (startedWord) {
+            numWords++;
+        }
+        return (numWords);
     }
 
 }
