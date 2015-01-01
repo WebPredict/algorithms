@@ -166,17 +166,26 @@ public class WordUtils {
          */
         StringBuilder builder = new StringBuilder();
 
-        // TODO: debug and simplify... isn't correct for last word, plus it adds space at end of each line
-        // Also needs to break up words if necessary
+        // TODO: debug and simplify... 
         int     curLineSize = 0;
         int     lastWordIdx = 0;
         for (int i = 0; i < words.size(); i++) {
             String curWord = words.get(i);
 
             int curWordLen = curWord.length();
-            if (i < words.size() - 1)
-                curWordLen += 1; // need a space
-            if (curWordLen + curLineSize < lineLength - 1) {
+            
+            if (curWordLen > lineLength) {
+            	String [] chunks = StringUtils.chunk(curWord, lineLength);
+            	words.set(i, chunks [0]);
+            	for (int k = 1; k < chunks.length; k++) {
+            		words.add(i + k, chunks [k]);
+            	}
+            }
+            if (i < words.size() - 1) {
+            	if (curWordLen + curLineSize < lineLength - 1)
+            		curWordLen += 1; // need a space if we're not about to fill the line
+            }
+            if (curWordLen + curLineSize < lineLength) {
                 curLineSize += curWordLen;
 
                 if (i == words.size() - 1) {
@@ -205,7 +214,7 @@ public class WordUtils {
                     curLineSize = 0;
                 }
             }
-            else if (curWordLen + curLineSize == lineLength - 1) { // a perfect fit
+            else if (curWordLen + curLineSize == lineLength) { // a perfect fit
                 // TODO: add all words to curLine with a single space
                 for (int j = lastWordIdx; j < i; j++) {
                     builder.append(words.get(j));
@@ -213,36 +222,47 @@ public class WordUtils {
                         builder.append(" ");
                 }
 
+                builder.append(words.get(i));
                 lines.add(builder.toString());
                 builder = new StringBuilder();
-                lastWordIdx = i;
+                lastWordIdx = i + 1;
                 curLineSize = 0;
             }
             else {
                 int numWords = i - lastWordIdx;
                 int extraSpace = lineLength - curLineSize;
-                float extraSpacePerWord =  (float)extraSpace / (float)numWords;
+                float extraSpacePerWord =  (float)extraSpace / (float)(numWords - 1);
                 float extraSpaceGiven = 0;
                 // interesting case: how to evenly space out the extra space
                 for (int j = lastWordIdx; j < i; j++) {
-                    builder.append(words.get(j));
-                    builder.append(" "); // TODO compute right amount of space
-
-                    extraSpaceGiven += extraSpacePerWord;
-
-                    if (((int)extraSpaceGiven) > 0) {
-                        for (int k = 0; k < (int)extraSpaceGiven; k++) {
-                            builder.append(" ");
-                        }
-                        extraSpaceGiven -= (int)extraSpaceGiven;
-                    }
+                	if (j == i - 1) {
+                		String spaces = StringUtils.repeat(' ', lineLength - (builder.toString().length() + words.get(j).length()));
+                		builder.append(spaces);
+                		builder.append(words.get(j));
+                	}
+                	else {
+	                    builder.append(words.get(j));
+	                    builder.append(" "); // TODO compute right amount of space
+	
+	                    extraSpaceGiven += extraSpacePerWord;
+	
+	                    if (((int)extraSpaceGiven) > 0) {
+	                        for (int k = 0; k < (int)extraSpaceGiven; k++) {
+	                            builder.append(" ");
+	                        }
+	                        extraSpaceGiven -= (int)extraSpaceGiven;
+	                    }
+                	}
                 }
 
                 lines.add(builder.toString());
                 builder = new StringBuilder();
-                //builder.append(words.get(i));
+                
+                if (i == words.size() - 1)
+                	lines.add(words.get(i));
+                
                 lastWordIdx = i;
-                curLineSize = words.get(i).length();
+                curLineSize = curWordLen == lineLength ? curWordLen : curWordLen + 1;
             }
 
         }

@@ -25,6 +25,24 @@ public class StringUtils {
         return (true);
     }
 
+    public static String [] chunk (String s, int size) {
+    	if (s == null)
+    		return (null);
+    	
+    	String [] ret = new String [(int)Math.ceil((double)s.length() / (double)size)];
+    	int startIdx = 0;
+    	int	idx = 0;
+    	while (true) {
+    		if (startIdx + size >= s.length()) {
+    			ret [idx] = s.substring(startIdx);
+    			break;
+    		}
+    		ret [idx++] = s.substring(startIdx, startIdx + size);
+    		startIdx += size;
+    	}
+    	return (ret);
+    }
+    
     public static String repeat (char c, int num) {
         char []     repeated = new char[num];
         for (int i = 0; i < num; i++) {

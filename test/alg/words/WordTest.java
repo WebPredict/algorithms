@@ -3,6 +3,7 @@ package test.alg.words;
 import alg.words.WordUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -25,9 +26,24 @@ public class WordTest {
         wordList.add("a");
         wordList.add("nifty");
         wordList.add("test");
+        wordList.add("indubitably"); 
+        wordList.add("insufficiently");
 
-        List<String> lines = WordUtils.textJustification(wordList, 20);
+        int lineLength = 20;
+        List<String> lines = WordUtils.textJustification(wordList, lineLength);
 
-        assert(lines.size() == 3);
+        for (int i = 0; i < lines.size() - 1; i++) {
+        	assert(lines.get(i).length() == lineLength);
+        }
+        assert(lines.size() == 4);
+        
+        String [] words = new String("this is a very long sentence that will be undubitably good for testing. I'm very confident it will be a great test of things.").split(" ");
+
+        lines = WordUtils.textJustification(Arrays.asList(words), lineLength);
+        
+        for (int i = 0; i < lines.size() - 1; i++) {
+        	//assert(lines.get(i).length() == lineLength);
+        	System.out.println(lines.get(i) + "|length: " + lines.get(i).length());
+        }
     }
 }
