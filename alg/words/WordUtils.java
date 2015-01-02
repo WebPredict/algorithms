@@ -87,6 +87,7 @@ public class WordUtils {
 
     }
 
+    // TODO: for completeness this should also take into consideration N-grams
     public static String    autocorrect (String s, Map<String, Float> wordToGeneralFrequencyMap, Trie dictionaryTrie, Map<String, String> pastSuggestionsToCorrectionsMap) {
 
         Set<String> wordSet = wordToGeneralFrequencyMap.keySet();
@@ -129,6 +130,7 @@ public class WordUtils {
 
         return (s); // TODO
     }
+
 
     public static String []     syllables (String s) {
         return (null); // TODO
