@@ -154,7 +154,7 @@ public class WordUtils {
             return (s + "s");
     }
 
-    public static List<String>  textJustification (String words, int lineLength) {
+    public static List<String>  leftRightTextJustification (String words, int lineLength) {
         if (words == null)
             return (null);
 
@@ -164,22 +164,41 @@ public class WordUtils {
         for (String line : lines) {
             allWords.addAll(Arrays.asList(line.split(" ")));
         }
-        return (textJustification(allWords, lineLength));
+        return (leftRightTextJustification(allWords, lineLength));
     }
 
-    public static List<String>  textJustification (List<String> words, int lineLength) {
+    public static List<String>  leftRightTextJustificationParagraphs (List<String> paragraphs, int lineLength) {
+        if (paragraphs == null)
+            return (null);
+
+
+        ArrayList<String> allWords = new ArrayList<String>();
+
+        for (String paragraph : paragraphs) {
+            String [] lines = paragraph.split("\n");
+
+            boolean first = true;
+            for (String line : lines) {
+                List<String> words = Arrays.asList(line.split(" "));
+                if (words != null && words.size() > 0 && first) {
+                    words.set(0, "    " + words.get(0));
+                    first = false;
+                }
+                allWords.addAll(words);
+            }
+        }
+        return (leftRightTextJustification(allWords, lineLength));
+    }
+
+    public static List<String>  leftRightTextJustification (List<String> words, int lineLength) {
         if (words == null)
             return (null);
 
         ArrayList<String> lines = new ArrayList<String>();
 
-        /**
-         * cases: words are often/always longer than lineLength? split big words I guess
-         *
-         */
         StringBuilder builder = new StringBuilder();
 
-        // TODO: debug and simplify... 
+        // TODO: simplify...
         int     curLineSize = 0;
         int     lastWordIdx = 0;
         for (int i = 0; i < words.size(); i++) {

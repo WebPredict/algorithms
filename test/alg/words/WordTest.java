@@ -35,7 +35,7 @@ public class WordTest {
         wordList.add("insufficiently");
 
         int lineLength = 20;
-        List<String> lines = WordUtils.textJustification(wordList, lineLength);
+        List<String> lines = WordUtils.leftRightTextJustification(wordList, lineLength);
 
         for (int i = 0; i < lines.size() - 1; i++) {
         	assert(lines.get(i).length() == lineLength);
@@ -44,7 +44,7 @@ public class WordTest {
         
         String [] words = new String("this is a very long sentence that will be undubitably good for testing. I'm very confident it will be a great test of things.").split(" ");
 
-        lines = WordUtils.textJustification(Arrays.asList(words), lineLength);
+        lines = WordUtils.leftRightTextJustification(Arrays.asList(words), lineLength);
         
         for (int i = 0; i < lines.size() - 1; i++) {
         	//assert(lines.get(i).length() == lineLength);
@@ -77,7 +77,7 @@ public class WordTest {
         System.out.println();
         System.out.println(text);
 
-        List<String> lines = WordUtils.textJustification(text, 40);
+        List<String> lines = WordUtils.leftRightTextJustificationParagraphs(Arrays.asList(text), 50);
 
         System.out.println();
         System.out.println();
