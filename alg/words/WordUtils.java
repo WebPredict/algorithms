@@ -3,6 +3,7 @@ package alg.words;
 import alg.strings.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -153,6 +154,18 @@ public class WordUtils {
             return (s + "s");
     }
 
+    public static List<String>  textJustification (String words, int lineLength) {
+        if (words == null)
+            return (null);
+
+        String [] lines = words.split("\n");
+
+        ArrayList<String> allWords = new ArrayList<String>();
+        for (String line : lines) {
+            allWords.addAll(Arrays.asList(line.split(" ")));
+        }
+        return (textJustification(allWords, lineLength));
+    }
 
     public static List<String>  textJustification (List<String> words, int lineLength) {
         if (words == null)
