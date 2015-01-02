@@ -1,10 +1,9 @@
 package alg.words;
 
 import alg.strings.StringUtils;
+import alg.trees.Trie;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -68,7 +67,66 @@ public class WordUtils {
         return (null); // TODO
     }
 
-    public static String    autocorrect (String s) {
+    /**
+     * Tries to make most useful autocorrections based on the following factors:
+     * keyboard layout (assumes qwerty for now)
+     * language (english for now)
+     * dictionary, optionally with word frequencies
+     * list of past suggestions vs. what the user did with them (accepted suggestion vs. changed to something else)
+     * Note this method computes a Trie (prefix tree) of the dictionary of words, which is potentially pretty expensive!
+     * @param s
+     * @param wordToGeneralFrequencyMap
+     * @param pastSuggestionsToCorrectionsMap
+     * @return
+     */
+    public static String    autocorrect (String s, Map<String, Float> wordToGeneralFrequencyMap, Map<String, String> pastSuggestionsToCorrectionsMap) {
+        if (wordToGeneralFrequencyMap == null)
+            return (s); // can't do anything
+
+        return (autocorrect(s, wordToGeneralFrequencyMap, new Trie(wordToGeneralFrequencyMap.keySet()), pastSuggestionsToCorrectionsMap));
+
+    }
+
+    public static String    autocorrect (String s, Map<String, Float> wordToGeneralFrequencyMap, Trie dictionaryTrie, Map<String, String> pastSuggestionsToCorrectionsMap) {
+
+        Set<String> wordSet = wordToGeneralFrequencyMap.keySet();
+
+        /**
+         * Some notes on approaches:
+         *
+         * if the word is in the dictionary:
+         *  if there are no words starting with this word in the trie,
+         *  return s
+         *  else find the highest frequency word that starts with this word
+         *  if there are no past suggestions about it, return highest frequency word
+         *  else return the correction
+         *
+         *
+         *  when s is not in the trie, need to look at min edit distance to a word in the dictionary,
+         *  taking into consideration distance function for qwerty keyboard.
+         *
+         *  But first look to see if s is in the past suggestions map, and return value if it's there.
+         *
+         *  approach: precompute a bunch of guesses based on qwerty edit distance to possible words
+         *  then see which ones are in the dictionary, then sort by frequency
+         *
+         */
+
+        Set<String>    wordsStartWithS = dictionaryTrie.wordsStartingWith(s);
+
+        if (wordsStartWithS == null) {
+
+        }
+        else {
+            if (wordsStartWithS.size() == 1)
+                return (s);
+            else {
+                // find highest frequency word
+                // then look for existing corrections around that word
+
+            }
+        }
+
         return (s); // TODO
     }
 

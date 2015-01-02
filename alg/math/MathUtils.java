@@ -25,6 +25,7 @@ public class MathUtils {
 
         String trimmed = expression.trim();
 
+        // TODO: finish
         int state = 0;
         int tokenStartIdx = 0;
         String operation = null;

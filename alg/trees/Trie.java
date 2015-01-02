@@ -1,6 +1,8 @@
 package alg.trees;
 
-import java.util.List;
+import alg.util.Node;
+
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -11,6 +13,8 @@ import java.util.List;
  */
 public class Trie {
 
+    private HashMap<Character, Trie> charToChildrenMap = new HashMap<Character, Trie>();
+
     /**
      * insert word
      * word exists?
@@ -19,17 +23,73 @@ public class Trie {
      *
      */
 
+    public Trie () { }
+
+    public Trie (Set<String> words) {
+        if (words != null) {
+            for (String word : words) {
+                insertWord(word);
+            }
+        }
+    }
+
+    public Trie (List<String> words) {
+        if (words != null) {
+            for (String word : words) {
+                insertWord(word);
+            }
+        }
+    }
 
     public void insertWord (String word) {
-    	// TODO
+    	if (word == null || word.length() == 0)
+            return;
+
+        char c = word.charAt(0);
+
+        Trie subtrie = charToChildrenMap.get(c);
+        if (subtrie == null) {
+            subtrie = new Trie();
+            charToChildrenMap.put(c, subtrie);
+        }
+        subtrie.insertWord(word.substring(1));
     }
 
     public boolean wordExists (String word) {
-        return (false); // TODO
+        if (word == null || word.length() == 0)
+            return (true);
+
+        char c = word.charAt(0);
+
+        Trie subtrie = charToChildrenMap.get(c);
+
+        if (subtrie == null)
+            return (false);
+        else
+            return (subtrie.wordExists(word.substring(1)));
+
     }
 
-    public List<String> wordsStartingWith (String prefix) {
-        return (null); // TODO
+    public Set<String> wordsStartingWith (String prefix) {
+        Set<String> set = new HashSet<String>();
+        if (prefix == null || prefix.length() == 0) {
+
+            Set<Character> keys = charToChildrenMap.keySet();
+
+            for (Character key : keys) {
+
+                Set<String> moreWords = charToChildrenMap.get(key).wordsStartingWith(prefix.substring(1));
+
+                if (moreWords != null) {
+                    for (String word : moreWords) {
+                       set.add(key + word);
+                    }
+                }
+            }
+            return (null);
+        }
+
+        return (set);
     }
 
     public void removeWord (String word) {

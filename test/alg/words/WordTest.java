@@ -1,9 +1,12 @@
 package test.alg.words;
 
+import alg.io.FileUtils;
+import alg.trees.Trie;
 import alg.words.WordUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -15,9 +18,11 @@ import java.util.List;
  */
 public class WordTest {
 
-    public static void main (String [] args) {
+    public static void main (String [] args) throws Exception {
 
         testLonger();
+
+        testAutocorrect();
 
     }
 
@@ -86,5 +91,56 @@ public class WordTest {
         for (int i = 0; i < lines.size(); i++) {
             System.out.println(lines.get(i));
         }
+    }
+
+
+    public static void testAutocorrect () throws Exception {
+
+        List<String> dictionary = FileUtils.getLines("C:/Users/jsanchez/Downloads/mostcommonwords.csv");
+
+        float frequency = .1f;
+
+        HashMap<String, Float> wordtoFrequencyMap = new HashMap<String, Float>();
+
+        for (String word : dictionary) {
+            wordtoFrequencyMap.put(word, frequency);
+
+            if (frequency > .0001f)
+                frequency = frequency * .99f;
+        }
+
+        Trie dictionaryTrie = new Trie(dictionary);
+        HashMap<String, String> pastSuggestionsMap = new HashMap<String, String>();
+
+        String word = "test";
+        String correction = WordUtils.autocorrect(word, wordtoFrequencyMap, dictionaryTrie, pastSuggestionsMap);
+
+        System.out.println("original: " + word + " correction: " + correction);
+        pastSuggestionsMap.put(word, correction);
+
+        word = "blah";
+        correction = WordUtils.autocorrect(word, wordtoFrequencyMap, dictionaryTrie, pastSuggestionsMap);
+        System.out.println("original: " + word + " correction: " + correction);
+
+        word = "thr";
+        correction = WordUtils.autocorrect(word, wordtoFrequencyMap, dictionaryTrie, pastSuggestionsMap);
+        System.out.println("original: " + word + " correction: " + correction);
+
+        word = "couldnt";
+        correction = WordUtils.autocorrect(word, wordtoFrequencyMap, dictionaryTrie, pastSuggestionsMap);
+        System.out.println("original: " + word + " correction: " + correction);
+
+        word = "bother";
+        correction = WordUtils.autocorrect(word, wordtoFrequencyMap, dictionaryTrie, pastSuggestionsMap);
+        System.out.println("original: " + word + " correction: " + correction);
+
+        pastSuggestionsMap.put(word, "bother");   // reject their suggestion of "both"
+
+        // second time around it should be "learned"
+        word = "bother";
+        correction = WordUtils.autocorrect(word, wordtoFrequencyMap, dictionaryTrie, pastSuggestionsMap);
+        System.out.println("original: " + word + " correction: " + correction);
+
+        assert(word.equals(correction));
     }
 }
