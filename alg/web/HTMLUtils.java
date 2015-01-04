@@ -176,11 +176,6 @@ public class HTMLUtils {
                         startedEndTag = true;
                 }
             }
-            else if (c == ' ') {
-//                if (startTag) {
-//                    startTag = false;
-//                }
-            }
             else if (c == '>') {
                 if (i > 0 && line.charAt(i - 1) != '%') {
                     if (startTag) {

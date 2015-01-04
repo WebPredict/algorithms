@@ -113,6 +113,7 @@ public class WordUtils {
          *
          */
 
+        // This needs to be cached, as it's expensive to compute this possibly large set of words starting with some prefix:
         Set<String>    wordsStartWithS = dictionaryTrie.wordsStartingWith(s);
 
         if (wordsStartWithS == null) {
@@ -122,6 +123,8 @@ public class WordUtils {
             if (wordsStartWithS.size() == 1)
                 return (s);
             else {
+
+
                 // find highest frequency word
                 // then look for existing corrections around that word
 
