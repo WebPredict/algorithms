@@ -80,36 +80,4 @@ public class ImageUtils {
         return (ret);
     }
 
-
-
-//    public static ImageMap  manhattanDistance (ImageMap imageMap) {
-//        int rows = imageMap.getRows();
-//        int cols = imageMap.getCols();
-//
-//        for (int i = 0; i < rows; i++) {
-//            for (int j = 0; j < cols; j++) {
-//
-//                if (imageMap.getColorAt(i, j) != 0) {
-//                    imageMap.setColorAt(i, j, 0);
-//                }
-//                else {
-//                    imageMap.setColorAt(i, j, rows + cols);
-//                    if (i > 0)
-//                        imageMap.setColorAt(i, j, Math.min(imageMap.getColorAt(i, j), imageMap.getColorAt(i - 1, j) + 1));
-//                    if (j > 0)
-//                        imageMap.setColorAt(i, j, Math.min(imageMap.getColorAt(i, j), imageMap.getColorAt(i, j - 1) + 1));
-//                }
-//            }
-//        }
-//
-//        for (int i = rows - 1; i >= 0; i--) {
-//            for (int j = cols - 1; j >= 0; j--) {
-//                  if (i + 1 < rows)
-//                      imageMap.setColorAt(i, j, Math.min(imageMap.getColorAt(i, j), imageMap.getColorAt(i + 1, j) + 1));
-//                if (j + 1 < cols)
-//                    imageMap.setColorAt(i, j, Math.min(imageMap.getColorAt(i, j), imageMap.getColorAt(i, j + 1) + 1));
-//            }
-//        }
-//        return (imageMap);
-//    }
 }

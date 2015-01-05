@@ -198,4 +198,16 @@ public class Reversi {
 
         return (foundPath);
     }
+
+    public int getColorAt (int row, int col) {
+        return (board [row][col]);
+    }
+
+    public int getNumRows () {
+        return (board.length);
+    }
+
+    public int getNumCols () {
+        return (board == null || board.length == 0 ? 0 : board [0].length);
+    }
 }
