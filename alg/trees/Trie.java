@@ -14,6 +14,7 @@ import java.util.*;
 public class Trie {
 
     private HashMap<Character, Trie> charToChildrenMap = new HashMap<Character, Trie>();
+    private HashMap<String, Set<String>> wordsStartingWithCache = new HashMap<String, Set<String>>();
 
     /**
      * insert word
@@ -53,6 +54,8 @@ public class Trie {
             charToChildrenMap.put(c, subtrie);
         }
         subtrie.insertWord(word.substring(1));
+
+        wordsStartingWithCache.remove(word);
     }
 
     public boolean wordExists (String word) {
@@ -71,6 +74,11 @@ public class Trie {
     }
 
     public Set<String> wordsStartingWith (String prefix) {
+
+        if (wordsStartingWithCache.containsKey(prefix)) {
+            return (wordsStartingWithCache.get(prefix));
+        }
+
         Set<String> set = new HashSet<String>();
         if (prefix == null || prefix.length() == 0) {
 
@@ -89,14 +97,19 @@ public class Trie {
             return (null);
         }
 
+        wordsStartingWithCache.put(prefix, set);
         return (set);
     }
 
     public void removeWord (String word) {
     	// TODO
+
+        wordsStartingWithCache.remove(word);
     }
 
     public void removeWordsStartingWith (String prefix) {
     	// TODO
+
+        wordsStartingWithCache.remove(prefix);
     }
 }
