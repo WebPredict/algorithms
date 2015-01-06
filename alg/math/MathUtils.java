@@ -207,7 +207,7 @@ public class MathUtils {
         /**
          * 8 7 6 5 4 3 2 1 / (3 2 1) (5 4 3 2 1)
          */
-
+        // TODO change to use string multiplication / division to support arbitrarily long numbers
         long nMinusK = n - k;
         long nFactorialNeeded = 1;
 
@@ -258,25 +258,127 @@ public class MathUtils {
         return (most);
     }
 
-    public static String    fractionToDecimal (int numerator, int denominator) {
+    /**
+     *
+     * @param numerator
+     * @param denominator
+     * @param numDigits
+     * @return  Decimal computed to numDigits. Sort of a poor man's BigInt, using strings
+     */
+    public static String    fractionToDecimal (int numerator, int denominator, int numDigits) {
         return (null); // TODO
     }
 
-    // elementary school multiplication algorithm on arbitrarily long numbers in string form
+    /**
+     *  elementary school multiplication algorithm on arbitrarily long numbers in string form
+     * @param a
+     * @param b
+     * @return  a * b
+     */
     public static String    multiplication (String a, String b) {
 
-        return (null); // TODO
+        /**
+         *       354
+         *      x440
+         *      ----
+         *       000
+         *     1416
+         *    1416
+         *    ------
+         *    155760
+         */
+        String answer = "";
+
+        return (answer);
     }
 
-    public static String    longDivision (int divisor, int dividend) {
-        // returns an answer like: 5 / 7 = "1 remainder 2"
+    /**
+     *
+     * @param divisor
+     * @param dividend
+     * @return  an answer of the form: 5 / 7 = "1 remainder 2"
+     */
+    public static String    longDivisionEnglishAnswer (int divisor, int dividend) {
+        /**
+         * example: 7 / 300 = 7 goes into 3? no, so try 30. 7 goes into 30? yes, 4 times. remainder
+         * of 2. Bring down the 0. 7 goes into 20? yes, 2 times, remainder 6.
+         */
 
-        return (null); // TODO
+        if (dividend == 0)
+            return ("division by zero (undefined)");
+
+        String  dividendStr = String.valueOf(dividend);
+        String  result = "";
+        int     toDivide = 0;
+        int     dividendStrIdx = 0;
+        while (dividendStrIdx < dividendStr.length()) {
+            char c = dividendStr.charAt(dividendStrIdx);
+            if (c < '0' || c > '9')
+                throw new RuntimeException("Invalid positive integer: " + dividend);
+
+            int digit = c - '0';
+            if (toDivide == 0)
+                toDivide = digit;
+            else {
+                // shift it and add
+                toDivide *= 10;
+                toDivide += digit;
+            }
+
+            if (divisor <= toDivide) {
+                int goesInto = toDivide / divisor;
+                result += goesInto;
+
+                int remainder = toDivide - divisor * goesInto;
+                toDivide = remainder;
+                dividendStrIdx += String.valueOf(goesInto).length();
+            }
+            else {
+                // bring down the next digit
+                dividendStrIdx++;
+            }
+        }
+
+        if (toDivide != 0)
+            result += " remainder " + toDivide;
+        return (result);
     }
 
     public static List<List<Integer>>  pascalsTriangle (int numRows) {
+        if (numRows == 0)
+            return (null);
 
-        return (null); // TODO
+        List<List<Integer>> triangle = new ArrayList<List<Integer>>();
+        ArrayList<Integer> firstRow = new ArrayList<Integer>();
+        firstRow.add(1);
+        triangle.add(firstRow);
+
+        for (int i = 2; i <= numRows; i++) {
+
+            ArrayList<Integer> row = new ArrayList<Integer>();
+
+            List<Integer> previousRow = triangle.get(i - 1);
+
+            for (int j = 0; j < previousRow.size() + 1; j++) {
+                int value;
+                if (j == 0)
+                    value = 1;
+                else if (j == previousRow.size())
+                    value = previousRow.get(j - 1);
+                else
+                    value = previousRow.get(j - 1) + previousRow.get(j);
+                row.add(value);
+            }
+            triangle.add(row);
+        }
+        return (triangle);
+    }
+
+    public static int frogJumps(int X, int Y, int D) {
+        int diff = Y - X;
+
+        int minSteps = (int)Math.ceil((float)diff / (float)D);
+        return (minSteps);
     }
 
     public static int  atoi (String asciiNum) {
