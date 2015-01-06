@@ -2,6 +2,8 @@ package alg.math.prob;
 
 import alg.math.MathUtils;
 
+import java.util.Random;
+
 /**
  * Created with IntelliJ IDEA.
  * User: jsanchez
@@ -25,17 +27,31 @@ public class ProbUtils {
     
     public static int []	randomIntegers (int [] list, int randomSize) {
     	// returns a random subset of size randomSize from list
-    	
-    	int []	randomList = new int [randomSize];
-    	// one approach: shuffle list, then just pick first randomSize from it
-    	// but we don't want to modify list, nor take up a lot of space
-    	// issue is how to avoid duplicates
-    	
-    	for (int i = 0; i < randomList.length; i++) {
-    		int nextIdx = MathUtils.generateRandom(list.length);
-    		// TODO
-    	}
+
+        // This should work, but TODO change to different approach to avoid the array copying
+    	Integer []	shuffledList = new Integer [list.length];
+    	for (int i = 0; i < shuffledList.length; i++) {
+            shuffledList [i] = list [i];
+        }
+
+        randomShuffleInPlace(shuffledList);
+
+        int [] randomList = new int[randomSize];
+        for (int i = 0; i < randomSize; i++) {
+            randomList [i] = shuffledList [i];
+        }
     	return (randomList); 
+    }
+
+    public static void  randomShuffleInPlace (Object [] objects) {
+        if (objects == null)
+            return;
+        for (int i = 0; i < objects.length; i++) {
+            int randomIdx = new Random().nextInt(objects.length);
+            Object tmp = objects [randomIdx];
+            objects [randomIdx] = objects [i];
+            objects [i] = tmp;
+        }
     }
 
     public double expectedValue (double chanceSomethingHappens, double payoff, double penalty, int attempts) {

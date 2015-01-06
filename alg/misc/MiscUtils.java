@@ -130,17 +130,6 @@ public class MiscUtils {
         return (s1.equals(s2));
     }
 
-    public static void  randomShuffleInPlace (Object [] objects) {
-        if (objects == null)
-            return;
-        for (int i = 0; i < objects.length; i++) {
-            int randomIdx = new Random().nextInt(objects.length);
-            Object tmp = objects [randomIdx];
-            objects [randomIdx] = objects [i];
-            objects [i] = tmp;
-        }
-    }
-
     public static void swap (List list, int firstIdx, int secondIdx) {
         Object tmp = list.get(firstIdx);
 
