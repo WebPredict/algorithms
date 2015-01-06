@@ -8,4 +8,30 @@ package alg.games;
  * To change this template use File | Settings | File Templates.
  */
 public class RubiksCube {
+
+    // hmm not sure this is the easiest to work with
+    private int [][][] allFaces = new int[3][3][3];
+
+    public RubiksCube () {
+
+    }
+
+    static enum Face {
+        LEFT,
+        RIGHT,
+        FRONT,
+        TOP,
+        BOTTOM,
+        BACK
+    }
+
+    public void rotate (Face face, int numTurnsClockwise) {
+
+    }
+
+    public int [][] getFaceValues (Face face) {
+
+        return (null); // TODO
+    }
+
 }
