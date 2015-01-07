@@ -42,6 +42,8 @@ public class RubiksCube {
 
                 // then rotate the parts of the other faces
                 // TODO
+
+
             }
                 break;
         }
@@ -53,15 +55,15 @@ public class RubiksCube {
             case LEFT:
                 return (faces [0]);
             case RIGHT:
-                return (faces [0]);
+                return (faces [1]);
             case FRONT:
-                return (faces [0]);
+                return (faces [2]);
             case TOP:
-                return (faces [0]);
+                return (faces [3]);
             case BOTTOM:
-                return (faces [0]);
+                return (faces [4]);
             case BACK:
-                return (faces [0]);
+                return (faces [5]);
         }
         throw new RuntimeException("Invalid value for face: " + face);
     }
