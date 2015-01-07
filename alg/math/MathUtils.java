@@ -136,8 +136,11 @@ public class MathUtils {
        return (primes);
     }
 
+    public static MarsenneTwister TWISTER = new MarsenneTwister();
+
     public static int     generateRandom (int max) {
-        return (0); // TODO
+        int nextRandom = TWISTER.getNextRandom();
+        return (nextRandom % max);
     }
 
     public static int     generateRandom (int max, int seed) {
@@ -152,6 +155,11 @@ public class MathUtils {
      */
 
 
+    /**
+     *
+     * @param n
+     * @return  List of prime factors in n
+     */
     public static List<Integer> primeFactors (int n) {
         double sqrt = Math.sqrt((double)n);
         int ceil = (int)Math.ceil(sqrt);
@@ -177,6 +185,11 @@ public class MathUtils {
         return (ret);
     }
 
+    /**
+     * Computes factorial of n
+     * @param n
+     * @return
+     */
     public static int     factorial (int n) {
         int total = 1;
         for (int i = 2; i <= n; i++) {
@@ -236,6 +249,10 @@ public class MathUtils {
         return (new double[] {a, b});
     }
 
+    public static double [] cubicSolve (double a, double b, double c, double y) {
+        return (null); // TODO
+    }
+
     public static int min (int [] list) {
         Integer least = null;
 
@@ -266,6 +283,14 @@ public class MathUtils {
      * @return  Decimal computed to numDigits. Sort of a poor man's BigInt, using strings
      */
     public static String    fractionToDecimal (int numerator, int denominator, int numDigits) {
+
+        int []  result = longDivisionWithRemainder(numerator, denominator);
+
+        String answer = result [0] + ".";
+
+        if (result [1] != 0) {
+
+        }
         return (null); // TODO
     }
 
@@ -289,6 +314,76 @@ public class MathUtils {
          */
         String answer = "";
 
+        String bTrimmed = b == null ? "" : b.trim();
+        String aTrimmed = a == null ? "" : a.trim();
+
+        if (bTrimmed.length() == 0 || aTrimmed.length() == 0)
+            throw new RuntimeException("Undefined multiplication on empty strings");
+
+        String [] toAdd = new String[bTrimmed.length()];
+
+        for (int i = bTrimmed.length() - 1; i >=0; i--) {
+            toAdd [i] = "";
+            char c = bTrimmed.charAt(i);
+            if (c < '0' || c > '9')
+                throw new RuntimeException("Invalid positive integer: " + bTrimmed);
+
+            int carry = 0;
+            for (int j = aTrimmed.length() - 1; j >= 0; j--) {
+
+                char ca = aTrimmed.charAt(j);
+                if (c < '0' || c > '9')
+                    throw new RuntimeException("Invalid positive integer: " + aTrimmed);
+
+                int value = ((c - '0') * (ca - '0')) + carry;
+                carry = 0;
+                if (value > 9) {
+                    // carry it
+                    carry += value / 10;
+                    value = value % 10;
+                }
+
+                toAdd [i] = String.valueOf(value) + toAdd [i];
+            }
+            if (carry > 0) {
+                toAdd [i] = String.valueOf(carry) + toAdd [i];
+            }
+
+            for (int j = 0; j < (bTrimmed.length() - 1) - i; j++) {
+                toAdd [j] += "0";
+            }
+        }
+
+        // add all the strings in toAdd with string addition to avoid overflow
+        int carry = 0;
+        int maxLen = toAdd [toAdd.length - 1].length();
+        for (int i = maxLen - 1; i >= 0; i--) {
+            int total = 0;
+            for (int j = 0; j < toAdd.length; j++) {
+
+                if (j == 0) {
+                    total = carry;
+                    carry = 0;
+                }
+
+                String cur = toAdd [j];
+                if (cur.length() <= i)
+                    continue;
+
+                char c = cur.charAt(i);
+                int cVal = c - '0';
+                total += cVal;
+            }
+            if (total > 9) {
+                carry = total / 10;
+                total = total % 10;
+            }
+            answer = String.valueOf(total) + answer;
+        }
+
+        if (carry > 0)
+            answer = String.valueOf(carry) + answer;
+
         return (answer);
     }
 
@@ -296,16 +391,16 @@ public class MathUtils {
      *
      * @param divisor
      * @param dividend
-     * @return  an answer of the form: 5 / 7 = "1 remainder 2"
+     * @return  an answer of the form: 5 / 7 = 1 remainder 2 = [1, 2]
      */
-    public static String    longDivisionEnglishAnswer (int divisor, int dividend) {
+    public static int []    longDivisionWithRemainder (int divisor, int dividend) {
         /**
          * example: 7 / 300 = 7 goes into 3? no, so try 30. 7 goes into 30? yes, 4 times. remainder
          * of 2. Bring down the 0. 7 goes into 20? yes, 2 times, remainder 6.
          */
 
         if (dividend == 0)
-            return ("division by zero (undefined)");
+            throw new RuntimeException("division by zero (undefined)");
 
         String  dividendStr = String.valueOf(dividend);
         String  result = "";
@@ -339,8 +434,77 @@ public class MathUtils {
             }
         }
 
-        if (toDivide != 0)
-            result += " remainder " + toDivide;
+        return (new int[] {Integer.parseInt(result), toDivide});
+    }
+
+    /**
+     *
+     * @param divisor
+     * @param dividend
+     * @return  an answer of the form: 5 / 7 = 1 remainder 2 = [1, 2]
+     */
+    public static String    longDivision (int divisor, int dividend, int maxDigits) {
+        /**
+         * example: 7 / 300 = 7 goes into 3? no, so try 30. 7 goes into 30? yes, 4 times. remainder
+         * of 2. Bring down the 0. 7 goes into 20? yes, 2 times, remainder 6.
+         */
+
+        if (dividend == 0)
+            throw new RuntimeException("division by zero (undefined)");
+
+        String  dividendStr = String.valueOf(dividend);
+        String  result = "";
+        int     toDivide = 0;
+        int     dividendStrIdx = 0;
+        while (dividendStrIdx < dividendStr.length()) {
+            char c = dividendStr.charAt(dividendStrIdx);
+            if (c < '0' || c > '9')
+                throw new RuntimeException("Invalid positive integer: " + dividend);
+
+            int digit = c - '0';
+            if (toDivide == 0)
+                toDivide = digit;
+            else {
+                // shift it and add
+                toDivide *= 10;
+                toDivide += digit;
+            }
+
+            if (divisor <= toDivide) {
+                int goesInto = toDivide / divisor;  // TODO remove this division
+                result += goesInto;
+
+                int remainder = toDivide - divisor * goesInto;
+                toDivide = remainder;
+                dividendStrIdx += String.valueOf(goesInto).length();
+            }
+            else {
+                // bring down the next digit
+                dividendStrIdx++;
+            }
+        }
+
+        if (toDivide > 0) {
+            result += ".";
+
+            int digits = 0;
+            while (digits < maxDigits) {
+
+                int extra = 0;
+                while (toDivide < divisor) {
+                    toDivide *= 10; // TODO take care for overflow here
+                    extra++;
+                }
+                int nextValue = toDivide / divisor; // TODO remove division
+                result += nextValue;
+                toDivide = toDivide - divisor * nextValue;
+                if (toDivide == 0)
+                    break;
+
+                digits += extra;
+            }
+        }
+
         return (result);
     }
 
