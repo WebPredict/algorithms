@@ -9,11 +9,12 @@ package alg.games;
  */
 public class RubiksCube {
 
-    // hmm not sure this is the easiest to work with
-    private int [][][] allFaces = new int[3][3][3];
+    private SquareGrid[] faces = new SquareGrid[6];
 
     public RubiksCube () {
-
+        for (int i = 0; i < faces.length; i++) {
+            faces [i] = new SquareGrid(3, i);
+        }
     }
 
     static enum Face {
@@ -26,12 +27,43 @@ public class RubiksCube {
     }
 
     public void rotate (Face face, int numTurnsClockwise) {
+        // This one's a doozy
 
+        switch (face) {
+            case FRONT: {
+                SquareGrid top = getFaceValues(Face.TOP);
+                SquareGrid left = getFaceValues(Face.LEFT);
+                SquareGrid right = getFaceValues(Face.RIGHT);
+                SquareGrid bottom = getFaceValues(Face.BOTTOM);
+
+                // First, rotate the front face
+                SquareGrid front = getFaceValues(Face.FRONT);
+                front.rotate(numTurnsClockwise, true);
+
+                // then rotate the parts of the other faces
+                // TODO
+            }
+                break;
+        }
     }
 
-    public int [][] getFaceValues (Face face) {
+    public SquareGrid getFaceValues (Face face) {
 
-        return (null); // TODO
+        switch (face) {
+            case LEFT:
+                return (faces [0]);
+            case RIGHT:
+                return (faces [0]);
+            case FRONT:
+                return (faces [0]);
+            case TOP:
+                return (faces [0]);
+            case BOTTOM:
+                return (faces [0]);
+            case BACK:
+                return (faces [0]);
+        }
+        throw new RuntimeException("Invalid value for face: " + face);
     }
 
 }
