@@ -207,6 +207,11 @@ public class WordUtils {
         return (ret);
     }
 
+    /**
+     * English pluralization
+     * @param s
+     * @return
+     */
     public static String    pluralize (String s) {
         if (s == null)
             return ("s");
@@ -402,4 +407,20 @@ public class WordUtils {
         return (numWords);
     }
 
+
+    /**
+     * Returns min length word transformation ladder with given dictionary, or null if not possible
+     * @param start
+     * @param end
+     * @param dictionary
+     * @return
+     */
+    public static List<String>  minWordLadder (String start, String end, List<String> dictionary) {
+        List<String> ret = null;
+
+        // TODO
+        // Only one letter can be changed at a time
+        // perhaps a recursive approach and take min length of solutions?
+        return (ret);
+    }
 }

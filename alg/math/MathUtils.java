@@ -641,4 +641,132 @@ public class MathUtils {
     public static int lcm (int num1, int num2) {
          return (num1 * num2 / gcd(num1, num2));
     }
+
+    /**
+     * TODO: move someplace else
+     * @param prices
+     * @return
+     */
+//    public static int   maxProfitWithAtMostTwoTransactions (int [] prices) {
+//        if (prices == null)
+//            return (0);
+//
+//        int ret = 0;
+//
+//
+//        int maxDiff = 0;
+//        int maxDiffStartIdx = 0;
+//        int maxDiffEndIdx = 0;
+//
+//        int secondMaxDiff = 0;
+//        int secondMaxDiffStartIdx = 0;
+//        int secondMaxDiffEndIdx = 0;
+//
+//        int thirdMaxDiff = 0;
+//
+//        int curDiff = 0;
+//        for (int i = 0; i < prices.length; i++) {
+//            curDiff += prices [i];
+//
+//            if (i > 0) {
+//                if (curDiff > maxDiff) {
+//                    maxDiffEndIdx = i;
+//                    maxDiff = curDiff;
+//                }
+//                else {
+//                    maxDiffStartIdx = i;
+//                }
+//            }
+//        }
+//
+//        /**
+//         * some cases:
+//         * length 0, return 0
+//         * all prices going down, return 0
+//         * monotonically up, return last - first
+//         *
+//         */
+//
+//        int [] lowestValues = new int [] {Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE};
+//        int [] lowestValueIdxes = new int [] {-1, -1, -1};
+//        int [] highestValues = new int [] {Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE};
+//        int [] highestValueIdxes = new int [] {-1, -1, -1};
+//
+//        for (int i = 0; i < prices.length; i++) {
+//
+//        }
+//
+//
+//
+//        int biggestDiff = 0;
+//        if (highestValueIdxes [0] > lowestValueIdxes [0]) {
+//            biggestDiff = prices [highestValueIdxes[0]] - prices [lowestValueIdxes[0]];
+//        }
+//        if (highestValueIdxes [1] > lowestValueIdxes [1] && highestValueIdxes[1] < highestValueIdxes [0]) {
+//            // so second biggest diff is outside of first biggest, to the left
+//            biggestDiff += prices [highestValueIdxes[1]] - prices [lowestValueIdxes[1]];
+//        }
+//        else if (highestValueIdxes [1] > lowestValueIdxes [1] && lowestValueIdxes[1] > highestValueIdxes [0]) {
+//            // so second biggest diff is outside of first biggest, to the right
+//            biggestDiff += prices [highestValueIdxes[1]] - prices [lowestValueIdxes[1]];
+//        }
+//        else if (highestValueIdxes [2] > lowestValueIdxes [2] && highestValueIdxes[2] < highestValueIdxes [0]) {
+//            // look at third biggest in same way
+//            biggestDiff += prices [highestValueIdxes[2]] - prices [lowestValueIdxes[2]];
+//        }
+//        else if (highestValueIdxes [2] > lowestValueIdxes [2] && lowestValueIdxes[2] > highestValueIdxes [0]) {
+//            biggestDiff += prices [highestValueIdxes[2]] - prices [lowestValueIdxes[2]];
+//        }
+//        else if (highestValueIdxes [1] < lowestValueIdxes [2] || lowestValueIdxes [1] > highestValueIdxes [2]) {
+//            // if second and third are both overlapping biggest but not each other, see if they add up to more
+//            int thirdBiggest = prices [highestValueIdxes[1]] - prices [lowestValueIdxes[1]];
+//            int secondBiggest = prices [highestValueIdxes[2]] - prices [lowestValueIdxes[2]];
+//            if (thirdBiggest + secondBiggest > biggestDiff)
+//                biggestDiff = thirdBiggest + secondBiggest;
+//        }
+//
+//        return (biggestDiff);
+//    }
+
+    /**
+     * TODO: move someplace else
+     * @param prices
+     * @return
+     */
+    public static int   maxProfitWithOneTransaction (int [] prices) {
+        if (prices == null)
+            return (0);
+
+        int ret = 0;
+
+        /**
+         * some cases:
+         * length 0, return 0
+         * all prices going down, return 0
+         * monotonically up, return last - first
+         *
+         */
+        int currentLowest = Integer.MAX_VALUE;
+        int currentLowestIdx = -1;
+        int currentHighest = Integer.MIN_VALUE;
+        int currentHighestIdx = -1;
+
+        for (int i = 0; i < prices.length; i++) {
+            if (i > 0) {
+                if (prices [i] < currentLowest) {
+                    currentLowest = prices [i];
+                    currentLowestIdx = i;
+                }
+                else if (prices [i] > currentHighest) {
+                    currentHighest = prices [i];
+                    currentHighestIdx = i;
+                }
+            }
+        }
+
+        if (currentLowestIdx != -1 && currentLowestIdx < currentHighestIdx) {
+            ret = prices [currentHighestIdx] - prices [currentLowestIdx];
+        }
+        return (ret);
+    }
 }
