@@ -53,6 +53,71 @@ public class ArrayUtils {
         }
     }
 
+    public static List<Integer> spiralOrder (int [][] matrix) {
+        if (matrix == null || matrix.length == 0 || matrix [0].length == 0)
+            return (null);
+
+        ArrayList<Integer>  numbers = new ArrayList<Integer>();
+
+        int rows = matrix.length;
+        int cols = matrix [0].length;
+        int rowIdx = 0;
+        int colIdx = 0;
+        int maxRowIdx = rows - 1;
+        int minRowIdx = 1;
+        int maxColIdx = cols - 1;
+        int minColIdx = 0;
+
+        int direction = 0;
+        while (numbers.size() < rows * cols) {
+            numbers.add(matrix [rowIdx][colIdx]);
+            switch (direction) {
+                case 0:
+                    if (colIdx < maxColIdx)
+                        colIdx++;
+                    else {
+                        maxColIdx--;
+                        rowIdx++;
+                        direction = 1;
+                    }
+                    break;
+
+                case 1:
+                    if (rowIdx < maxRowIdx)
+                        rowIdx++;
+                    else {
+                        colIdx--;
+                        maxRowIdx--;
+                        direction = 2;
+                    }
+                    break;
+
+                case 2:
+                    if (colIdx > minColIdx)
+                        colIdx--;
+                    else {
+                        minColIdx++;
+                        direction = 3;
+                        rowIdx--;
+                    }
+                    break;
+
+                case 3:
+                    if (rowIdx > minRowIdx)
+                        rowIdx--;
+                    else {
+                        minRowIdx++;
+                        colIdx++;
+                        direction = 0;
+                    }
+                    break;
+
+            }
+        }
+
+        return (numbers);
+    }
+
     /**
      *
      * @param array1
