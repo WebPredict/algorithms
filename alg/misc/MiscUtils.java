@@ -100,6 +100,7 @@ public class MiscUtils {
          * next -> next = root
          * next = tmp
          */
+        root.setNext(null);
         while (next != null) {
             LinkNode tmp = next.getNext();
 
@@ -108,6 +109,39 @@ public class MiscUtils {
 
             next = tmp;
         }
+        return (root);
+    }
+
+    @InterestingAlgorithm
+    public static LinkNode reverseLinkedListBetween (LinkNode root, int fromIdx, int toIdxIncl) {
+        if (root == null)
+            return (null);
+
+        LinkNode next = root;
+
+        int ctr = 0;
+        LinkNode beforeNext = null;
+        while (ctr < fromIdx) {
+            ctr++;
+            beforeNext = next;
+            next = next.getNext();
+        }
+
+        LinkNode afterNewSection = next;
+        LinkNode newHead = next;
+        while (ctr < toIdxIncl) {
+            LinkNode tmp = next.getNext();
+
+            next.setNext(newHead);
+            newHead = next;
+
+            next = tmp;
+            ctr++;
+            if (ctr == toIdxIncl)
+                afterNewSection.setNext(tmp);
+        }
+
+        beforeNext.setNext(newHead);
         return (root);
     }
 

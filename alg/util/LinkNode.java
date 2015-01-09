@@ -27,4 +27,24 @@ public class LinkNode<T extends Comparable> {
     public void setNext(LinkNode<T> next) {
         this.next = next;
     }
+
+    public String toString () {
+        StringBuilder builder = new StringBuilder();
+        if (value == null)
+            builder.append("NULL");
+        else
+            builder.append(value.toString());
+
+        LinkNode<T> iter = next;
+        int counter = 100; // cutoff for loops
+        while (iter != null && counter >= 0) {
+            builder.append(" -> ");
+            builder.append(iter.getValue());
+
+            iter = iter.getNext();
+            counter--;
+        }
+
+        return builder.toString();
+    }
 }

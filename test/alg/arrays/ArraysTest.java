@@ -22,5 +22,18 @@ public class ArraysTest {
 
         for (int i = 0; i < spiralOrder.size(); i++)
             System.out.println(spiralOrder.get(i));
+
+        testMatrix = new int [][] {{1}};
+        spiralOrder = ArrayUtils.spiralOrder(testMatrix);
+
+        for (int i = 0; i < spiralOrder.size(); i++)
+            System.out.println(spiralOrder.get(i));
+
+        testMatrix = new int [][] {{1, 2}, {3, 4}, {5, 6}, {7, 8}};
+        spiralOrder = ArrayUtils.spiralOrder(testMatrix);
+
+        for (int i = 0; i < spiralOrder.size(); i++)
+            System.out.println(spiralOrder.get(i));
+
     }
 }

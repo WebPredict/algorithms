@@ -54,8 +54,11 @@ public class ArrayUtils {
     }
 
     public static List<Integer> spiralOrder (int [][] matrix) {
-        if (matrix == null || matrix.length == 0 || matrix [0].length == 0)
+        if (matrix == null)
             return (null);
+
+        if (matrix.length == 0 || matrix [0].length == 0)
+            return (new ArrayList<Integer>());
 
         ArrayList<Integer>  numbers = new ArrayList<Integer>();
 
