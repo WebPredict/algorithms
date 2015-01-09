@@ -1,5 +1,6 @@
 package alg.trees;
 
+import alg.misc.InterestingAlgorithm;
 import alg.util.BinaryNode;
 import alg.util.NodeVisitor;
 
@@ -61,6 +62,7 @@ public class TreeUtils {
         return (null);
     }
 
+    @InterestingAlgorithm
     public static BinaryNode    find (BinaryNode<? extends Comparable> tree, Comparable value) {
         if (tree == null)
             return (null);
@@ -78,6 +80,7 @@ public class TreeUtils {
         }
     }
 
+    @InterestingAlgorithm
     public static void preorderTraversal (BinaryNode tree, NodeVisitor visitor) {
         visitor.visit(tree);
         if (tree.getLeft() != null)
@@ -87,6 +90,7 @@ public class TreeUtils {
     }
 
     // TODO hard way: do it iteratively
+    @InterestingAlgorithm
     public static void postorderTraversal (BinaryNode tree, NodeVisitor visitor) {
         if (tree.getLeft() != null)
             postorderTraversal(tree.getLeft(), visitor);
@@ -117,7 +121,7 @@ public class TreeUtils {
         return (new BinaryNode[] {treeRoot.getLeft(), treeRoot.getRight()});
     }
 
-
+    @InterestingAlgorithm
     public static BinaryNode    min (BinaryNode root) {
         if (root == null)
             return (null);

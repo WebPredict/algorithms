@@ -80,13 +80,13 @@ public class Matrix {
 
     public double determinant () {
         double det = 0d;
-
+        // TODO
         return (det);
     }
 
     public double trace () {
-         double ret = 0d;
-
+        double ret = 0d;
+        // TODO
 
         return (ret);
     }

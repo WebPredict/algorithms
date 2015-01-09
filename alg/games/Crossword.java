@@ -1,5 +1,7 @@
 package alg.games;
 
+import alg.misc.InterestingAlgorithm;
+
 import java.util.List;
 
 /**
@@ -29,6 +31,7 @@ public class Crossword {
         this.dictionary = dictionary;
     }
 
+    @InterestingAlgorithm
     public void generate () {
         // TODO
     }

@@ -1,6 +1,7 @@
 package alg.math;
 
 import alg.arrays.Interval;
+import alg.misc.InterestingAlgorithm;
 
 import java.util.*;
 
@@ -18,6 +19,7 @@ public class MathUtils {
      * @param expression
      * @return
      */
+    @InterestingAlgorithm
     public static double evaluateArithmeticExpression (String expression) throws Exception {
 
         if (expression == null)
@@ -111,7 +113,7 @@ public class MathUtils {
      * All primes up to a certain number
      * random # generators
      */
-
+    @InterestingAlgorithm
    public static List<Integer> sieveOfEratosthenes (int allPrimesUpTo) {
        boolean [] possiblePrimes = new boolean[allPrimesUpTo];
 
@@ -138,6 +140,7 @@ public class MathUtils {
 
     public static MarsenneTwister TWISTER = new MarsenneTwister();
 
+    @InterestingAlgorithm
     public static int     generateRandom (int max) {
         int nextRandom = TWISTER.getNextRandom();
         return (nextRandom % max);
@@ -160,6 +163,7 @@ public class MathUtils {
      * @param n
      * @return  List of prime factors in n
      */
+    @InterestingAlgorithm
     public static List<Integer> primeFactors (int n) {
         double sqrt = Math.sqrt((double)n);
         int ceil = (int)Math.ceil(sqrt);
@@ -203,6 +207,7 @@ public class MathUtils {
      * @param n
      * @return
      */
+    @InterestingAlgorithm
     public static long   nthCatalan (int n) {
 
         long twoNChooseN = nChooseK(2 * n, n);
@@ -216,6 +221,7 @@ public class MathUtils {
      * @param k
      * @return
      */
+    @InterestingAlgorithm
     public static long   nChooseK (int n, int k) {
         /**
          * 8 7 6 5 4 3 2 1 / (3 2 1) (5 4 3 2 1)
@@ -243,12 +249,14 @@ public class MathUtils {
         return (nFactorialNeeded);
     }
 
+    @InterestingAlgorithm
     public static double [] quadraticSolve (double a, double b, double y) {
         double first = -b + Math.sqrt(b * b - 4 * a * y) / 2d * a;
         double second = -b - Math.sqrt(b * b - 4 * a * y) / 2d * a;
         return (new double[] {a, b});
     }
 
+    @InterestingAlgorithm
     public static double [] cubicSolve (double a, double b, double c, double y) {
         return (null); // TODO
     }
@@ -282,6 +290,7 @@ public class MathUtils {
      * @param numDigits
      * @return  Decimal computed to numDigits. Sort of a poor man's BigInt, using strings
      */
+    @InterestingAlgorithm
     public static String    fractionToDecimal (int numerator, int denominator, int numDigits) {
 
         int []  result = longDivisionWithRemainder(numerator, denominator);
@@ -300,6 +309,7 @@ public class MathUtils {
      * @param b
      * @return  a * b
      */
+    @InterestingAlgorithm
     public static String    multiplication (String a, String b) {
 
         /**
@@ -393,6 +403,7 @@ public class MathUtils {
      * @param dividend
      * @return  an answer of the form: 5 / 7 = 1 remainder 2 = [1, 2]
      */
+    @InterestingAlgorithm
     public static int []    longDivisionWithRemainder (int divisor, int dividend) {
         /**
          * example: 7 / 300 = 7 goes into 3? no, so try 30. 7 goes into 30? yes, 4 times. remainder
@@ -443,6 +454,7 @@ public class MathUtils {
      * @param dividend
      * @return  an answer of the form: 5 / 7 = 1 remainder 2 = [1, 2]
      */
+    @InterestingAlgorithm
     public static String    longDivision (int divisor, int dividend, int maxDigits) {
         /**
          * example: 7 / 300 = 7 goes into 3? no, so try 30. 7 goes into 30? yes, 4 times. remainder
@@ -508,6 +520,7 @@ public class MathUtils {
         return (result);
     }
 
+    @InterestingAlgorithm
     public static List<List<Integer>>  pascalsTriangle (int numRows) {
         if (numRows == 0)
             return (null);
@@ -538,6 +551,7 @@ public class MathUtils {
         return (triangle);
     }
 
+    @InterestingAlgorithm(timeComplexity = "O(1)", spaceComplexity = "O(1)")
     public static int frogJumps(int X, int Y, int D) {
         int diff = Y - X;
 
@@ -545,6 +559,12 @@ public class MathUtils {
         return (minSteps);
     }
 
+    /**
+     *
+     * @param asciiNum
+     * @return
+     */
+    @InterestingAlgorithm
     public static int  atoi (String asciiNum) {
         if (asciiNum == null || asciiNum.length() == 0)
             throw new RuntimeException("atoi undefined for: " + asciiNum);
@@ -566,6 +586,7 @@ public class MathUtils {
         return (negate ? -total : total);
     }
 
+    @InterestingAlgorithm
     public static double atod (String asciiNum) {
         if (asciiNum == null || asciiNum.length() == 0)
             throw new RuntimeException("atod undefined for: " + asciiNum);
@@ -601,6 +622,7 @@ public class MathUtils {
         return (negate ? -total : total);
     }
 
+    @InterestingAlgorithm
     public static String itoa (int num) {
         if (num == 0)
             return ("0");
@@ -626,6 +648,7 @@ public class MathUtils {
      * @param num2
      * @return    greatest common divisor
      */
+    @InterestingAlgorithm
     public static int gcd (int num1, int num2) {
         if (num2 == 0)
             return (num1);
@@ -638,6 +661,7 @@ public class MathUtils {
      * @param num2
      * @return
      */
+    @InterestingAlgorithm
     public static int lcm (int num1, int num2) {
          return (num1 * num2 / gcd(num1, num2));
     }

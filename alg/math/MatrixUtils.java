@@ -1,10 +1,13 @@
 package alg.math;
 
+import alg.misc.InterestingAlgorithm;
+
 /**
  * All of these methods return a Matrix copy as a result
  */
 public class MatrixUtils {
 
+    @InterestingAlgorithm
     public static Matrix add (Matrix m1, Matrix m2) {
 
         int numRows = m1.getNumRows();
@@ -23,6 +26,7 @@ public class MatrixUtils {
        return (ret);
     }
 
+    @InterestingAlgorithm
     public static Matrix multiply (Matrix m1, Matrix m2) {
 
         int numRows = m2.getNumRows();
@@ -48,6 +52,7 @@ public class MatrixUtils {
         return (ret);
     }
 
+    @InterestingAlgorithm
     public static Matrix multiply (Matrix m, double scalar) {
 
         Matrix ret = new Matrix(m.getNumRows(), m.getNumCols());
@@ -60,6 +65,7 @@ public class MatrixUtils {
         return (ret);
     }
 
+    @InterestingAlgorithm
     public static Matrix transpose (Matrix m) {
         Matrix  ret = new Matrix(m.getNumCols(), m.getNumRows());
 
@@ -71,6 +77,7 @@ public class MatrixUtils {
         return (ret);
     }
 
+    @InterestingAlgorithm
     public static Matrix submatrix (Matrix m, int startRow, int startCol, int rowLen, int colLen) {
         Matrix ret = new Matrix(rowLen, colLen);
 
@@ -82,6 +89,7 @@ public class MatrixUtils {
         return (ret);
     }
 
+    @InterestingAlgorithm
     public static Matrix identity (int size) {
 
         Matrix  m = new Matrix(size, size);
@@ -91,7 +99,7 @@ public class MatrixUtils {
         return (m);
     }
 
-
+    @InterestingAlgorithm
     public static Matrix    rotate (Matrix m, Axis axis, double degrees) {
 
         double radians = Math.toRadians(degrees);

@@ -15,6 +15,7 @@ import java.util.Random;
  */
 public class MiscUtils {
 
+    @InterestingAlgorithm
     public static int fibonacci(int n) {
         if (n < 0)
             throw new IllegalArgumentException("Invalid fibonacci num: " + n);
@@ -50,6 +51,7 @@ public class MiscUtils {
      * @param <T>
      * @return
      */
+    @InterestingAlgorithm
     public static <T> LinkNode removeValue (LinkNode start, T value) {
         LinkNode ret = null;
         LinkNode cur = ret;
@@ -78,7 +80,8 @@ public class MiscUtils {
      * @param root
      * @return
      */
-    public static LinkNode reverseLink (LinkNode root) {
+    @InterestingAlgorithm
+    public static LinkNode reverseLinkedList (LinkNode root) {
 
         if (root == null)
             return (null);
@@ -113,6 +116,7 @@ public class MiscUtils {
      * @param root
      * @return
      */
+    @InterestingAlgorithm
     public static LinkNode   detectCycle (LinkNode root) {
         LinkNode cur = root;
         LinkNode twiceCur = root;
@@ -137,6 +141,7 @@ public class MiscUtils {
      * @param root2
      * @return
      */
+    @InterestingAlgorithm
     public static LinkNode   detectIntersection (LinkNode root1, LinkNode root2) {
 
         int lengthFirst = length(root1);
@@ -169,6 +174,7 @@ public class MiscUtils {
      * @param root
      * @return
      */
+    @InterestingAlgorithm
     public static int length (LinkNode root) {
         int length = 0;
 
@@ -186,6 +192,7 @@ public class MiscUtils {
      * @param index of column header
      * @return Excel column header
      */
+    @InterestingAlgorithm
     public static String    excelColumn (int index) {
         /**
          * 1 -> A
@@ -222,6 +229,7 @@ public class MiscUtils {
      * @param unsortedNonNegIntegers   Non negative integers
      * @return
      */
+    @InterestingAlgorithm
     public static int       maximumGap (List<Integer> unsortedNonNegIntegers) {
         // Hard part is doing it without sorting i.e. in linear time
 
@@ -229,6 +237,7 @@ public class MiscUtils {
     }
 
     // compares version numbers of the form 1.0.0
+    @InterestingAlgorithm
     public static int       compareVersions (String v1, String v2) {
 
         int v1FirstDotIdx = v1.indexOf('.');
@@ -251,6 +260,7 @@ public class MiscUtils {
      * @param numbers
      * @return A peak element is higher than its neighbors. Returns first one or null if none.
      */
+    @InterestingAlgorithm
     public static Integer       findPeakElement (List<Integer> numbers) {
 
         if (numbers == null)

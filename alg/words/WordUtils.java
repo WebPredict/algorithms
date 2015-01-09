@@ -1,5 +1,6 @@
 package alg.words;
 
+import alg.misc.InterestingAlgorithm;
 import alg.strings.StringUtils;
 import alg.trees.Trie;
 
@@ -16,10 +17,12 @@ public class WordUtils {
 
     public static String []     commonWords; // TODO fill
 
+    @InterestingAlgorithm
     public static boolean   rhymingEnglishWords (String s1, String s2) {
         return (false);
     }
 
+    @InterestingAlgorithm
     public static String    soundex (String s) {
 
         if (s == null)
@@ -62,7 +65,7 @@ public class WordUtils {
         return (ret);
     }
 
-
+    @InterestingAlgorithm
     public static String [] doubleMetaphone (String s) {
         return (null); // TODO
     }
@@ -79,6 +82,7 @@ public class WordUtils {
      * @param pastSuggestionsToCorrectionsMap
      * @return
      */
+    @InterestingAlgorithm
     public static String    autocorrect (String s, Map<String, Float> wordToGeneralFrequencyMap, Map<String, String> pastSuggestionsToCorrectionsMap) {
         if (wordToGeneralFrequencyMap == null)
             return (s); // can't do anything
@@ -134,11 +138,12 @@ public class WordUtils {
         return (s); // TODO
     }
 
-
+    @InterestingAlgorithm
     public static String []     syllables (String s) {
         return (null); // TODO
     }
 
+    @InterestingAlgorithm
     public static String    capitalizeAndJoin (String... words) {
         String ret = "";
 
@@ -148,6 +153,7 @@ public class WordUtils {
         return (ret);
     }
 
+    @InterestingAlgorithm
     public static String    capitalizeAndSpace (String camelCaseWord) {
         ArrayList<Character> chars = new ArrayList<Character>();
         boolean sawLower = false;
@@ -185,7 +191,7 @@ public class WordUtils {
         return (Character.toUpperCase(word.charAt(0)) + word.substring(1));
     }
 
-
+    @InterestingAlgorithm
     public static String    reverseWords (String s) {
         // reverse order of words, not letters in words - do the double reverse:
 
@@ -222,6 +228,7 @@ public class WordUtils {
             return (s + "s");
     }
 
+    @InterestingAlgorithm
     public static List<String>  leftRightTextJustification (String words, int lineLength) {
         if (words == null)
             return (null);
@@ -235,6 +242,7 @@ public class WordUtils {
         return (leftRightTextJustification(allWords, lineLength));
     }
 
+    @InterestingAlgorithm
     public static List<String>  leftRightTextJustificationParagraphs (List<String> paragraphs, int lineLength) {
         if (paragraphs == null)
             return (null);
@@ -258,6 +266,7 @@ public class WordUtils {
         return (leftRightTextJustification(allWords, lineLength));
     }
 
+    @InterestingAlgorithm
     public static List<String>  leftRightTextJustification (List<String> words, int lineLength) {
         if (words == null)
             return (null);
@@ -370,6 +379,7 @@ public class WordUtils {
         return (lines);
     }
 
+    @InterestingAlgorithm
     public static boolean isMatch (String s, String pattern) {
         // ? matches any character
         // * matches any sequence of characters including empty
@@ -380,6 +390,7 @@ public class WordUtils {
     	return (null); // TODO
     }
 
+    @InterestingAlgorithm
     public static int       numWords (String s) {
         if (s == null)
             return (0);
@@ -415,6 +426,7 @@ public class WordUtils {
      * @param dictionary
      * @return
      */
+    @InterestingAlgorithm
     public static List<String>  minWordLadder (String start, String end, List<String> dictionary) {
         List<String> ret = null;
 

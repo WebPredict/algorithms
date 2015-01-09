@@ -1,5 +1,7 @@
 package alg.games;
 
+import alg.misc.InterestingAlgorithm;
+
 /**
  * Created with IntelliJ IDEA.
  * User: jsanchez
@@ -19,6 +21,7 @@ public class SquareGrid {
         }
     }
 
+    @InterestingAlgorithm
     public void rotate (int times, boolean clockwise) {
 
         int actualTimes = times % 4;

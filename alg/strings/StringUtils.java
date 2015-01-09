@@ -1,5 +1,7 @@
 package alg.strings;
 
+import alg.misc.InterestingAlgorithm;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -14,6 +16,12 @@ import java.util.List;
  */
 public class StringUtils {
 
+    /**
+     *
+     * @param s
+     * @return
+     */
+    @InterestingAlgorithm
     public static boolean isPalindrome (String s) {
         if (s == null)
             return (true);
@@ -25,6 +33,7 @@ public class StringUtils {
         return (true);
     }
 
+    @InterestingAlgorithm
     public static String [] chunk (String s, int size) {
     	if (s == null)
     		return (null);
@@ -42,7 +51,8 @@ public class StringUtils {
     	}
     	return (ret);
     }
-    
+
+    @InterestingAlgorithm
     public static String repeat (char c, int num) {
         char []     repeated = new char[num];
         for (int i = 0; i < num; i++) {
@@ -51,6 +61,7 @@ public class StringUtils {
         return (new String(repeated));
     }
 
+    @InterestingAlgorithm
     public static String join (String [] lines) {
         StringBuilder builder = new StringBuilder();
 
@@ -85,6 +96,7 @@ public class StringUtils {
 
     public static int DPMaxMatrixSize = 1000 * 1000;
 
+    @InterestingAlgorithm
     public static String longestCommonSubstring (String s1, String s2) {
         if (s1 == null || s2 == null)
             return (null);
@@ -127,6 +139,7 @@ public class StringUtils {
         return (ret);
     }
 
+    @InterestingAlgorithm
     public static boolean areAnagrams (String s1, String s2) {
         if (s1 == null)
             return (s2 == null);
@@ -158,6 +171,7 @@ public class StringUtils {
        return (charToIntCount.size() == 0);
     }
 
+    @InterestingAlgorithm
     public static List<String> listAnagrams (String s) {
         if (s == null)
             return (null);
@@ -180,6 +194,7 @@ public class StringUtils {
         return (retAnagrams);
     }
 
+    @InterestingAlgorithm
     public static List<List<String>>    allPossiblePalindromePartitions (String s) {
         return (null); // TODO
     }
@@ -188,6 +203,7 @@ public class StringUtils {
         return ((s == null ? "" : s) + String.copyValueOf(new char[] {padding}, 0, amount));
     }
 
+    @InterestingAlgorithm
     public static String        longestCommonSubsequence (String s1, String s2) {
         if (s1 == null || s2 == null)
             return (null);
@@ -238,6 +254,7 @@ public class StringUtils {
 
     // TODO: need a version of this for lines, not individual characters
     // TODO: optimize by detecting any initial similarities and end similarities in the strings/lines
+    @InterestingAlgorithm
     public static void printDiff (StringBuilder buf, int [][] longest, String s1, String s2, int i, int j) {
         if (i > 0 && j > 0 && s1.charAt(i) == s2.charAt(j)) {
             printDiff(buf, longest, s1, s2, i - 1, j - 1);
@@ -283,6 +300,7 @@ public class StringUtils {
         buf.append(text + "\n");
     }
 
+    @InterestingAlgorithm
     public static Integer extractIntegerFrom (String s) {
         int started = -1;
         int ended = -1;
@@ -314,10 +332,12 @@ public class StringUtils {
      * @param s
      * @return if s == "aaaabbbccccd" return "a4b3c4d" or original string if compressed will be longer
      */
+    @InterestingAlgorithm
     public static String	basicCompression (String s) {
     	return (s); // TODO
     }
-    
+
+    @InterestingAlgorithm
     public static int		shortestDistanceBetweenWords (String text, String word1, String word2) {
     	return (0); // TODO
     }

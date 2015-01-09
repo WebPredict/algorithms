@@ -1,5 +1,7 @@
 package alg.bits;
 
+import alg.misc.InterestingAlgorithm;
+
 /**
  * Created with IntelliJ IDEA.
  * User: jsanchez
@@ -9,6 +11,7 @@ package alg.bits;
  */
 public class BitmapUtils {
 
+    @InterestingAlgorithm
     public static Bitmap wipeOut(Bitmap bitmap, boolean toOnes) {
         int width = bitmap.getWidth();
         int height = bitmap.getHeight();
@@ -22,6 +25,7 @@ public class BitmapUtils {
         return (bitmap);
     }
 
+    @InterestingAlgorithm
     public static Bitmap invert(Bitmap bitmap) {
         int width = bitmap.getWidth();
         int height = bitmap.getHeight();
@@ -35,6 +39,7 @@ public class BitmapUtils {
         return (bitmap);
     }
 
+    @InterestingAlgorithm
     public static Bitmap diff (Bitmap b1, Bitmap b2) {
         if ((b1 == null && b2 != null) || (b2 == null && b1 != null) ||
                 b1.getHeight() != b2.getHeight() || b1.getWidth() != b2.getWidth())

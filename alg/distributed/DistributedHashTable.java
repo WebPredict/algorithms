@@ -1,5 +1,7 @@
 package alg.distributed;
 
+import alg.misc.InterestingAlgorithm;
+
 /**
  * Created with IntelliJ IDEA.
  * User: jsanchez
@@ -9,10 +11,12 @@ package alg.distributed;
  */
 public class DistributedHashTable<K, V> {
 
+    @InterestingAlgorithm
     public V get (K key) {
         return (null); // TODO
     }
 
+    @InterestingAlgorithm
     public void put (K key, V value) {
         // TODO
     }

@@ -1,5 +1,6 @@
 package alg.arrays;
 
+import alg.misc.InterestingAlgorithm;
 import alg.misc.MiscUtils;
 
 import java.util.*;
@@ -13,6 +14,7 @@ import java.util.*;
  */
 public class ArrayUtils {
 
+    @InterestingAlgorithm
     public static Comparable [] removeDuplicates (Comparable [] inArray) {
         if (inArray == null)
             return (null);
@@ -38,6 +40,7 @@ public class ArrayUtils {
      * @param array2
      * @return  Sorted array of array1 + array2's contents
      */
+    @InterestingAlgorithm
     public static Comparable [] mergeSortedArrays (Comparable [] array1, Comparable [] array2) {
         if (array1 == null)
             return (array2);
@@ -61,6 +64,7 @@ public class ArrayUtils {
         return (ret);
     }
 
+    @InterestingAlgorithm
     public int []           equilibriumIndices (int [] array) {
         if (array == null)
             return (null);
@@ -96,6 +100,7 @@ public class ArrayUtils {
         return (ret);
     }
 
+    @InterestingAlgorithm
     public static int []    interleave (int [] array1, int [] array2) {
         if (array1 == null)
             return (array2);
@@ -125,6 +130,7 @@ public class ArrayUtils {
         return (ret);
     }
 
+    @InterestingAlgorithm
     public static List<Interval>    merge(List<Interval> intervalList) {
         if (intervalList == null)
             return (null);
@@ -186,6 +192,7 @@ public class ArrayUtils {
      * @param numbers
      * @return
      */
+    @InterestingAlgorithm
     public static Integer majorityElement (int [] numbers) {
         if (numbers != null) {
             int     threshhold = numbers.length / 2 + 1;
@@ -214,6 +221,7 @@ public class ArrayUtils {
      * @param end
      * @return
      */
+    @InterestingAlgorithm
     public static int medianOfMediansIdx (List<Integer> list, int start, int end) {
         int numMedians = (int)Math.ceil(((double)(end - start)) / 5d);
 
@@ -251,6 +259,7 @@ public class ArrayUtils {
         return (list.get(idx));
     }
 
+    @InterestingAlgorithm
     public static int selectIdx (List<Integer> list, int left, int right, int n) {
         if (left == right)
             return (left);
@@ -278,6 +287,7 @@ public class ArrayUtils {
      * @param pivotIndex
      * @return
      */
+    @InterestingAlgorithm
     public static int partition(List<Integer> list, int left, int right, int pivotIndex) {
         int pivotValue = list.get(pivotIndex);
         MiscUtils.swap(list, pivotIndex, right);

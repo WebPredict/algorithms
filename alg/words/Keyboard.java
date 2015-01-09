@@ -1,5 +1,7 @@
 package alg.words;
 
+import alg.misc.InterestingAlgorithm;
+
 import java.util.HashMap;
 
 /**
@@ -33,6 +35,7 @@ public class Keyboard {
         return (characterCoordinatesMap.get(c));
     }
 
+    @InterestingAlgorithm
     public static int       getDistanceBetween (char c1, char c2) {
         Integer [] c1Coord = characterCoordinatesMap.get(c1);
 

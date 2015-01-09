@@ -1,6 +1,7 @@
 package alg.math.stats;
 
 import alg.arrays.ArrayUtils;
+import alg.misc.InterestingAlgorithm;
 import alg.sort.SortUtils;
 
 import java.util.HashMap;
@@ -52,6 +53,7 @@ public class StatUtils {
         return (ret);
     }
 
+    @InterestingAlgorithm
     public static double modeSkewness (int [] values) {
         double mean = average(values);
         Integer mode = mode(values);
@@ -62,6 +64,7 @@ public class StatUtils {
         return ((mean - (double)mode) / stddev(values));
     }
 
+    @InterestingAlgorithm
     public static Integer mode (int [] values) {
         Integer ret = null;
 
@@ -87,6 +90,7 @@ public class StatUtils {
         return (ret);
     }
 
+    @InterestingAlgorithm
     public static double median (int [] values) {
         if (values == null || values.length == 0)
             return (Double.NaN);
@@ -102,6 +106,7 @@ public class StatUtils {
             return ((double)sorted [sorted.length / 2]);
     }
 
+    @InterestingAlgorithm
     public static double variance (int [] values) {
         if (values == null || values.length == 0)
             return (Double.NaN);
@@ -120,6 +125,7 @@ public class StatUtils {
     }
 
     // runtime should be O(log(m + n)):
+    @InterestingAlgorithm
     public static double findMedianSortedArrays (int [] a1, int [] a2) {
          return (Double.NaN); // TODO
     }

@@ -1,6 +1,7 @@
 package alg.sequence;
 
 import alg.math.MathUtils;
+import alg.misc.InterestingAlgorithm;
 import alg.misc.MiscUtils;
 import alg.strings.StringUtils;
 
@@ -19,7 +20,7 @@ public class SequenceUtils {
      * TODO: Hirschberg's algorithm for optimal sequence alignment
      *
      */
-
+    @InterestingAlgorithm
     public static int hammingDistance (String s1, String s2) {
         int s1Len = s1 == null ? 0 : s1.length();
         int s2Len = s2 == null ? 0 : s2.length();
@@ -35,6 +36,7 @@ public class SequenceUtils {
         return (distance);
     }
 
+    @InterestingAlgorithm
     public static int [] needlemanWunschScore (String x, String y) {
 //        HashMap<Integer, HashMap<Integer, Integer>> matrixMap = new HashMap<Integer, HashMap<Integer, Integer>>();
 //
@@ -87,6 +89,7 @@ public class SequenceUtils {
         return (1);
     }
 
+    @InterestingAlgorithm
     public static String []     hirschbergOptimalAlignment (String x, String y) {
         String []   ret = new String [] {"", ""};
         int         xLen = x == null ? 0 : x.length();
@@ -156,6 +159,7 @@ public class SequenceUtils {
         return (levenshteinDistanceRec(s1, s1 == null ? 0 : s1.length(), s2, s2 == null ? 0 : s2.length()));
     }
 
+    @InterestingAlgorithm
     public static int levenshteinDistanceRec (String s1, int s1Len, String s2, int s2Len) {
         if (s1Len == 0)
             return (s2Len);
@@ -181,6 +185,7 @@ public class SequenceUtils {
      * @param s2
      * @return
      */
+    @InterestingAlgorithm
     public static int levenshteinDistance (String s1, String s2) {
         if (MiscUtils.safeEquals(s1, s2))
             return (0);

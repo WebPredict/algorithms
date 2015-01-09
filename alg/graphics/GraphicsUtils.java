@@ -1,5 +1,7 @@
 package alg.graphics;
 
+import alg.misc.InterestingAlgorithm;
+
 import java.awt.geom.Point2D;
 
 /**
@@ -19,10 +21,12 @@ public class GraphicsUtils {
      *
      */
 
+    @InterestingAlgorithm
     public static void paintfill (ImageMap image, int colorVal, Point2D start) {
          // TODO
     }
 
+    @InterestingAlgorithm
     public int maxPointsOnLine (Point2D [] points) {
         return (0); // TODO
     }
@@ -32,6 +36,7 @@ public class GraphicsUtils {
      * @param points
      * @return
      */
+    @InterestingAlgorithm
     public double   simplePolygonArea (Point2D [] points) {
         double area = 0;
 
@@ -61,10 +66,12 @@ public class GraphicsUtils {
         return (area);
     }
 
+    @InterestingAlgorithm
     public boolean  isSimplePolygon (Point2D [] points) {
         return (false); // TODO
     }
 
+    @InterestingAlgorithm
     public Point2D []   smooth (Point2D [] line) {
         // Ramer-Douglas-Peucker
         // rectangular smooth
@@ -72,6 +79,7 @@ public class GraphicsUtils {
     }
 
     // Could return a point, line segment, or line
+    @InterestingAlgorithm
     public Object       lineIntersect (Line2D l1, Line2D l2) {
         return (null);
     }

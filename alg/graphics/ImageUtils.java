@@ -1,5 +1,7 @@
 package alg.graphics;
 
+import alg.misc.InterestingAlgorithm;
+
 /**
  * Created with IntelliJ IDEA.
  * User: jsanchez
@@ -15,6 +17,7 @@ public class ImageUtils {
      * @param radiusOfSnow
      * @return
      */
+    @InterestingAlgorithm
     public static ImageMap correctSnow (ImageMap imageMap, int radiusOfSnow) {
         ImageMap blackAndWhiteImage = imageMap.clone().threshold(1);
         // Copy the threshold and dilate and erode the copy
@@ -34,6 +37,7 @@ public class ImageUtils {
      * @param snowPixels
      * @return new ImageMap with pixels marked as snow with the color of surrounding pixels in original
      */
+    @InterestingAlgorithm
     public static ImageMap blendSnowPixels (ImageMap original, ImageMap snowPixels) {
 
         int rows = original.getRows();
@@ -58,6 +62,7 @@ public class ImageUtils {
         return (ret);
     }
 
+    @InterestingAlgorithm
     public static ImageMap diff (ImageMap map1, ImageMap map2) {
         int rows = map1.getRows();
         int cols = map1.getCols();

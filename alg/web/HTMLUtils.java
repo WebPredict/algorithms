@@ -1,5 +1,6 @@
 package alg.web;
 
+import alg.misc.InterestingAlgorithm;
 import alg.strings.StringUtils;
 import alg.words.WordUtils;
 
@@ -127,6 +128,7 @@ public class HTMLUtils {
         // TODO
     }
 
+    @InterestingAlgorithm
     public static String    formatHTML (String content, int tabSize) {
 
         String []   lines = content.split("\n");
@@ -156,6 +158,7 @@ public class HTMLUtils {
         return (StringUtils.join(lines));
     }
 
+    @InterestingAlgorithm
     public static int   unbalancedTags (String line) {
         if (line == null || line.trim().equals(""))
             return (0);

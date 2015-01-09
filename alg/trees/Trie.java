@@ -1,5 +1,6 @@
 package alg.trees;
 
+import alg.misc.InterestingAlgorithm;
 import alg.util.Node;
 
 import java.util.*;
@@ -42,6 +43,7 @@ public class Trie {
         }
     }
 
+    @InterestingAlgorithm
     public void insertWord (String word) {
     	if (word == null || word.length() == 0)
             return;
@@ -58,6 +60,7 @@ public class Trie {
         wordsStartingWithCache.remove(word);
     }
 
+    @InterestingAlgorithm
     public boolean wordExists (String word) {
         if (word == null || word.length() == 0)
             return (true);
@@ -73,6 +76,7 @@ public class Trie {
 
     }
 
+    @InterestingAlgorithm
     public Set<String> wordsStartingWith (String prefix) {
 
         if (wordsStartingWithCache.containsKey(prefix)) {

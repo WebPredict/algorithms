@@ -1,5 +1,7 @@
 package alg.games;
 
+import alg.misc.InterestingAlgorithm;
+
 /**
  * Created with IntelliJ IDEA.
  * User: jsanchez
@@ -28,6 +30,7 @@ public class Life {
         return (board.length == 0 ? 0 : board.length);
     }
 
+    @InterestingAlgorithm
     public void nextGeneration (int generations) {
 
         // TODO: is there a way to do this more efficiently, a la manhattan distance for image erode/dilate?

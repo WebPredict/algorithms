@@ -1,5 +1,7 @@
 package alg.graphics;
 
+import alg.misc.InterestingAlgorithm;
+
 import java.awt.geom.Point2D;
 
 /**
@@ -17,10 +19,12 @@ public class Polygon {
         this.points = points;
     }
 
+    @InterestingAlgorithm
     public boolean  isSimple () {
         return (false); // TODO
     }
 
+    @InterestingAlgorithm
     public boolean  isConvex () {
         return (false); // TODO
     }
@@ -33,6 +37,7 @@ public class Polygon {
         this.points = points;
     }
 
+    @InterestingAlgorithm
     public boolean  selfIntersects () {
         return (false); // TODO hmm how to do this in less than O(n^2) time?
     }

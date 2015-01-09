@@ -1,5 +1,7 @@
 package alg.graphics;
 
+import alg.misc.InterestingAlgorithm;
+
 /**
  * Created with IntelliJ IDEA.
  * User: jsanchez
@@ -45,6 +47,7 @@ public class ImageMap {
 
     public static final int TMP_SET_COLOR = -1;
 
+    @InterestingAlgorithm
     public  ImageMap erode () {
         // TODO: need to rewrite this to support multiple colors beyond B&W!
         for (int i = 0; i < rows; i++) {
@@ -74,6 +77,7 @@ public class ImageMap {
         return (this);
     }
 
+    @InterestingAlgorithm
     public  ImageMap dilate () {
 
         // TODO: need to rewrite this to support multiple colors beyond B&W!
@@ -104,6 +108,7 @@ public class ImageMap {
         return (this);
     }
 
+    @InterestingAlgorithm
     public ImageMap dilate (int k) {
         convertToManhattanDistance();
 
@@ -115,6 +120,7 @@ public class ImageMap {
         return (this);
     }
 
+    @InterestingAlgorithm
     public ImageMap erode (int k) {
         convertToManhattanDistance();
 
@@ -137,6 +143,7 @@ public class ImageMap {
         return (copy);
     }
 
+    @InterestingAlgorithm
     public ImageMap  convertToManhattanDistance () {
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
@@ -177,6 +184,7 @@ public class ImageMap {
         return (this);
     }
 
+    @InterestingAlgorithm
     public int      getAverageColorAround (int i, int j) {
 
         if (rows == 1 && cols == 1)

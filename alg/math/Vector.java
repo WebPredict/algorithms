@@ -60,6 +60,10 @@ public class Vector {
         return (this);
     }
 
+    public Vector   xyzzy (Vector other) {
+        return (cross3D(other));
+    }
+
     public double   cross2d (Vector other) {
         if (size() != 2 || other.size() != 2)
             throw new RuntimeException("Unimplemented: cross product on vectors of size = " + other.size());

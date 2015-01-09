@@ -3,6 +3,7 @@ package alg.math.finance;
 import alg.arrays.Interval;
 import alg.math.prob.ProbUtils;
 import alg.math.stats.StatUtils;
+import alg.misc.InterestingAlgorithm;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -22,6 +23,7 @@ public class StockUtils {
      * @param prices
      * @return
      */
+    @InterestingAlgorithm
     public static int [][]   getAllPeakAndValleyIndicesLeftToRight (int [] prices) {
         if (prices == null)
             return (null);
@@ -40,6 +42,7 @@ public class StockUtils {
      * @param prices
      * @return
      */
+    @InterestingAlgorithm
     public static double    computeVolatility (int [] prices) {
         return (StatUtils.stddev(prices));
     }
@@ -50,10 +53,17 @@ public class StockUtils {
      * @param n
      * @return
      */
+    @InterestingAlgorithm
     public static int [][]  getTopNPeakAndValleyIndicesSorted (int [] prices, int n) {
         return (null);
     }
 
+    /**
+     *
+     * @param prices
+     * @return
+     */
+    @InterestingAlgorithm
     public static int   maxProfitWithMaxTransactions (int [] prices) {
         if (prices == null)
             return (0);
@@ -79,6 +89,12 @@ public class StockUtils {
         return (ret);
     }
 
+    /**
+     *
+     * @param prices
+     * @return
+     */
+    @InterestingAlgorithm
     public static int   maxProfitWithAtMostTwoTransactions (int [] prices) {
         if (prices == null)
             return (0);
@@ -124,111 +140,11 @@ public class StockUtils {
         return (ret);
     }
 
-
-//    /**
-//     * TODO remove maybe
-//     * @param prices
-//     * @return
-//     */
-//    public static int   maxProfitWithAtMostTwoTransactionsBad (int [] prices) {
-//        if (prices == null)
-//            return (0);
-//
-//        int ret = 0;
-//
-//
-//        /**
-//         * one approach:
-//         * get least, second, third idxes
-//         * get most, second, third idxes
-//         *
-//         *  then we can make intervals for all pairs of low, high where lowidx < highidx
-//         *  then we need to return either two non-overlapping pairs, or one pair, whichever adds to the most
-//         *
-//         */
-//
-//        int [] lowestValues = new int [] {Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE};
-//        int [] lowestValueIdxes = new int [] {-1, -1, -1};
-//        int [] highestValues = new int [] {Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE};
-//        int [] highestValueIdxes = new int [] {-1, -1, -1};
-//
-//        for (int i = 0; i < prices.length; i++) {
-//            if (prices [i] < lowestValues [0]) {
-//                lowestValues[0] = prices [i];
-//                lowestValueIdxes[0] = i;
-//            }
-//            else if (prices [i] < lowestValues[1]) {
-//                lowestValues[1] = prices [i];
-//                lowestValueIdxes[1] = i;
-//            }
-//            else if (prices [i] < lowestValues[2]) {
-//                lowestValues[2] = prices [i];
-//                lowestValueIdxes[2] = i;
-//            }
-//            // TODO
-//            if (prices [i] < lowestValues [0]) {
-//                lowestValues[0] = prices [i];
-//                lowestValueIdxes[0] = i;
-//            }
-//            else if (prices [i] < lowestValues[1]) {
-//                lowestValues[1] = prices [i];
-//                lowestValueIdxes[1] = i;
-//            }
-//            else if (prices [i] < lowestValues[2]) {
-//                lowestValues[2] = prices [i];
-//                lowestValueIdxes[2] = i;
-//            }
-//            // TODO the same for highest
-//        }
-//
-//        ArrayList<Interval> intervals = new ArrayList<Interval>();
-//        int maxDiff = 0;
-//        for (int i = 0; i < lowestValueIdxes.length; i++) {
-//            int lowestIdx = lowestValueIdxes [i];
-//
-//            for (int j = 0; j < highestValueIdxes.length; j++) {
-//                int highestIdx = highestValueIdxes [j];
-//                if (highestIdx > lowestIdx) {
-//                    int diff = highestValues [j] - lowestValues [i];
-//                    if (diff > maxDiff)
-//                        maxDiff = diff;
-//                    intervals.add(new Interval(lowestIdx, highestIdx));
-//                }
-//            }
-//        }
-//        Collections.sort(intervals, new Comparator<Interval>() {
-//
-//            public int compare(Interval first, Interval second) {
-//                //return ((first.end - first.start) - (second.end - second.start));
-//                if (first.start < second.start)
-//                    return (-1);
-//                else if (first.start == second.start)
-//                    return (0);
-//                else
-//                    return (1);
-//            }
-//        });
-//
-//        for (int i = 0; i < intervals.size(); i++) {
-//            Interval cur = intervals.get(i);
-//
-//            for (int j = i + 1; j < intervals.size(); j++) {
-//                Interval next = intervals.get(j);
-//                if (next.start > cur.end) {
-//                    int possibleMax  = prices [cur.end] - prices [cur.start] + prices [next.end] - prices [next.start];
-//                    if (possibleMax > maxDiff)
-//                        maxDiff = possibleMax;
-//                }
-//            }
-//        }
-//
-//        return (maxDiff);
-//    }
-
     /**
      * @param prices
      * @return
      */
+    @InterestingAlgorithm
     public static int   maxProfitWithOneTransaction (int [] prices) {
         if (prices == null)
             return (0);
@@ -240,6 +156,7 @@ public class StockUtils {
      * @param prices
      * @return
      */
+    @InterestingAlgorithm
     public static int   maxProfitWithOneTransaction (int [] prices, int startIdx, int endIdx) {
         if (prices == null)
             return (0);

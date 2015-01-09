@@ -1,5 +1,7 @@
 package alg.graph;
 
+import alg.misc.InterestingAlgorithm;
+
 import java.util.List;
 
 /**
@@ -17,18 +19,22 @@ public class GraphUtils {
      */
 
 
+    @InterestingAlgorithm
     public static Graph minimumSpanningTree (Graph input) {
         return (null); // TODO
     }
 
+    @InterestingAlgorithm
     public static List<Graph> separateIntoClusters (Graph input)  {
         return (null); // TODO
     }
-    
+
+    @InterestingAlgorithm
     public static void depthFirstSearch (Graph input, VertexVisitor visitor) {
     	// TODO
     }
-    
+
+    @InterestingAlgorithm
     public static void breadthFirstSearch (Graph input, VertexVisitor visitor) {
     	// TODO
     }

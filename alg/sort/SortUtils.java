@@ -2,6 +2,7 @@ package alg.sort;
 
 import alg.arrays.ArrayUtils;
 import alg.math.MathUtils;
+import alg.misc.InterestingAlgorithm;
 import alg.misc.MiscUtils;
 import alg.misc.RecursionDepthExceeded;
 
@@ -16,6 +17,7 @@ import java.util.*;
  */
 public class SortUtils {
 
+    @InterestingAlgorithm
     public static <T extends Comparable<? super T>> void    quickSort(List<T> list) {
         int size = list == null ? 0 : list.size();
         if (size < 2)
@@ -23,6 +25,7 @@ public class SortUtils {
     	quickSort(list, 0, size);
     }
 
+    @InterestingAlgorithm
     static <T extends Comparable<? super T>> void    quickSort(List<T> list, int start, int end) {
         if (start < end) {
             int partitionIdx = partition(list, start, end);
@@ -38,6 +41,7 @@ public class SortUtils {
         quickSort(list, 0, size, maxRecDepth, 0);
     }
 
+    @InterestingAlgorithm
     static <T extends Comparable<? super T>> void    quickSort(List<T> list, int start, int end, int maxRecDepth, int recDepth) throws RecursionDepthExceeded {
         if (recDepth >= maxRecDepth)
             throw new RecursionDepthExceeded(maxRecDepth);
@@ -49,6 +53,7 @@ public class SortUtils {
         }
     }
 
+    @InterestingAlgorithm
     public static <T extends Comparable<? super T>> int partition (List<T> list, int start, int end) {
         int pivotIdx = choosePivot(list, start, end);
         T pivotValue = list.get(pivotIdx);
@@ -72,6 +77,7 @@ public class SortUtils {
         return (new Random().nextInt(end - start)) + start;
     }
 
+    @InterestingAlgorithm
     public static <T extends Comparable<? super T>> void    mergeSort(List<T> list) {
     	int size = list == null ? 0 : list.size();
 
@@ -96,6 +102,7 @@ public class SortUtils {
         }
     }
 
+    @InterestingAlgorithm
     public static  <T extends Comparable<? super T>> void mergeSortedListsWithStorage (List<T> first, List<T> second, List<T> storage) {
         int firstLen = first == null ? 0 : first.size();
         int secondLen = second == null ? 0 : second.size();
@@ -133,6 +140,7 @@ public class SortUtils {
      * @param list
      * @param <T>
      */
+    @InterestingAlgorithm
     public static <T extends Comparable<? super T>> void    introSort(List<T> list) {
     	try {
             quickSort(list, (int)(3d * Math.log(list.size())));
@@ -142,6 +150,7 @@ public class SortUtils {
         }
     }
 
+    @InterestingAlgorithm
     public static <T extends Comparable<? super T>> void    bubbleSort(List<T> list) {
         if (list != null) {
             for (int i = 0; i < list.size(); i++) {
@@ -164,6 +173,7 @@ public class SortUtils {
         heapSort(list, null);
     }
 
+    @InterestingAlgorithm
     public static <T> void    heapSort (List<T> list, Comparator<T> comparator) {
          if (list == null)
              return;
@@ -195,6 +205,7 @@ public class SortUtils {
         }
     }
 
+    @InterestingAlgorithm
     public static <T> void    heapify (List<T> list, int count) {
         int start = (int)Math.floor((count - 2) / 2);
 
@@ -213,6 +224,7 @@ public class SortUtils {
         }
     }
 
+    @InterestingAlgorithm
     public static <T> void    siftDown (List<T> list, int start, int end, Comparator<T> comparator) {
         int root = start;
 
@@ -236,6 +248,7 @@ public class SortUtils {
         }
     }
 
+    @InterestingAlgorithm
     public static <T> void    siftDown (List<T> list, int start, int end) {
         int root = start;
 
@@ -259,6 +272,7 @@ public class SortUtils {
         }
     }
 
+    @InterestingAlgorithm
     public static <T extends Comparable<? super T>> void    selectionSort(List<T> list) {
     	if (list != null) {
             for (int i = 0; i < list.size(); i++) {
@@ -286,6 +300,7 @@ public class SortUtils {
     	// TODO
     }
 
+    @InterestingAlgorithm
     public static void    radixSort (int [] values) {
     	if (values == null || values.length < 2)
             return;
@@ -322,6 +337,7 @@ public class SortUtils {
      * 
      * @param inputLargeDataListFileName name of a file of a list of items to be sorted. May be too large to fit in memory
      */
+    @InterestingAlgorithm
     public static void		externalSort (String inputLargeDataListFileName, String outputSortedDataListFileName) {
         // load blocks into memory one by one, sort them, then merge sorted blocks in pairs?
     	// TODO

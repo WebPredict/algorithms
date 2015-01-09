@@ -1,5 +1,7 @@
 package alg.games;
 
+import alg.misc.InterestingAlgorithm;
+
 /**
  * Created with IntelliJ IDEA.
  * User: jsanchez
@@ -26,6 +28,7 @@ public class RubiksCube {
         BACK
     }
 
+    @InterestingAlgorithm
     public void rotate (Face face, int numTurnsClockwise) {
         // This one's a doozy
 

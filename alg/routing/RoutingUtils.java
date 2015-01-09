@@ -3,6 +3,7 @@ package alg.routing;
 import java.util.HashMap;
 
 import alg.graph.Graph;
+import alg.misc.InterestingAlgorithm;
 import alg.queues.MinPriorityQueue;
 import alg.graph.Vertex;
 
@@ -27,6 +28,7 @@ public class RoutingUtils {
 	 * @param source
 	 * @return
 	 */
+    @InterestingAlgorithm
 	public static PathInfo	dijkstra (Graph g, Vertex source) {
 		
 		HashMap<Vertex, Integer> vertexDistanceMap = new HashMap<Vertex, Integer>();

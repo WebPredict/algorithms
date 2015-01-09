@@ -1,5 +1,7 @@
 package alg.games;
 
+import alg.misc.InterestingAlgorithm;
+
 /**
  * Created with IntelliJ IDEA.
  * User: jsanchez
@@ -30,6 +32,7 @@ public class Reversi {
      * @param color
      * @return false if invalid move
      */
+    @InterestingAlgorithm
     public boolean  makeMove (int row, int col, int color) {
 
         // This method assumes a square board:

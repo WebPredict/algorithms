@@ -1,5 +1,7 @@
 package alg.io;
 
+import alg.misc.InterestingAlgorithm;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -87,6 +89,17 @@ public class FileUtils {
         return (true);
     }
 
+    /**
+     *
+     * @param fileLines
+     * @param markerLines
+     * @param additionalLines
+     * @param onlyFirstInstance
+     * @param fromTheStart
+     * @return
+     * @throws Exception
+     */
+    @InterestingAlgorithm
     public static boolean insertAfter (List<String> fileLines, String [] markerLines, String [] additionalLines, boolean onlyFirstInstance,
                                        boolean fromTheStart) throws Exception {
 
@@ -140,6 +153,17 @@ public class FileUtils {
         return (didIt);
     }
 
+    /**
+     *
+     * @param fileLines
+     * @param markerLines
+     * @param additionalLines
+     * @param onlyFirstInstance
+     * @param fromTheStart
+     * @return
+     * @throws Exception
+     */
+    @InterestingAlgorithm
     public static boolean insertBefore (List<String> fileLines, String [] markerLines, String [] additionalLines, boolean onlyFirstInstance,
                                        boolean fromTheStart) throws Exception {
         boolean matched = false;
@@ -181,6 +205,17 @@ public class FileUtils {
         return (didIt);
     }
 
+    /**
+     *
+     * @param fileLines
+     * @param markerLines
+     * @param additionalLines
+     * @param onlyFirstInstance
+     * @param fromTheStart
+     * @return
+     * @throws Exception
+     */
+    @InterestingAlgorithm
     public static boolean replace (List<String> fileLines, String [] markerLines, String [] additionalLines, boolean onlyFirstInstance,
                                         boolean fromTheStart) throws Exception {
         boolean matched = false;
@@ -222,15 +257,18 @@ public class FileUtils {
         return (false);
     }
 
+    @InterestingAlgorithm
     public static int []    patternOccurances (List<String> fileLines, String [] lookingForLines, String startMarkerRange, String endMarkerRange) throws Exception
     {
          return (null);
     }
 
+    @InterestingAlgorithm
     public static String    formatAsJson (String data, int indent) {
          return (data); // TODO  move somewhere else
     }
 
+    @InterestingAlgorithm
     public static String    formatAsXML (String data, int indent) {
         return (data); // TODO   move somewhere else
     }
@@ -287,6 +325,14 @@ public class FileUtils {
         write(buf.toString(), file, createSubdirsIfNeeded);
     }
 
+    /**
+     *
+     * @param buf
+     * @param file
+     * @param createSubdirsIfNeeded
+     * @throws Exception
+     */
+    @InterestingAlgorithm
     public static void      write (String buf, String file, boolean createSubdirsIfNeeded) throws Exception {
         PrintWriter pw = null;
 
