@@ -43,6 +43,13 @@ public class MiscUtils {
     }
 
 
+    /**
+     * Removes all nodes in a linked list with a particular value
+     * @param start
+     * @param value
+     * @param <T>
+     * @return
+     */
     public static <T> LinkNode removeValue (LinkNode start, T value) {
         LinkNode ret = null;
         LinkNode cur = ret;
@@ -64,6 +71,114 @@ public class MiscUtils {
             cur = cur.getNext();
         }
         return (ret);
+    }
+
+    /**
+     * Returns new head of list
+     * @param root
+     * @return
+     */
+    public static LinkNode reverseLink (LinkNode root) {
+
+        if (root == null)
+            return (null);
+
+        LinkNode next = root.getNext();
+
+        /**
+         * A -> B -> C -> D
+         *
+         * next is B
+         * root is A
+         * We need:
+         * B -> A, save C
+         *
+         * tmp = next -> next
+         * next -> next = root
+         * next = tmp
+         */
+        while (next != null) {
+            LinkNode tmp = next.getNext();
+
+            next.setNext(root);
+            root = next;
+
+            next = tmp;
+        }
+        return (root);
+    }
+
+    /**
+     * Returns beginning of cycle or null if none.
+     * @param root
+     * @return
+     */
+    public static LinkNode   detectCycle (LinkNode root) {
+        LinkNode cur = root;
+        LinkNode twiceCur = root;
+
+        while (twiceCur != null) {
+            cur = cur.getNext();
+
+            twiceCur = twiceCur.getNext();
+            if (twiceCur != null)
+                twiceCur = twiceCur.getNext();
+
+            if (twiceCur == cur)
+                return (cur);
+        }
+
+        return (null);
+    }
+
+    /**
+     * Returns intersecting node, or null if none.
+     * @param root1
+     * @param root2
+     * @return
+     */
+    public static LinkNode   detectIntersection (LinkNode root1, LinkNode root2) {
+
+        int lengthFirst = length(root1);
+        int lengthSecond = length(root2);
+
+        int diff = lengthFirst - lengthSecond;
+
+        LinkNode first = root1;
+        LinkNode second = root2;
+        if (diff > 0) {
+            while (diff-- > 0) {
+                 first = first.getNext();
+            }
+        }
+        else if (diff < 0) {
+            while (diff++ < 0) {
+                second = second.getNext();
+            }
+        }
+
+        while (first == null || first != second) {
+            first = first.getNext();
+            second = second.getNext();
+        }
+        return (first);
+    }
+
+    /**
+     * Returns length of list
+     * @param root
+     * @return
+     */
+    public static int length (LinkNode root) {
+        int length = 0;
+
+        LinkNode next = root;
+        while (next != null) {
+            length++;
+            next = next.getNext();
+        }
+
+        return (length);
     }
 
     /**
@@ -101,25 +216,59 @@ public class MiscUtils {
         return (StringUtils.reverse(ret));
     }
 
+    /**
+     *    find the max difference between successive elements in sorted form, but computed in linear time & space.
+     *
+     * @param unsortedNonNegIntegers   Non negative integers
+     * @return
+     */
+    public static int       maximumGap (List<Integer> unsortedNonNegIntegers) {
+        // Hard part is doing it without sorting i.e. in linear time
 
-    // find the max difference between successive elements in sorted form, but computed in linear time & space.
-    // All ints are non-negative
-    public static int       maximumGap (List<Integer> numbers) {
         return (0);
     }
 
     // compares version numbers of the form 1.0.0
     public static int       compareVersions (String v1, String v2) {
-         return (0); // TODO
+
+        int v1FirstDotIdx = v1.indexOf('.');
+        int v1NextDotIdx = v1.indexOf('.', v1FirstDotIdx + 1);
+        int v2FirstDotIdx = v2.indexOf('.');
+        int v2NextDotIdx = v2.indexOf('.', v2FirstDotIdx + 1);
+
+        int firstCompare = Integer.valueOf(v1.substring(0, v1FirstDotIdx)).compareTo(Integer.valueOf(v2.substring(0, v2FirstDotIdx)));
+        if (firstCompare != 0)
+            return (firstCompare);
+        int secondCompare = Integer.valueOf(v1.substring(v1FirstDotIdx + 1, v1NextDotIdx)).compareTo(Integer.valueOf(v2.substring(v2FirstDotIdx + 1, v2NextDotIdx)));
+        if (secondCompare != 0)
+            return (secondCompare);
+        int thirdCompare = Integer.valueOf(v1.substring(v1NextDotIdx + 1)).compareTo(Integer.valueOf(v2.substring(v1NextDotIdx + 1)));
+        return (thirdCompare);
     }
 
     /**
      *
      * @param numbers
-     * @return A peak element is higher than its neighbors. Returns first one.
+     * @return A peak element is higher than its neighbors. Returns first one or null if none.
      */
-    public static int       findPeakElement (List<Integer> numbers) {
-        return (0); // TODO
+    public static Integer       findPeakElement (List<Integer> numbers) {
+
+        if (numbers == null)
+            return (null);
+
+        for (int i = 0; i < numbers.size(); i++) {
+
+            if (i > 0 && numbers.get(i) > numbers.get(i - 1)) {
+                if (i == numbers.size() - 1)
+                    return (numbers.get(i));
+                else if (numbers.get(i + 1) < numbers.get(i))
+                    return (numbers.get(i));
+            }
+            else if (numbers.size() == 1)
+                return (numbers.get(0));
+        }
+
+        return (null);
     }
 
     public static boolean   safeEquals (String s1, String s2) {
