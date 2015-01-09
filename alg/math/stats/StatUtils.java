@@ -52,6 +52,16 @@ public class StatUtils {
         return (ret);
     }
 
+    public static double modeSkewness (int [] values) {
+        double mean = average(values);
+        Integer mode = mode(values);
+
+        if (mode == null)
+            return (Double.NaN);
+
+        return ((mean - (double)mode) / stddev(values));
+    }
+
     public static Integer mode (int [] values) {
         Integer ret = null;
 
