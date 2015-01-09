@@ -39,6 +39,12 @@ public class Polygon {
 
     @InterestingAlgorithm
     public boolean  selfIntersects () {
-        return (false); // TODO hmm how to do this in less than O(n^2) time?
+        return (false); // TODO hmm how to do this in less than O(n^2) time?  Need to sort them
+    }
+
+    @InterestingAlgorithm
+    public boolean  containsPoint (Point2D point) {
+        // TODO: draw a line that contains the point, look at intersections even odd
+        return (false);
     }
 }

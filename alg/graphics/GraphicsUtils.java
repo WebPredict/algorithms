@@ -78,9 +78,25 @@ public class GraphicsUtils {
         return (line); // TODO
     }
 
-    // Could return a point, line segment, or line
+    // Could return a point or line or nothing if parallel
     @InterestingAlgorithm
     public Object       lineIntersect (Line2D l1, Line2D l2) {
-        return (null);
+        if (l1 == null || l2 == null)
+            return (null);
+        else if (l1.equals(l2))
+            return (l1);
+
+        double slope1 = l1.getA();
+        double slope2 = l2.getA();
+
+        double offset1 = l1.getB();
+        double offset2 = l2.getB();
+
+        if (slope1 == slope2)
+            return (null); // parallel
+
+        Point2D point = new Point2D.Double((offset2 - offset1) / (slope1 - slope2), (slope1 * offset2 - slope2 * offset1) / (slope1 - slope2));
+
+        return (point);
     }
 }

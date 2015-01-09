@@ -34,6 +34,25 @@ public class ArrayUtils {
         return (ret);
     }
 
+    @InterestingAlgorithm
+    public static void swapRows (int [][] grid, int fromIdx, int toIdx) {
+        int [] tmp = grid [fromIdx];
+        grid [fromIdx] = grid [toIdx];
+        grid [toIdx] = tmp;
+    }
+
+    @InterestingAlgorithm
+    public static void swapCols (int [][] grid, int fromIdx, int toIdx) {
+
+        for (int i = 0; i < grid.length; i++) {
+            for (int j = 0; j < grid [0].length; j++) {
+                int tmp = grid [i][fromIdx];
+                grid[i][fromIdx] = grid[i][toIdx];
+                grid[i][toIdx] = tmp;
+            }
+        }
+    }
+
     /**
      *
      * @param array1

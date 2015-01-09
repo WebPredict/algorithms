@@ -1,6 +1,7 @@
 package alg.math.prob;
 
 import alg.math.MathUtils;
+import alg.misc.InterestingAlgorithm;
 
 import java.util.Random;
 
@@ -21,10 +22,11 @@ public class ProbUtils {
      * bayes theorem
      */
 
-    public double   bayesTheorem (double probA, double probB, double probBGivenA) {
+    public static double   bayesTheorem (double probA, double probB, double probBGivenA) {
         return (probBGivenA * probA / probB);
     }
-    
+
+    @InterestingAlgorithm
     public static int []	randomIntegers (int [] list, int randomSize) {
     	// returns a random subset of size randomSize from list
 
@@ -43,6 +45,7 @@ public class ProbUtils {
     	return (randomList); 
     }
 
+    @InterestingAlgorithm
     public static void  randomShuffleInPlace (Object [] objects) {
         if (objects == null)
             return;
@@ -54,8 +57,12 @@ public class ProbUtils {
         }
     }
 
-    public double expectedValue (double chanceSomethingHappens, double payoff, double penalty, int attempts) {
+    public static double expectedValue (double chanceSomethingHappens, double payoff, double penalty, int attempts) {
 
         return (double) (attempts * (chanceSomethingHappens * payoff - (1d - chanceSomethingHappens) * penalty));
+    }
+
+    public static boolean coinFlip () {
+        return (MathUtils.generateRandom(2) == 0);
     }
 }
