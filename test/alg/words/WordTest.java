@@ -24,6 +24,10 @@ public class WordTest {
 
         testAutocorrect();
 
+        System.out.println(WordUtils.reverseWords("  This   is a test"));
+        System.out.println(WordUtils.reverseWords("this "));
+        System.out.println(WordUtils.reverseWords(" "));
+
     }
 
     public static void test2 ()  {

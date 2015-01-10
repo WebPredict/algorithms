@@ -18,10 +18,25 @@ public class MiscUtilsTest {
             System.out.println(MiscUtils.fibonacciRec(i));
         }
 
+        String col1 = MiscUtils.excelColumn(1);
+        String col5 = MiscUtils.excelColumn(5);
+        String col26 = MiscUtils.excelColumn(26);
+        String col27 = MiscUtils.excelColumn(27);
+        String az = MiscUtils.excelColumn(26 + 26);
+        String ba = MiscUtils.excelColumn(26 * 2 + 1);
+        String ec = MiscUtils.excelColumn(26 * 5 + 3);
+
 
         LinkNode<Integer>   links = generateList(10);
         System.out.println(links);
 
+        LinkNode<Integer>   threeFive = new LinkNode<Integer>();
+        threeFive.setValue(3);
+        LinkNode<Integer>   five = new LinkNode<Integer>();
+        five.setValue(5);
+        threeFive.setNext(five);
+
+        LinkNode<Integer>   partialReversed = MiscUtils.reverseLinkedListBetween(threeFive, 1, 2);
         LinkNode<Integer>   reversed = MiscUtils.reverseLinkedList(links);
 
         System.out.println(reversed);

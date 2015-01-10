@@ -113,15 +113,15 @@ public class MiscUtils {
     }
 
     @InterestingAlgorithm
-    public static LinkNode reverseLinkedListBetween (LinkNode root, int fromIdx, int toIdxIncl) {
+    public static LinkNode reverseLinkedListBetween (LinkNode root, int fromIdxOneBased, int toIdxIncl) {
         if (root == null)
             return (null);
 
         LinkNode next = root;
 
-        int ctr = 0;
+        int ctr = 1;
         LinkNode beforeNext = null;
-        while (ctr < fromIdx) {
+        while (ctr < fromIdxOneBased) {
             ctr++;
             beforeNext = next;
             next = next.getNext();
@@ -129,7 +129,7 @@ public class MiscUtils {
 
         LinkNode afterNewSection = next;
         LinkNode newHead = next;
-        while (ctr < toIdxIncl) {
+        while (ctr <= toIdxIncl) {
             LinkNode tmp = next.getNext();
 
             next.setNext(newHead);
@@ -137,11 +137,13 @@ public class MiscUtils {
 
             next = tmp;
             ctr++;
-            if (ctr == toIdxIncl)
-                afterNewSection.setNext(tmp);
         }
+        afterNewSection.setNext(next);
+        if (beforeNext == null)
+            return (newHead);
 
         beforeNext.setNext(newHead);
+
         return (root);
     }
 
@@ -237,21 +239,21 @@ public class MiscUtils {
          *
          * 26 + 26 -> AZ
          * 26 * 2 + 1 -> BA
+         * 26 * 2 + 26 - > BZ
          * 26 * 26 + 3 * 26 + 4 -> ACD
          */
-
         String ret = "";
         int curval = index;
-        int counter = 1;
-        while (curval > 0) {
+        while (true) {
 
-            int remainder = curval % 26;
-            if (remainder > 0) {
-                ret += String.valueOf('A' + (remainder - 1));
-            }
-            // remove remainder
-            // then divide by power of 26
-            curval /= Math.pow(26, counter++);
+            int remainder = (curval - 1) % 26;
+            ret += String.valueOf((char)('A' + remainder));
+
+            if (curval < 27)
+                break;
+            curval -= (remainder + 1);
+
+            curval /= 26;
         }
 
         return (StringUtils.reverse(ret));

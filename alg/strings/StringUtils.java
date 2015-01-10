@@ -74,12 +74,12 @@ public class StringUtils {
         return (builder.toString());
     }
 
-    public static void reverseInPlace (char [] chars, int startIdx, int endIdxInclusive) {
-        for (int i = 0; i < (endIdxInclusive - startIdx) / 2; i++) {
+    public static void reverseInPlace (char [] chars, int startIdx, int endIdxExclusive) {
+        for (int i = 0; i < (endIdxExclusive - startIdx) / 2; i++) {
             char tmp = chars [i + startIdx];
 
-            chars [i] = chars [endIdxInclusive - i];
-            chars [endIdxInclusive - i] = tmp;
+            chars [i + startIdx] = chars [endIdxExclusive - i - 1];
+            chars [endIdxExclusive - i - 1] = tmp;
         }
     }
 

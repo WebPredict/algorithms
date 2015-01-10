@@ -194,11 +194,13 @@ public class WordUtils {
     @InterestingAlgorithm
     public static String    reverseWords (String s) {
         // reverse order of words, not letters in words - do the double reverse:
+        if (s == null)
+            return (null);
 
-        String ret = StringUtils.reverse(s);
+        char [] chars = s.toCharArray();
+        StringUtils.reverseInPlace(chars, 0, s.length());
         int wordStart = -1;
-        char [] chars = ret.toCharArray();
-        for (int i = 0; i < ret.length(); i++) {
+        for (int i = 0; i < chars.length; i++) {
             if (chars [i] != ' ') {
                 if (wordStart == -1)
                     wordStart = i;
@@ -210,8 +212,35 @@ public class WordUtils {
                 }
             }
         }
-        return (ret);
+        if (wordStart != -1) {
+            StringUtils.reverseInPlace(chars, wordStart, chars.length);
+            wordStart = -1;
+        }
+
+        return (new String(removeExcessSpaces(chars)));
     }
+
+    public static String removeExcessSpaces (char [] chars) {
+        char [] tmpArr = new char[chars.length];
+        boolean seenWord = false;
+        int lastSeenLetterIdx = -1;
+        int toRetIdx = 0;
+        for (int i = 0; i < chars.length; i++) {
+            if (chars [i] != ' ') {
+                tmpArr [toRetIdx++] = chars [i];
+                seenWord = true;
+                lastSeenLetterIdx = i;
+            }
+            else if (seenWord) {
+                seenWord = false;
+                tmpArr [toRetIdx++] = chars [i];
+            }
+        }
+        char [] ret = new char[lastSeenLetterIdx + 1];
+        System.arraycopy(tmpArr, 0, ret, 0, lastSeenLetterIdx + 1);
+        return (new String(ret));
+    }
+
 
     /**
      * English pluralization

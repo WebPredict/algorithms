@@ -155,6 +155,7 @@ public class MathUtils {
      * TODO:
      *  solving linear equations
      *
+     *  solve for x: 3x + ((4 - x) * 5) + x = 5
      */
 
 
