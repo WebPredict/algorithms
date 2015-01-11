@@ -442,8 +442,17 @@ public class WordUtils {
                 curLineSize += curWordLen;
 
                 if (i == words.length - 1) {
-
-                    arrangeLine(words, lastWordIdx, i + 1, lineLength, builder, curLineSize);
+                    for (int j = lastWordIdx; j < i + 1; j++) {
+                        if (j == i) {
+                            String spaces = StringUtils.repeat(' ', lineLength - (builder.toString().length() + words [j].length()));
+                            builder.append(words [j]);
+                            builder.append(spaces);
+                        }
+                        else {
+                            builder.append(words [j]);
+                            builder.append(" ");
+                        }
+                    }
 
                     lines.add(builder.toString());
                     builder = new StringBuilder();
@@ -511,11 +520,12 @@ public class WordUtils {
 
                 extraSpaceGiven += extraSpacePerWord;
 
-                if (((int)extraSpaceGiven) > 0) {
-                    for (int k = 0; k < (int)extraSpaceGiven; k++) {
+                int roundedExtra = Math.round(extraSpaceGiven);
+                if (roundedExtra > 0) {
+                    for (int k = 0; k < roundedExtra; k++) {
                         builder.append(" ");
                     }
-                    extraSpaceGiven -= (int)extraSpaceGiven;
+                    extraSpaceGiven -= roundedExtra;
                 }
             }
         }

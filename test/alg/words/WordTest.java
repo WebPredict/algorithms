@@ -47,7 +47,11 @@ public class WordTest {
 
         List<String> lines = WordUtils.leftRightTextJustification(new String[] {"this", "is"}, 8);
 
-        lines = WordUtils.leftRightTextJustification(new String[] {""}, 2);
+        //lines = WordUtils.leftRightTextJustification(new String[] {""}, 2);
+
+        //lines = WordUtils.leftRightTextJustification(new String[] {"What","must","be","shall","be."}, 12);
+
+        lines = WordUtils.leftRightTextJustification(new String[] {"Here","is","an","example","of","text","justification."}, 15);
 
         int lineLength = 20;
         lines = WordUtils.leftRightTextJustification(wordList, lineLength);
