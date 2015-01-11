@@ -155,10 +155,10 @@ public class RailsGen extends Generator {
     	StringUtils.addLine(buf, "<% end %>");
     	StringUtils.addLine(buf, "<li><%= link_to \"Help\", help_path %></li>");
     	StringUtils.addLine(buf, "</ul>");
-    	StringUtils.addLine(buf, "</div>");
-    	StringUtils.addLine(buf, "</div>");
-    	StringUtils.addLine(buf, "</div>");
-    	StringUtils.addLine(buf, "</div>");
+        HTMLUtils.closeDiv(buf);
+        HTMLUtils.closeDiv(buf);
+        HTMLUtils.closeDiv(buf);
+        HTMLUtils.closeDiv(buf);
 
     	FileUtils.write(buf, app.getWebAppDir() + "/app/views/layouts/_header.html.erb", true);
 
@@ -166,13 +166,33 @@ public class RailsGen extends Generator {
 
     	HTMLUtils.addRubyOutput(buf, "render 'layouts/header'");
 
+        // TODO: this is the place to set out the site-wide layout, and render the sections in those side areas if any:
+        switch (app.getAppConfig().getLayout()) {
+            case ONE_COL:
+                break;
+
+            case ONE_COL_FIXED_WIDTH:
+                break;
+
+            case TWO_COL_THIN_LEFT:
+                break;
+
+            case TWO_COL_THIN_RIGHT:
+                break;
+
+            case TWO_COL_EVEN:
+                break;
+
+            case THREE_COL:
+                break;
+        }
     	StringUtils.addLine(buf, "<div class=\"container\"> ");
     	HTMLUtils.addRuby(buf, "flash.each do |key, value|");
     	StringUtils.addLine(buf, "<div class=\"alert alert-<%= key %>\"><%= value %></div>  ");
     	HTMLUtils.addRuby(buf, "end");
     	HTMLUtils.addRubyOutput(buf, "yield");
-    	StringUtils.addLine(buf, "</div> ");
-    	HTMLUtils.addRubyOutput(buf, "render 'layouts/footer'");
+        HTMLUtils.closeDiv(buf);
+        HTMLUtils.addRubyOutput(buf, "render 'layouts/footer'");
 
     	FileUtils.replaceInFile(app.getWebAppDir() + "/app/views/layouts/application.html.erb", new String[]{"<%= yield %>"},
     			new String [] {buf.toString()}, true, true);
@@ -266,7 +286,7 @@ public class RailsGen extends Generator {
             HTMLUtils.addRubyOutput(buf, "<%= link_to \"Search " + plural + "\", " + plural + "_path, class: \"btn btn-large btn-primary\"");
         }
         HTMLUtils.addRubyOutput(buf, "<%= link_to \"Signup!\", signup_path, class: \"btn btn-large\"");
-        StringUtils.addLine(buf, "</div>");
+        HTMLUtils.closeDiv(buf);
         HTMLUtils.addLineBreak(buf);
 
          Model  frontPageModelList = app.getFrontPageListModel();
