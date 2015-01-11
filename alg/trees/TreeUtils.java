@@ -1,7 +1,9 @@
 package alg.trees;
 
 import alg.misc.InterestingAlgorithm;
+import alg.misc.MiscUtils;
 import alg.util.BinaryNode;
+import alg.util.LinkNode;
 import alg.util.NodeVisitor;
 
 import java.util.*;
@@ -221,6 +223,47 @@ public class TreeUtils {
         if (Math.abs(maxHeight(root.getLeft()) - maxHeight(root.getRight())) > 1)
             return (false);
         return (isBalanced(root.getLeft()) && isBalanced(root.getRight()));
+    }
+
+    /**
+     *
+     * @param head  sorted linked list
+     * @return
+     */
+    public static BinaryNode sortedListToBST(LinkNode head) {
+        int length = MiscUtils.length(head);
+        int middle = length / 2;
+
+        LinkNode nodeToUse = middle == 0 ? head : advance(head, middle);
+
+        BinaryNode root = new BinaryNode(nodeToUse.getValue());
+        root.setLeft(sortedListToBST(head, 0, middle, root));
+        root.setRight(sortedListToBST(nodeToUse.getNext(), middle + 1, length, root));
+        return (root);
+    }
+
+    public static BinaryNode sortedListToBST(LinkNode head, int start, int end, BinaryNode root) {
+        int length = end - start;
+        if (length == 0)
+            return (null);
+
+        int middle = length / 2;
+
+        LinkNode nodeToUse = middle == 0 ? head : advance(head, middle);
+        BinaryNode ret = new BinaryNode(nodeToUse.getValue());
+
+        if (middle > 0) {
+            ret.setLeft(sortedListToBST(head, 0, middle, root));
+            ret.setRight(sortedListToBST(nodeToUse.getNext(), middle + 1, length, root));
+        }
+        return (ret);
+    }
+
+    public static LinkNode advance (LinkNode head, int n) {
+        while (n-- > 0) {
+            head = head.getNext();
+        }
+        return (head);
     }
 
     public static void printTree (BinaryNode tree) {

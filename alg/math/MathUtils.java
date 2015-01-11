@@ -552,6 +552,34 @@ public class MathUtils {
         return (triangle);
     }
 
+    /**
+     *
+     * @param k 1st row is row 0
+     * @return
+     */
+    @InterestingAlgorithm
+    public static List<Integer>  getRowInPascalsTriangle (int k) {
+        ArrayList<Integer> previousRow = new ArrayList<Integer>();
+        previousRow.add(1);
+
+        for (int i = 0; i < k; i++) {
+            ArrayList<Integer> row = new ArrayList<Integer>();
+
+            for (int j = 0; j < previousRow.size() + 1; j++) {
+                int value;
+                if (j == 0)
+                    value = 1;
+                else if (j == previousRow.size())
+                    value = previousRow.get(j - 1);
+                else
+                    value = previousRow.get(j - 1) + previousRow.get(j);
+                row.add(value);
+            }
+            previousRow = row;
+        }
+        return (previousRow);
+    }
+
     @InterestingAlgorithm(timeComplexity = "O(1)", spaceComplexity = "O(1)")
     public static int frogJumps(int X, int Y, int D) {
         int diff = Y - X;

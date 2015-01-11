@@ -16,4 +16,9 @@ public class Interval {
         this.start = start;
         this.end = end;
     }
+
+    public static Interval parse (String s) {
+        String [] vals = s.substring(1, s.length() - 1).split(" ");
+        return (new Interval(Integer.parseInt(vals [0]), Integer.parseInt(vals [1])));
+    }
 }

@@ -15,6 +15,54 @@ import java.util.*;
 public class ArrayUtils {
 
     @InterestingAlgorithm
+    public static void merge(int A[], int m, int B[], int n) {
+
+        for (int i = 0; i < n; i++) {
+
+            int insertIdx = -1;
+            for (int j = 0; j < m + i; j++) {
+                if (A[j] > B[i]) {
+                    insertIdx = j;
+                    break;
+                }
+            }
+            if (insertIdx == -1)
+                insertIdx = m + i;
+
+            for (int j = m + i; j > insertIdx; j--)
+                A[j] = A[j - 1];
+            A[insertIdx] = B[i];
+
+        }
+
+//        int totalSize = m + n;
+//        int aCtr = 0;
+//        int bCtr = 0;
+//        int aIdx = m;
+//        for (int i = 0; i < totalSize; i++) {
+//
+//            if (aCtr < m && A[aCtr] < B[bCtr]) {
+//                A[aIdx] = A[aCtr++];
+//            }
+//            else if (bCtr < n && A [aCtr] > B[bCtr]) {
+//                A[aIdx] = B[bCtr++];
+//            }
+//            else {
+//                if (aCtr < m)
+//                    A[aIdx] = A[aCtr++];
+//                else
+//                    A[aIdx] = B[bCtr++];
+//            }
+//            if (aIdx == m + n - 1)
+//                aIdx = 0;
+//            else
+//                aIdx++;
+//        }
+
+    }
+
+
+    @InterestingAlgorithm
     public static Comparable [] removeDuplicates (Comparable [] inArray) {
         if (inArray == null)
             return (null);
@@ -218,6 +266,18 @@ public class ArrayUtils {
     }
 
     @InterestingAlgorithm
+    public static List<Interval>    merge(String intervalText) {
+
+        StringTokenizer tok = new StringTokenizer(intervalText, ",");
+        ArrayList<Interval> intervals = new ArrayList<Interval>();
+        while (tok.hasMoreTokens()) {
+            String next = tok.nextToken();
+            intervals.add(Interval.parse(next));
+        }
+        return (merge(intervals));
+    }
+
+    @InterestingAlgorithm
     public static List<Interval>    merge(List<Interval> intervalList) {
         if (intervalList == null)
             return (null);
@@ -241,18 +301,22 @@ public class ArrayUtils {
 
             Interval interval = intervalList.get(i);
             int next = i + 1;
+            boolean handledLast = false;
             while (next < intervalList.size()) {
 
                 Interval nextInterval = intervalList.get(next);
                 if (nextInterval.start >= interval.start && nextInterval.start <= interval.end) {
                      // they overlap.
                     // could be: completely contained, or actually overlapping:
-                    if (nextInterval.end <= interval.end) {
-                        // we don't need this one
-                        //i++;
-                    }
-                    else {
+                    if (nextInterval.end > interval.end)
                         interval =  new Interval(interval.start, nextInterval.end);
+                    else
+                        interval =  new Interval(interval.start, interval.end);
+
+                    i++;
+                    if (i == intervalList.size() - 1) {
+                        merged.add(interval);
+                        handledLast = true;
                     }
                 }
                 else {
@@ -261,6 +325,8 @@ public class ArrayUtils {
                 }
                 next++;
             }
+            if (i == intervalList.size() - 1 && !handledLast)
+                merged.add(interval);
         }
 
         return (merged);

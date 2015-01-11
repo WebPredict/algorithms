@@ -14,17 +14,16 @@ public class TreeTest {
 
     public static void main (String [] args) {
 
-
-        BinaryNode root = new BinaryNode();
+        BinaryNode root = new BinaryNode(1);
 
         int minHeight = TreeUtils.minHeight(root);
         System.out.println(minHeight);
 
-        //root.setLeft(new BinaryNode());
-        //minHeight = TreeUtils.minHeight(root);
+        root.setLeft(new BinaryNode(2));
+        minHeight = TreeUtils.minHeight(root);
         //System.out.println(minHeight);
 
-        root.setRight(new BinaryNode());
+        root.setRight(new BinaryNode(3));
         minHeight = TreeUtils.minHeight(root);
         System.out.println(minHeight);
 

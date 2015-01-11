@@ -16,10 +16,8 @@ public class TreeTestUtils {
     public BinaryNode<Integer> createRandomIntTree (int depth, int start, int end) {
         if (depth == 0)
             return (null);
-        BinaryNode<Integer> root = new BinaryNode<Integer>();
-
         int data = start + new Random().nextInt(end - start);
-        root.setData(data);
+        BinaryNode<Integer> root = new BinaryNode<Integer>(data);
 
         root.setLeft(createRandomIntTree(depth -1, 0, data));
         root.setRight(createRandomIntTree(depth -1, data, end));
