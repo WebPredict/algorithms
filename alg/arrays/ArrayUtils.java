@@ -14,6 +14,13 @@ import java.util.*;
  */
 public class ArrayUtils {
 
+    /**
+     * Merge B into A, where A is assumed to have enough storage for both A and B.
+     * @param A
+     * @param m
+     * @param B
+     * @param n
+     */
     @InterestingAlgorithm
     public static void merge(int A[], int m, int B[], int n) {
 
@@ -34,30 +41,6 @@ public class ArrayUtils {
             A[insertIdx] = B[i];
 
         }
-
-//        int totalSize = m + n;
-//        int aCtr = 0;
-//        int bCtr = 0;
-//        int aIdx = m;
-//        for (int i = 0; i < totalSize; i++) {
-//
-//            if (aCtr < m && A[aCtr] < B[bCtr]) {
-//                A[aIdx] = A[aCtr++];
-//            }
-//            else if (bCtr < n && A [aCtr] > B[bCtr]) {
-//                A[aIdx] = B[bCtr++];
-//            }
-//            else {
-//                if (aCtr < m)
-//                    A[aIdx] = A[aCtr++];
-//                else
-//                    A[aIdx] = B[bCtr++];
-//            }
-//            if (aIdx == m + n - 1)
-//                aIdx = 0;
-//            else
-//                aIdx++;
-//        }
 
     }
 
@@ -101,6 +84,7 @@ public class ArrayUtils {
         }
     }
 
+    @InterestingAlgorithm
     public static List<Integer> spiralOrder (int [][] matrix) {
         if (matrix == null)
             return (null);

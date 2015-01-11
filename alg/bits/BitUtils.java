@@ -13,4 +13,15 @@ public class BitUtils {
 
         return (value); // TODO
     }
+
+    public boolean getBitAt (int value, int bit) {
+        return (((1 << bit) & value) == 1);
+    }
+
+    public void setBitAt (int value, int bit, boolean on) {
+        if (on)
+            value |= (bit << 1);
+        else
+            value &= ~(bit << 1);
+    }
 }
