@@ -1,5 +1,7 @@
 package alg.math;
 
+import java.awt.geom.Point2D;
+
 /**
  * Created with IntelliJ IDEA.
  * User: jsanchez
@@ -13,6 +15,10 @@ public class Vector {
 
     public Vector (double [] data) {
         this.data = data;
+    }
+
+    public static Vector fromPoints (Point2D first, Point2D second) {
+        return (new Vector(new double[] {second.getX() - first.getX(), second.getY() - first.getY()}));
     }
 
     public Vector (int size) {
@@ -58,6 +64,13 @@ public class Vector {
         set(1, second);
         set(2, third);
         return (this);
+    }
+
+    public double   norm () {
+        double sum = 0;
+        for (int i = 0; i < data.length; i++)
+            sum += data [i] * data [i];
+        return (Math.sqrt(sum));
     }
 
     public Vector   xyzzy (Vector other) {

@@ -1,6 +1,7 @@
 package test.alg.misc;
 
 import alg.misc.MiscUtils;
+import alg.strings.StringUtils;
 import alg.util.LinkNode;
 
 /**
@@ -14,17 +15,28 @@ public class MiscUtilsTest {
 
     public static void main (String [] args) {
 
+        int colIdx = MiscUtils.excelColumnIndex("A");
+        colIdx = MiscUtils.excelColumnIndex("E");
+        colIdx = MiscUtils.excelColumnIndex("Z");
+        colIdx = MiscUtils.excelColumnIndex("AA");
+        colIdx = MiscUtils.excelColumnIndex("AZ");
+        colIdx = MiscUtils.excelColumnIndex("BB");
+        colIdx = MiscUtils.excelColumnIndex("BCE");
+
+        boolean palin = StringUtils.isPalindromeOnlyAlphanumeric("A man, a plan, a canal: Panama");
+        palin = StringUtils.isPalindromeOnlyAlphanumeric("A man, a plan, a canal: yeah Panama");
+
         for (int i = 0; i < 20; i++) {
             System.out.println(MiscUtils.fibonacciRec(i));
         }
 
-        String col1 = MiscUtils.excelColumn(1);
-        String col5 = MiscUtils.excelColumn(5);
-        String col26 = MiscUtils.excelColumn(26);
-        String col27 = MiscUtils.excelColumn(27);
-        String az = MiscUtils.excelColumn(26 + 26);
-        String ba = MiscUtils.excelColumn(26 * 2 + 1);
-        String ec = MiscUtils.excelColumn(26 * 5 + 3);
+        String col1 = MiscUtils.excelColumnTitle(1);
+        String col5 = MiscUtils.excelColumnTitle(5);
+        String col26 = MiscUtils.excelColumnTitle(26);
+        String col27 = MiscUtils.excelColumnTitle(27);
+        String az = MiscUtils.excelColumnTitle(26 + 26);
+        String ba = MiscUtils.excelColumnTitle(26 * 2 + 1);
+        String ec = MiscUtils.excelColumnTitle(26 * 5 + 3);
 
 
         LinkNode<Integer>   links = generateList(10);

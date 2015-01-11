@@ -524,14 +524,14 @@ public class MathUtils {
     @InterestingAlgorithm
     public static List<List<Integer>>  pascalsTriangle (int numRows) {
         if (numRows == 0)
-            return (null);
+            return (new ArrayList<List<Integer>>());
 
         List<List<Integer>> triangle = new ArrayList<List<Integer>>();
         ArrayList<Integer> firstRow = new ArrayList<Integer>();
         firstRow.add(1);
         triangle.add(firstRow);
 
-        for (int i = 2; i <= numRows; i++) {
+        for (int i = 1; i < numRows; i++) {
 
             ArrayList<Integer> row = new ArrayList<Integer>();
 
@@ -560,31 +560,61 @@ public class MathUtils {
         return (minSteps);
     }
 
+    @InterestingAlgorithm
+    public static double angleBetweenVectors2D (Vector v1, Vector v2) {
+        double cross = v1.cross2d(v2);
+        double normV1 = v1.norm();
+        double normV2 = v2.norm();
+
+        double sinAngleBetween = cross / (normV1 * normV2);
+        return (Math.acos(sinAngleBetween));
+    }
+
     /**
      *
      * @param asciiNum
      * @return
      */
     @InterestingAlgorithm
-    public static int  atoi (String asciiNum) {
-        if (asciiNum == null || asciiNum.length() == 0)
-            throw new RuntimeException("atoi undefined for: " + asciiNum);
+    public static int  atoi (String str) {
+        if (str == null)
+            return (0);
 
-        int total = 0;
-        boolean negate = false;
-        for (int i = 0; i < asciiNum.length(); i++) {
-            char c = asciiNum.charAt(i);
-            if (c >= '0' && c <= '9') {
-                 total += Math.pow(10, asciiNum.length() - (1 + i)) * -('0' - c);
+        String trimmed = str.trim();
+        if (trimmed.length() == 0)
+            return (0);
+
+        for (int i = 0; i < trimmed.length(); i++) {
+            char c = trimmed.charAt(i);
+            if (c < '0' || c > '9') {
+                if (c != '-' && c != '+') {
+                    trimmed = trimmed.substring(0, i);
+                    break; // cut it off at invalid char
+                }
             }
-            else if (c == '-' && i == 0) {
-                negate = true;
-            }
-            else
-                throw new RuntimeException("atoi undefined for " + asciiNum);
         }
 
-        return (negate ? -total : total);
+        long total = 0;
+        boolean negate = false;
+        for (int i = 0; i < trimmed.length(); i++) {
+            char c = trimmed.charAt(i);
+            if (c >= '0' && c <= '9') {
+                total += Math.pow(10, trimmed.length() - (1 + i)) * -('0' - c);
+            }
+            else if (i == 0) {
+                if (c == '-')
+                    negate = true;
+                else if (c != '+') {
+                    break;
+                }
+            }
+            else
+                break; // syntax error
+        }
+
+        if (negate && (int)total == Integer.MIN_VALUE)
+            return (Integer.MIN_VALUE);
+        return (int)(negate ? -total : total);
     }
 
     @InterestingAlgorithm
@@ -666,5 +696,11 @@ public class MathUtils {
     public static int lcm (int num1, int num2) {
          return (num1 * num2 / gcd(num1, num2));
     }
+
+    public static boolean closeEnough (double d1, double d2) {
+        return (Math.abs(d1 - d2) <= epsilon);
+    }
+
+    public static double epsilon = 0.0000001d;
 
 }

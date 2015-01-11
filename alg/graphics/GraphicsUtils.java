@@ -1,5 +1,6 @@
 package alg.graphics;
 
+import alg.math.MathUtils;
 import alg.misc.InterestingAlgorithm;
 
 import java.awt.geom.Point2D;
@@ -24,6 +25,21 @@ public class GraphicsUtils {
     @InterestingAlgorithm
     public static void paintfill (ImageMap image, int colorVal, Point2D start) {
          // TODO
+    }
+
+    public double   totalArea (Rectangle [] rects) {
+        /**
+         * TODO: put point in priority queue based on sorted X for efficient line sweep
+         */
+        return (0);
+    }
+
+    public double   totalPerimeter (Rectangle [] rects) {
+        return (0);
+    }
+
+    public double   maxIntersectingArea (Rectangle [] rects) {
+        return (0);
     }
 
     @InterestingAlgorithm
@@ -67,8 +83,10 @@ public class GraphicsUtils {
     }
 
     @InterestingAlgorithm
-    public boolean  isSimplePolygon (Point2D [] points) {
-        return (false); // TODO
+    public static Polygon   computeConvexHull (Point2D [] points) {
+        Polygon ret = null;
+        // TODO
+        return (null);
     }
 
     @InterestingAlgorithm
@@ -78,25 +96,4 @@ public class GraphicsUtils {
         return (line); // TODO
     }
 
-    // Could return a point or line or nothing if parallel
-    @InterestingAlgorithm
-    public Object       lineIntersect (Line2D l1, Line2D l2) {
-        if (l1 == null || l2 == null)
-            return (null);
-        else if (l1.equals(l2))
-            return (l1);
-
-        double slope1 = l1.getA();
-        double slope2 = l2.getA();
-
-        double offset1 = l1.getB();
-        double offset2 = l2.getB();
-
-        if (slope1 == slope2)
-            return (null); // parallel
-
-        Point2D point = new Point2D.Double((offset2 - offset1) / (slope1 - slope2), (slope1 * offset2 - slope2 * offset1) / (slope1 - slope2));
-
-        return (point);
-    }
 }

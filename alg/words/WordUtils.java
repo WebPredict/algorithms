@@ -220,6 +220,12 @@ public class WordUtils {
         return (new String(removeExcessSpaces(chars)));
     }
 
+    /**
+     * Performs a trim both at beginning, end and in between words in chars.
+     * @param chars
+     * @return
+     */
+    @InterestingAlgorithm
     public static String removeExcessSpaces (char [] chars) {
         char [] tmpArr = new char[chars.length];
         boolean seenWord = false;
@@ -229,15 +235,17 @@ public class WordUtils {
             if (chars [i] != ' ') {
                 tmpArr [toRetIdx++] = chars [i];
                 seenWord = true;
-                lastSeenLetterIdx = i;
+                lastSeenLetterIdx = toRetIdx;
             }
             else if (seenWord) {
                 seenWord = false;
                 tmpArr [toRetIdx++] = chars [i];
             }
         }
-        char [] ret = new char[lastSeenLetterIdx + 1];
-        System.arraycopy(tmpArr, 0, ret, 0, lastSeenLetterIdx + 1);
+        if (lastSeenLetterIdx == -1)
+            return ("");
+        char [] ret = new char[lastSeenLetterIdx];
+        System.arraycopy(tmpArr, 0, ret, 0, lastSeenLetterIdx);
         return (new String(ret));
     }
 
@@ -396,8 +404,12 @@ public class WordUtils {
                 lines.add(builder.toString());
                 builder = new StringBuilder();
                 
-                if (i == words.size() - 1)
-                	lines.add(words.get(i));
+                if (i == words.size() - 1) {
+                    if (words.get(i).length() < lineLength)
+                	    lines.add(words.get(i) + StringUtils.repeat(' ', (lineLength - words.get(i).length())));
+                    else
+                        lines.add(words.get(i));
+                }
                 
                 lastWordIdx = i;
                 curLineSize = curWordLen == lineLength ? curWordLen : curWordLen + 1;
@@ -406,6 +418,107 @@ public class WordUtils {
         }
 
         return (lines);
+    }
+
+    public static List<String>  leftRightTextJustification (String [] words, int lineLength) {
+        if (words == null)
+            return (null);
+
+        ArrayList<String> lines = new ArrayList<String>();
+        StringBuilder builder = new StringBuilder();
+
+        int     curLineSize = 0;
+        int     lastWordIdx = 0;
+        for (int i = 0; i < words.length; i++) {
+            String curWord = words [i];
+
+            int curWordLen = curWord.length();
+
+            if (i < words.length - 1) {
+                if (curWordLen + curLineSize < lineLength - 1)
+                    curWordLen += 1; // need a space if we're not about to fill the line
+            }
+            if (curWordLen + curLineSize < lineLength) {
+                curLineSize += curWordLen;
+
+                if (i == words.length - 1) {
+
+                    arrangeLine(words, lastWordIdx, i + 1, lineLength, builder, curLineSize);
+
+                    lines.add(builder.toString());
+                    builder = new StringBuilder();
+                    lastWordIdx = i - 1;
+                    curLineSize = 0;
+                }
+            }
+            else if (curWordLen + curLineSize == lineLength) { // a perfect fit
+                // TODO: add all words to curLine with a single space
+                for (int j = lastWordIdx; j < i; j++) {
+                    builder.append(words [j]);
+                    if (i < words.length - 1)
+                        builder.append(" ");
+                }
+
+                builder.append(words [i]);
+                lines.add(builder.toString());
+                builder = new StringBuilder();
+                lastWordIdx = i + 1;
+                curLineSize = 0;
+            }
+            else {
+                arrangeLine(words, lastWordIdx, i, lineLength, builder, curLineSize);
+
+                lines.add(builder.toString());
+                builder = new StringBuilder();
+
+                if (i == words.length - 1) {
+                    if (words[i].length() < lineLength)
+                        lines.add(words[i] + StringUtils.repeat(' ', (lineLength - words[i].length())));
+                    else
+                        lines.add(words[i]);
+                }
+
+                lastWordIdx = i;
+                curLineSize = curWordLen == lineLength ? curWordLen : curWordLen + 1;
+            }
+
+        }
+
+        return (lines);
+    }
+
+    static void arrangeLine (String [] words, int lastWordIdx, int wordIdx, int lineLength, StringBuilder builder, int curLineSize) {
+        int numWords = wordIdx - lastWordIdx;
+        int extraSpace = lineLength - curLineSize;
+        float extraSpacePerWord =  (float)extraSpace / (float)(numWords - 1);
+        float extraSpaceGiven = 0;
+        if (numWords == 1) {
+            String spaces = StringUtils.repeat(' ', lineLength - (builder.toString().length() + words [lastWordIdx].length()));
+            builder.append(words [lastWordIdx]);
+            builder.append(spaces);
+            return;
+        }
+        // interesting case: how to evenly space out the extra space
+        for (int j = lastWordIdx; j < wordIdx; j++) {
+            if (j == wordIdx - 1) {
+                String spaces = StringUtils.repeat(' ', lineLength - (builder.toString().length() + words [j].length()));
+                builder.append(spaces);
+                builder.append(words [j]);
+            }
+            else {
+                builder.append(words [j]);
+                builder.append(" "); // TODO compute right amount of space
+
+                extraSpaceGiven += extraSpacePerWord;
+
+                if (((int)extraSpaceGiven) > 0) {
+                    for (int k = 0; k < (int)extraSpaceGiven; k++) {
+                        builder.append(" ");
+                    }
+                    extraSpaceGiven -= (int)extraSpaceGiven;
+                }
+            }
+        }
     }
 
     @InterestingAlgorithm

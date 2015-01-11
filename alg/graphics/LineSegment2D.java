@@ -1,5 +1,7 @@
 package alg.graphics;
 
+import alg.math.MathUtils;
+
 import java.awt.geom.Point2D;
 
 /**
@@ -33,5 +35,56 @@ public class LineSegment2D {
 
     public void setEnd(Point2D end) {
         this.end = end;
+    }
+
+    public double   getSlope () {
+        return ((end.getY() - start.getY()) / (end.getX() - start.getY()));
+    }
+
+    public Object       lineIntersect (Line2D other) {
+        if (other == null)
+            return (null);
+
+        double slope1 = getSlope();
+
+        double slope2 = other.getA();
+
+        double offset1 = start.getY();
+        double offset2 = other.getB();
+
+        if (MathUtils.closeEnough(slope1, slope2)) {
+            if (MathUtils.closeEnough(offset1, offset2))
+                return (this); // same
+            else
+                return (null); // parallel
+        }
+
+        Point2D point = new Point2D.Double((offset2 - offset1) / (slope1 - slope2), (slope1 * offset2 - slope2 * offset1) / (slope1 - slope2));
+        double lowestX;
+        double highestX;
+        double lowestY;
+        double highestY;
+
+        if (start.getX() <= end.getX()) {
+            lowestX = start.getX();
+            highestX = end.getX();
+        }
+        else {
+            lowestX = end.getX();
+            highestX = start.getX();
+        }
+        if (start.getY() <= end.getY()) {
+            lowestY = start.getY();
+            highestY = end.getY();
+        }
+        else {
+            lowestY = end.getY();
+            highestY = start.getY();
+        }
+
+        if (point.getX() >= lowestX && point.getY() >= lowestY && point.getX() <= highestX && point.getY() <= highestY)
+            return (point);
+        else
+            return (null);
     }
 }

@@ -20,17 +20,18 @@ public class WordTest {
 
     public static void main (String [] args) throws Exception {
 
+        testShortJustify();
         testLonger();
 
         testAutocorrect();
 
         System.out.println(WordUtils.reverseWords("  This   is a test"));
-        System.out.println(WordUtils.reverseWords("this "));
+        System.out.println(WordUtils.reverseWords("  a   b"));
         System.out.println(WordUtils.reverseWords(" "));
 
     }
 
-    public static void test2 ()  {
+    public static void testShortJustify ()  {
         List<String> wordList = new ArrayList<String>();
         wordList.add("this");
         wordList.add("could");
@@ -43,8 +44,13 @@ public class WordTest {
         wordList.add("indubitably"); 
         wordList.add("insufficiently");
 
+
+        List<String> lines = WordUtils.leftRightTextJustification(new String[] {"this", "is"}, 8);
+
+        lines = WordUtils.leftRightTextJustification(new String[] {""}, 2);
+
         int lineLength = 20;
-        List<String> lines = WordUtils.leftRightTextJustification(wordList, lineLength);
+        lines = WordUtils.leftRightTextJustification(wordList, lineLength);
 
         for (int i = 0; i < lines.size() - 1; i++) {
         	assert(lines.get(i).length() == lineLength);

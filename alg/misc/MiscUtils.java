@@ -198,10 +198,11 @@ public class MiscUtils {
             }
         }
 
-        while (first == null || first != second) {
+        while (first != null && second != null && first != second) {
             first = first.getNext();
             second = second.getNext();
         }
+
         return (first);
     }
 
@@ -225,23 +226,21 @@ public class MiscUtils {
 
     /**
      *
-     * @param index of column header
+     * 1 -> A
+     * 2 -> B
+     * 26 -> Z
+     * 27 -> AA
+     * 28 -> AB
+     *
+     * 26 + 26 -> AZ
+     * 26 * 2 + 1 -> BA
+     * 26 * 2 + 26 - > BZ
+     * 26 * 26 + 3 * 26 + 4 -> ACD
+     * @param index of column header (1 based)
      * @return Excel column header
      */
     @InterestingAlgorithm
-    public static String    excelColumn (int index) {
-        /**
-         * 1 -> A
-         * 2 -> B
-         * 26 -> Z
-         * 27 -> AA
-         * 28 -> AB
-         *
-         * 26 + 26 -> AZ
-         * 26 * 2 + 1 -> BA
-         * 26 * 2 + 26 - > BZ
-         * 26 * 26 + 3 * 26 + 4 -> ACD
-         */
+    public static String    excelColumnTitle (int index) {
         String ret = "";
         int curval = index;
         while (true) {
@@ -260,6 +259,24 @@ public class MiscUtils {
     }
 
     /**
+     *
+     * @param title of column header (1 based)
+     * @return Excel column index
+     */
+    @InterestingAlgorithm
+    public static int    excelColumnIndex (String title) {
+        int ret = 0;
+
+        for (int i = 0; i < title.length(); i++) {
+
+            char c = title.charAt(i);
+            ret += Math.pow(26, title.length() - (i + 1)) * ((c + 1) - 'A');
+        }
+
+        return (ret);
+    }
+
+    /**
      *    find the max difference between successive elements in sorted form, but computed in linear time & space.
      *
      * @param unsortedNonNegIntegers   Non negative integers
@@ -272,23 +289,51 @@ public class MiscUtils {
         return (0);
     }
 
-    // compares version numbers of the form 1.0.0
+    /**
+     * 0.1 < 1.1 < 1.2 < 13.37
+     * @param v1
+     * @param v2
+     * @return
+     */
     @InterestingAlgorithm
     public static int       compareVersions (String v1, String v2) {
 
-        int v1FirstDotIdx = v1.indexOf('.');
-        int v1NextDotIdx = v1.indexOf('.', v1FirstDotIdx + 1);
-        int v2FirstDotIdx = v2.indexOf('.');
-        int v2NextDotIdx = v2.indexOf('.', v2FirstDotIdx + 1);
+        int curV1Idx = 0;
+        int curV2Idx = 0;
+        int prevV1Idx = -1;
+        int prevV2Idx = -1;
 
-        int firstCompare = Integer.valueOf(v1.substring(0, v1FirstDotIdx)).compareTo(Integer.valueOf(v2.substring(0, v2FirstDotIdx)));
-        if (firstCompare != 0)
-            return (firstCompare);
-        int secondCompare = Integer.valueOf(v1.substring(v1FirstDotIdx + 1, v1NextDotIdx)).compareTo(Integer.valueOf(v2.substring(v2FirstDotIdx + 1, v2NextDotIdx)));
-        if (secondCompare != 0)
-            return (secondCompare);
-        int thirdCompare = Integer.valueOf(v1.substring(v1NextDotIdx + 1)).compareTo(Integer.valueOf(v2.substring(v1NextDotIdx + 1)));
-        return (thirdCompare);
+        String nextV1Part = null;
+        String nextV2Part = null;
+        while (true) {
+            if (prevV1Idx == v1.length())
+                nextV1Part = "0";
+           else {
+                curV1Idx = v1.indexOf('.', prevV1Idx + 1);
+                nextV1Part = curV1Idx == -1 ? v1.substring(prevV1Idx + 1) : v1.substring(prevV1Idx + 1, curV1Idx);
+            }
+
+            if (prevV2Idx == v2.length())
+                nextV2Part = "0";
+            else {
+                curV2Idx = v2.indexOf('.', prevV2Idx + 1);
+                nextV2Part = curV2Idx == -1 ? v2.substring(prevV2Idx + 1) : v2.substring(prevV2Idx + 1, curV2Idx);
+            }
+
+            int firstCompare = Integer.valueOf(nextV1Part).compareTo(Integer.valueOf(nextV2Part));
+            if (firstCompare != 0 || (curV1Idx == -1 && curV2Idx == -1))
+                return (firstCompare);
+
+            if (curV1Idx != -1)
+                prevV1Idx = curV1Idx;
+            else
+                prevV1Idx = v1.length();
+
+            if (curV2Idx != -1)
+                prevV2Idx = curV2Idx;
+            else
+                prevV2Idx = v2.length();
+        }
     }
 
     /**

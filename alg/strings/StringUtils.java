@@ -33,6 +33,39 @@ public class StringUtils {
         return (true);
     }
 
+    public static boolean isAlphanumeric (char c) {
+        return ((c >= 'a' && c <= 'z') || (c >= '0' && c <= '9'));
+    }
+
+    @InterestingAlgorithm
+    public static boolean isPalindromeOnlyAlphanumeric (String s) {
+        if (s == null)
+            return (true);
+
+        int leftCtr = 0;
+        int rightCtr = s.length() - 1;
+
+        while (leftCtr < rightCtr) {
+
+            char leftChar = Character.toLowerCase(s.charAt(leftCtr));
+            char rightChar = Character.toLowerCase(s.charAt(rightCtr));
+
+            if (!isAlphanumeric(leftChar)) {
+                leftCtr++;
+            }
+            else if (!isAlphanumeric(rightChar)) {
+                rightCtr--;
+            }
+            else {
+                leftCtr++;
+                rightCtr--;
+                if (leftChar != rightChar)
+                    return (false);
+            }
+        }
+        return (true);
+    }
+
     @InterestingAlgorithm
     public static String [] chunk (String s, int size) {
     	if (s == null)
