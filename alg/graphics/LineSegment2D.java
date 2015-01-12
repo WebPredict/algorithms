@@ -1,6 +1,7 @@
 package alg.graphics;
 
 import alg.math.MathUtils;
+import alg.misc.InterestingAlgorithm;
 
 import java.awt.geom.Point2D;
 
@@ -41,6 +42,7 @@ public class LineSegment2D {
         return ((end.getY() - start.getY()) / (end.getX() - start.getY()));
     }
 
+    @InterestingAlgorithm
     public Object       lineIntersect (Line2D other) {
         if (other == null)
             return (null);

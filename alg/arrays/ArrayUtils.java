@@ -2,6 +2,7 @@ package alg.arrays;
 
 import alg.misc.InterestingAlgorithm;
 import alg.misc.MiscUtils;
+import alg.sort.SortUtils;
 
 import java.util.*;
 
@@ -249,6 +250,9 @@ public class ArrayUtils {
         return (ret);
     }
 
+    /**
+     * Merges overlapping intervals, from input text of the form: "[1 2],[2 6]..."
+     */
     @InterestingAlgorithm
     public static List<Interval>    merge(String intervalText) {
 
@@ -261,6 +265,11 @@ public class ArrayUtils {
         return (merge(intervals));
     }
 
+    /**
+     * Merges overlapping intervals
+     * @param intervalList
+     * @return
+     */
     @InterestingAlgorithm
     public static List<Interval>    merge(List<Interval> intervalList) {
         if (intervalList == null)
@@ -269,7 +278,7 @@ public class ArrayUtils {
         // sort intervals by start time
         Collections.sort(intervalList, new Comparator<Interval>() {
 
-            public int compare (Interval first, Interval second) {
+            public int compare(Interval first, Interval second) {
                 if (first.start < second.start)
                     return (-1);
                 else if (first.start == second.start)
@@ -376,6 +385,7 @@ public class ArrayUtils {
         return (selectIdx(list, start, end + numMedians - 1, numMedians / 2));
     }
 
+    @InterestingAlgorithm
     public static int selectKthLargest (List<Integer> list, int k) {
         if (list == null || list.size() < k)
             throw new RuntimeException("Invalid list for select kth largest: " + list + " k: " + k);
@@ -471,4 +481,29 @@ public class ArrayUtils {
         return (-1);
     }
 
+    /**
+     * Finds two numbers that add to num, or null if none, in nlogn time.
+     * @param values
+     * @param num
+     * @return
+     */
+    @InterestingAlgorithm
+    public static int [] findTwoNumbersThatAddTo (int [] values, int num) {
+        if (values == null)
+            return (null);
+
+        SortUtils.radixSort(values);
+
+        for (int i = 0; i < values.length; i++) {
+            int trial = values [i];
+
+            int desired = num - trial;
+
+            int desiredIdx = findIndexInSortedList(values, desired);
+            if (desiredIdx != -1) {
+                return (new int[] {i, desiredIdx});
+            }
+        }
+        return (null);
+    }
 }
