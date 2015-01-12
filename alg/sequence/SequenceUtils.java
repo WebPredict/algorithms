@@ -36,14 +36,14 @@ public class SequenceUtils {
         return (distance);
     }
 
-    @InterestingAlgorithm
+    public static EditDistanceCostComputer defaultCostComputer = new EditDistanceCostComputer();
+
     public static int [] needlemanWunschScore (String x, String y) {
-//        HashMap<Integer, HashMap<Integer, Integer>> matrixMap = new HashMap<Integer, HashMap<Integer, Integer>>();
-//
-//        HashMap<Integer, Integer> first = new HashMap<Integer, Integer>();
-//        first.put(0, 0);
-//
-//        matrixMap.put(0, first);
+         return (needlemanWunschScore(x, y, defaultCostComputer));
+    }
+
+    @InterestingAlgorithm
+    public static int [] needlemanWunschScore (String x, String y, EditDistanceCostComputer costComputer) {
 
         int         xLen = x == null ? 0 : x.length();
         int         yLen = y == null ? 0 : y.length();
@@ -54,16 +54,16 @@ public class SequenceUtils {
 
         // TODO: is this < or <=?
         for (int j = 1; j < y.length(); j++) {
-            scores [0][j] = scores [0][j - 1] + insertionCost(y.charAt(j));
+            scores [0][j] = scores [0][j - 1] + costComputer.insertionCost(y.charAt(j));
         }
 
         for (int i = 1; i < x.length(); i++) {
-            scores [i][0] = scores [i - 1][0] + deletionCost(x.charAt(i));
+            scores [i][0] = scores [i - 1][0] + costComputer.deletionCost(x.charAt(i));
 
             for (int j = 1; j < y.length(); j++) {
-                int scoreSub = scores [i -1][j - 1] + substitutionCost(x.charAt(i), y.charAt(j));
-                int scoreDel = scores [i - 1][j] + deletionCost(x.charAt(i));
-                int scoreIns = scores [i][j - 1] + insertionCost(y.charAt(j));
+                int scoreSub = scores [i -1][j - 1] + costComputer.substitutionCost(x.charAt(i), y.charAt(j));
+                int scoreDel = scores [i - 1][j] + costComputer.deletionCost(x.charAt(i));
+                int scoreIns = scores [i][j - 1] + costComputer.insertionCost(y.charAt(j));
 
                 scores [i][j] = MathUtils.max(new int [] {scoreSub, scoreDel, scoreIns});
             }
@@ -75,18 +75,6 @@ public class SequenceUtils {
             lastLine [j] = scores [xLen - 1][j];
         }
         return (lastLine);
-    }
-
-    public static int insertionCost(char c) {
-        return (1);
-    }
-
-    public static int deletionCost(char c) {
-        return (1);
-    }
-
-    public static int substitutionCost(char c1, char c2) {
-        return (1);
     }
 
     @InterestingAlgorithm
@@ -180,7 +168,7 @@ public class SequenceUtils {
     }
 
     /**
-     * the iterative dynamic programming version
+     * the iterative dynamic programming version for computing edit distance
      * @param s1
      * @param s2
      * @return

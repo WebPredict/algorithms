@@ -2,6 +2,8 @@ package alg.graph;
 
 import alg.misc.InterestingAlgorithm;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -21,6 +23,7 @@ public class GraphUtils {
 
     @InterestingAlgorithm
     public static Graph minimumSpanningTree (Graph input) {
+        // Kruskal's algorithm - need set utils for disjoint set data structures
         return (null); // TODO
     }
 
@@ -31,7 +34,25 @@ public class GraphUtils {
 
     @InterestingAlgorithm
     public static void depthFirstSearch (Graph input, VertexVisitor visitor) {
-    	// TODO
+
+        List<Vertex> vertexes = input.getVertices();
+        if (vertexes == null)
+            return;
+
+        HashSet<Vertex> seen = new HashSet<Vertex>();
+
+       for (int i = 0; i < vertexes.size(); i++) {
+           Vertex current = vertexes.get(i);
+
+           if (!seen.contains(current)) {
+               visitor.visit(current);
+               seen.add(current);
+
+               Vertex [] neighbors = current.getNeighbors();
+               // TODO: go as deep as possible for each unseen neighbor
+           }
+       }
+
     }
 
     @InterestingAlgorithm

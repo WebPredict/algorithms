@@ -107,6 +107,7 @@ public class StringUtils {
         return (builder.toString());
     }
 
+    @InterestingAlgorithm
     public static void reverseInPlace (char [] chars, int startIdx, int endIdxExclusive) {
         for (int i = 0; i < (endIdxExclusive - startIdx) / 2; i++) {
             char tmp = chars [i + startIdx];
@@ -285,8 +286,17 @@ public class StringUtils {
         }
     }
 
-    // TODO: need a version of this for lines, not individual characters
-    // TODO: optimize by detecting any initial similarities and end similarities in the strings/lines
+    /**
+     * Prints char-by-char differences between strings
+     *  TODO: need a version of this for lines, not individual characters
+     *  TODO: optimize by detecting any initial similarities and end similarities in the strings/lines
+     * @param buf
+     * @param longest
+     * @param s1
+     * @param s2
+     * @param i
+     * @param j
+     */
     @InterestingAlgorithm
     public static void printDiff (StringBuilder buf, int [][] longest, String s1, String s2, int i, int j) {
         if (i > 0 && j > 0 && s1.charAt(i) == s2.charAt(j)) {
