@@ -1,5 +1,7 @@
 package alg.graphics;
 
+import alg.misc.InterestingAlgorithm;
+
 import java.awt.geom.Point2D;
 
 /**
@@ -66,6 +68,13 @@ public class Rectangle {
         return (Math.abs(lowerLeft.getX() - lowerRight.getX()) * Math.abs(upperLeft.getX() - lowerLeft.getX()));
     }
 
+    /**
+     * Intersection with another rectangle. Returns null if no intersection. Rectangle may be a line
+     * if intersection is on an edge
+     * @param other
+     * @return
+     */
+    @InterestingAlgorithm
     public Rectangle intersect (Rectangle other) {
 
         Point2D otherLowerLeft = other.getLowerLeft();
@@ -73,57 +82,57 @@ public class Rectangle {
         Point2D otherUpperLeft = other.getUpperLeft();
         Point2D otherUpperRight = other.getUpperRight();
 
-        Point2D interLowerLeft = null;
-        Point2D interLowerRight = null;
-        Point2D interUpperLeft = null;
-        Point2D interUpperRight = null;
+        Double  xLeft = null;
+        Double  xRight = null;
+        Double  yLower = null;
+        Double  yUpper = null;
 
-        // TODO fix this ain't correct
         if (otherLowerLeft.getX() >= lowerLeft.getX() && otherLowerLeft.getX() <= lowerRight.getX()) {
             // x is in range
-            interLowerLeft = otherLowerLeft;
+            xLeft = otherLowerLeft.getX();
 
             if (otherLowerRight.getX() <= lowerRight.getX())
-                interLowerRight = otherLowerRight;
+                xRight = otherLowerRight.getX();
             else
-                interLowerRight = lowerRight;
+                xRight = lowerRight.getX();
         }
         else if (otherLowerLeft.getX() < lowerLeft.getX() && otherLowerRight.getX() >= lowerLeft.getX()) {
             // either it intersects from left, or completely contains:
             if (otherLowerRight.getX() >= lowerRight.getX()) {
                 // contains, on X axis
-                interLowerLeft = lowerLeft;
-                interLowerRight = lowerRight;
+                xLeft = lowerLeft.getX();
+                xRight = lowerRight.getX();
             }
             else {
-                interLowerLeft = lowerLeft;
-                interLowerRight = otherLowerRight;
+                xLeft = lowerLeft.getX();
+                xRight = otherLowerRight.getX();
             }
         }
 
-        if (otherUpperLeft.getY() >= upperLeft.getY() && otherLowerLeft.getY() <= upperLeft.getY()) {
+        if (otherUpperLeft.getY() >= lowerLeft.getY() && otherUpperLeft.getY() <= upperLeft.getY()) {
             // y is in range
-            interUpperLeft = upperLeft;
-            if (otherLowerRight.getX() <= lowerRight.getX())
-                interLowerRight = otherLowerRight;
+            yUpper = otherUpperLeft.getY();
+            if (otherLowerLeft.getY() >= lowerLeft.getY())
+                yLower = otherLowerLeft.getY();
             else
-                interLowerRight = lowerRight;
+                yLower = lowerLeft.getY();
         }
-        else if (otherLowerLeft.getX() < lowerLeft.getX() && otherLowerRight.getX() >= lowerLeft.getX()) {
-            // either it intersects from left, or completely contains:
-            if (otherLowerRight.getX() >= lowerRight.getX()) {
-                // contains, on X axis
-                interLowerLeft = lowerLeft;
-                interLowerRight = lowerRight;
+        else if (otherUpperLeft.getY() > upperLeft.getY() && otherLowerLeft.getY() <= upperLeft.getY()) {
+            // either it intersects from top, or completely contains on Y axis:
+            if (otherLowerLeft.getY() <= lowerLeft.getY()) {
+                // contains, on Y axis
+                yUpper = upperLeft.getY();
+                yLower = lowerLeft.getY();
             }
             else {
-                interLowerLeft = lowerLeft;
-                interLowerRight = otherLowerRight;
+                yLower = otherLowerLeft.getY();
+                yUpper = upperLeft.getY();
             }
         }
 
-        if (interLowerLeft != null && interLowerRight != null && interUpperLeft != null && interUpperRight != null)
-            return (new Rectangle(interLowerLeft, interLowerRight, interUpperLeft, interUpperRight));
+        if (xLeft != null && xRight != null && yLower != null && yUpper != null)
+            return (new Rectangle(new Point2D.Double(xLeft, yLower), new Point2D.Double(xLeft, yUpper),
+                    new Point2D.Double(xRight, yLower), new Point2D.Double(xRight, yUpper)));
         else
             return (null);
     }

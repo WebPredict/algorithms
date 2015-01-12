@@ -22,8 +22,14 @@ public class MathUtils {
     @InterestingAlgorithm
     public static double evaluateArithmeticExpression (String expression) throws Exception {
 
+        EvalInfo info = evaluateArithmeticSubExpression(expression);
+        return (info.value);
+    }
+
+    public static EvalInfo evaluateArithmeticSubExpression (String expression) throws Exception {
+
         if (expression == null)
-            return (Double.NaN);
+            return (new EvalInfo());
 
         String trimmed = expression.trim();
 
@@ -44,9 +50,11 @@ public class MathUtils {
             // parsing an operator = 2
             // computing a sub-result   ?
 
+            // "3 + (3 * (4 / (5 - 2))) * -1.2"
+
             switch (state) {
                 case 0: // initial state
-                    if ((c >= '0' && c <= '9') || c == '-') {
+                    if ((c >= '0' && c <= '9') || c == '-' || c == '+' || c == '.') {
                         tokenStartIdx = i;
                         state = 1; // parsing a number, possibly negative
                     }
@@ -54,15 +62,21 @@ public class MathUtils {
                         // nothing to do
                     }
                     else if (c == '(') {
-                        double num =  evaluateArithmeticExpression(trimmed.substring(i + 1));
-                        // TODO
+                        EvalInfo info =  evaluateArithmeticSubExpression(trimmed.substring(i + 1));
+                        i = info.strIdx;
+                        if (firstOperand == null)
+                            firstOperand = info.value;
+                        else if (secondOperand == null) {
+                            secondOperand = info.value;
+                        }
+                        // state = ??
                     }
                     else
                         throw new Exception("Syntax error in " + trimmed + " at position " + i);
                     break;
 
                 case 1: // parsing a number
-                    if (c == ' ') {
+                    if (c == ' ') {  // finished parsing number
                         double num = atod(trimmed.substring(tokenStartIdx, i));
                         if (operation != null) {
                             if (firstOperand == null) {
@@ -73,13 +87,25 @@ public class MathUtils {
                                 secondOperand = num;
                                 // TODO the operation
 
-                                Double result = 0d;
                                 switch (operation.charAt(0)) {
                                     case '+':
-                                        result = firstOperand + secondOperand;
+                                        firstOperand += secondOperand;
+                                        break;
+
+                                    case '-':
+                                        firstOperand -= secondOperand;
+                                        break;
+
+                                    case '/':
+                                        firstOperand /= secondOperand;
+                                        break;
+
+                                    case '*':
+                                        firstOperand *= secondOperand;
                                         break;
                                 }
                                 operation = null;
+                                secondOperand = null;
                                 state = 0;
                             }
                         }
@@ -89,8 +115,11 @@ public class MathUtils {
                         throw new Exception("Syntax error in " + trimmed + " at position " + i + " unbalanced parentheses");
 
                     }
-                    else if (c == ')') {
-                        return (atod(trimmed.substring(tokenStartIdx, i)));
+                    else if (c == ')') {   // This only is valid if we're already in a paren expression
+                        EvalInfo info = new EvalInfo();
+                        info.value = atod(trimmed.substring(tokenStartIdx, i));
+                        info.strIdx = i;
+                        return (info);
                     }
                     break;
 
@@ -102,11 +131,20 @@ public class MathUtils {
                     else
                         throw new Exception("Syntax error in " + trimmed + " at position " + i + " expecting operator");
                     break;
-
             }
         }
 
-        return (Double.NaN); // TODO
+        EvalInfo resultInfo = new EvalInfo();
+        if (firstOperand != null)
+            resultInfo.value = firstOperand;
+
+        resultInfo.strIdx = trimmed.length() - 1;
+        return (resultInfo);
+    }
+
+    static class EvalInfo {
+        public double value = Double.NaN;
+        public int strIdx;
     }
 
     /**
@@ -140,16 +178,16 @@ public class MathUtils {
 
     public static MarsenneTwister TWISTER = new MarsenneTwister();
 
+    /**
+     * Generates random number from 0..max (exclusive)
+     * @param max
+     * @return
+     */
     @InterestingAlgorithm
     public static int     generateRandom (int max) {
         int nextRandom = TWISTER.getNextRandom();
         return (nextRandom % max);
     }
-
-    public static int     generateRandom (int max, int seed) {
-        return (0); // TODO
-    }
-
 
     /**
      * TODO:
@@ -250,6 +288,13 @@ public class MathUtils {
         return (nFactorialNeeded);
     }
 
+    /**
+     * Solves quadratic equations
+     * @param a
+     * @param b
+     * @param y
+     * @return
+     */
     @InterestingAlgorithm
     public static double [] quadraticSolve (double a, double b, double y) {
         double first = -b + Math.sqrt(b * b - 4 * a * y) / 2d * a;
@@ -599,8 +644,8 @@ public class MathUtils {
     }
 
     /**
-     *
-     * @param asciiNum
+     *  Tries to return integer from ascii string. Stops when encountering non-numeric value.
+     * @param str String to convert.
      * @return
      */
     @InterestingAlgorithm

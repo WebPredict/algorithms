@@ -440,4 +440,35 @@ public class ArrayUtils {
         return (storeIndex);
 
     }
+
+    /**
+     * Simple binary search
+     * @param list
+     * @return
+     */
+    public static int findIndexInSortedList (int [] list, int value) {
+        if (list == null || list.length == 0)
+            return (-1);
+
+        int idx = list.length / 2;
+
+        int startIdx = 0;
+        int endIdx = list.length;
+
+        while (startIdx != endIdx) {
+            int curVal = list [idx];
+            if (curVal == value) {
+                return (idx);
+            }
+            else if (curVal < value) {
+                startIdx = idx;
+            }
+            else {
+                endIdx = idx;
+            }
+            idx = startIdx + (endIdx - startIdx) / 2;
+        }
+        return (-1);
+    }
+
 }
