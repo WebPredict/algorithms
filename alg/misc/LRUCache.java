@@ -1,5 +1,7 @@
 package alg.misc;
 
+import java.util.PriorityQueue;
+
 /**
  * Created with IntelliJ IDEA.
  * User: jsanchez
@@ -9,11 +11,12 @@ package alg.misc;
  */
 public class LRUCache {
 
-    // TODO: use a priority queue
-
     private int capacity;
 
+    private PriorityQueue   queue;
+
     public LRUCache(int capacity) {
+        queue = new PriorityQueue(capacity);
         this.capacity = capacity;
     }
 
@@ -23,6 +26,6 @@ public class LRUCache {
     }
 
     public void set (int key, int value) {
-        // TODO:
+        // TODO: add to queue with priority as timestamp
     }
 }

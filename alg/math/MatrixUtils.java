@@ -100,10 +100,12 @@ public class MatrixUtils {
     }
 
     @InterestingAlgorithm
-    public static Matrix    rotate (Matrix m, Axis axis, double degrees) {
+    public static Vector    rotate (Vector v, Axis axis, double degrees) {
 
         double radians = Math.toRadians(degrees);
 
-        return (m); // TODO
+        // TODO: create rotational matrix
+
+        return (v); // TODO
     }
 }

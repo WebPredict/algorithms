@@ -58,6 +58,12 @@ public class StockUtils {
         return (null);
     }
 
+    /**
+     *
+     * @param num
+     * @return
+     */
+    @InterestingAlgorithm
     public static int findPeakElementIdx(int[] num) {
 
         if (num == null || num.length < 2)

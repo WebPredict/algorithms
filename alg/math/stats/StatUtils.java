@@ -129,4 +129,5 @@ public class StatUtils {
     public static double findMedianSortedArrays (int [] a1, int [] a2) {
          return (Double.NaN); // TODO
     }
+
 }

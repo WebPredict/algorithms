@@ -1,11 +1,7 @@
 package alg.misc;
 
 /**
- * Created with IntelliJ IDEA.
- * User: jsanchez
- * Date: 1/9/15
- * Time: 2:29 PM
- * To change this template use File | Settings | File Templates.
+ * An annotation for non-trivial (sometimes) interesting algorithms in this library
  */
 public @interface InterestingAlgorithm {
 
