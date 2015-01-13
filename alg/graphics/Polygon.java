@@ -5,7 +5,9 @@ import alg.math.Vector;
 import alg.misc.InterestingAlgorithm;
 
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.PriorityQueue;
 
 /**
@@ -17,32 +19,26 @@ import java.util.PriorityQueue;
  */
 public class Polygon {
 
-    private Point2D []  points;
+    private List<Point2D>  points = new ArrayList<Point2D>();
 
-    public Polygon (Point2D [] points) {
+    public Polygon (List<Point2D> points) {
         this.points = points;
     }
 
-    @InterestingAlgorithm
-    public boolean  isSimple () {
-        /**
-         * approach: need to see if there are any intersecting line segments
-         * Should probably line sweep the line segments
-         */
-        return (false); // TODO
+    public Polygon () {
     }
 
     @InterestingAlgorithm
     public boolean  isConvex () {
-        if (points == null || points.length < 4)
+        if (points == null || points.size() < 4)
             return (false);
 
         boolean seenNeg = false;
         boolean seenPos = false;
-        for (int i = 2; i < points.length; i++) {
-            Point2D first = points [i - 2];
-            Point2D second = points [i - 1];
-            Point2D third = points [i];
+        for (int i = 2; i < points.size(); i++) {
+            Point2D first = points.get(i - 2);
+            Point2D second = points.get(i - 1);
+            Point2D third = points.get(i);
 
             double angleBetween = MathUtils.angleBetweenVectors2D(Vector.fromPoints(second, first), Vector.fromPoints(third, second));
             if (angleBetween < 0)
@@ -57,11 +53,20 @@ public class Polygon {
         return (false);
     }
 
-    public Point2D[] getPoints() {
+    @InterestingAlgorithm
+    public boolean  isSimple () {
+        /**
+         * approach: need to see if there are any intersecting line segments
+         * Should probably line sweep the line segments
+         */
+        return (false); // TODO
+    }
+
+    public List<Point2D> getPoints() {
         return points;
     }
 
-    public void setPoints(Point2D[] points) {
+    public void setPoints(List<Point2D> points) {
         this.points = points;
     }
 
@@ -72,7 +77,7 @@ public class Polygon {
 
     @InterestingAlgorithm
     public boolean  containsPoint (Point2D point) {
-        if (points == null || points.length < 1)
+        if (points == null || points.size() < 1)
             return (false);
 
         PriorityQueue   pointsQueue = new PriorityQueue(0, new Comparator() {
@@ -90,8 +95,8 @@ public class Polygon {
         });
         Line2D line = new Line2D(0, point.getY());
 
-        for (int i = 1; i < points.length; i++) {
-            LineSegment2D segment = new LineSegment2D(points [i - 1], points[i]);
+        for (int i = 1; i < points.size(); i++) {
+            LineSegment2D segment = new LineSegment2D(points.get(i - 1), points.get(i));
             Object intersection = segment.lineIntersect(line);
             if (intersection instanceof LineSegment2D)
                 return (true);

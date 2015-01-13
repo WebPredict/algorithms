@@ -3,7 +3,10 @@ package alg.math;
 import alg.arrays.Interval;
 import alg.misc.InterestingAlgorithm;
 
+import java.awt.*;
+import java.awt.geom.Point2D;
 import java.util.*;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -768,6 +771,14 @@ public class MathUtils {
     @InterestingAlgorithm
     public static int lcm (int num1, int num2) {
          return (num1 * num2 / gcd(num1, num2));
+    }
+
+    public static double crossProduct (Point2D p1, Point2D p2, Point2D p3, Point2D p4) {
+        return (Vector.fromPoints(p2, p1).cross2d(Vector.fromPoints(p4, p3)));
+    }
+
+    public static double dotProduct (Point2D p1, Point2D p2, Point2D p3, Point2D p4) {
+        return (Vector.fromPoints(p2, p1).dot(Vector.fromPoints(p4, p3)));
     }
 
     public static boolean closeEnough (double d1, double d2) {

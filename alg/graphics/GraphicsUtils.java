@@ -5,10 +5,7 @@ import alg.math.Vector;
 import alg.misc.InterestingAlgorithm;
 
 import java.awt.geom.Point2D;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.PriorityQueue;
-import java.util.Queue;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -208,18 +205,113 @@ public class GraphicsUtils {
         return (area);
     }
 
+    /**
+     * Adapted from TopCoder notes - one way to compute a convex hull, assuming
+     * we do not include colinear points
+     * @param points
+     * @return
+     */
     @InterestingAlgorithm
     public static Polygon   computeConvexHull (Point2D [] points) {
-        Polygon ret = null;
-        // TODO
-        return (null);
+        if (points == null)
+            return (null);
+
+        int          numPoints = points.length;
+        int         leftmostPIdx = 0;
+        boolean[]   used = new boolean [numPoints];
+
+        //First find the leftmost point
+        for(int i = 1; i < numPoints; i++) {
+            if(points[i].getX() < points[leftmostPIdx].getX())
+                leftmostPIdx = i;
+        }
+
+        int         start = leftmostPIdx;
+        do {
+            int     n = -1;
+            double  dist = 0;
+
+            for(int i = 0; i < numPoints; i++) {
+                //Don't go back to the same point you came from
+                if (i == leftmostPIdx)
+                    continue;
+
+                //Don't go to a visited point
+                if (used[i])
+                    continue;
+
+                if(n == -1)
+                    n = i;
+
+                double cross = MathUtils.crossProduct(points[i], points [leftmostPIdx], points [n], points [leftmostPIdx]);
+
+                //dot is the distance from leftmostPIdx to i
+                double dot =  MathUtils.dotProduct(points[i], points [leftmostPIdx], points [i], points [leftmostPIdx]);
+
+                if (cross < 0) {
+                    n = i;
+                    dist = dot;
+                }
+                else if (cross == 0) {
+
+                    if (dot > dist) {
+                        dist = dot;
+                        n = i;
+                    }
+                }
+            }
+            leftmostPIdx = n;
+            used[leftmostPIdx] = true;
+        } while (start != leftmostPIdx);
+
+        Polygon     ret = new Polygon();
+        for (int i = 0; i < used.length; i++) {
+            if (used [i])
+                ret.getPoints().add(points[i]);
+        }
+        return (ret);
     }
 
+    public List<Point2D> smooth (Point2D [] line, double epsilon) {
+        if (line == null)
+            return (null);
+
+        return (smooth(line, 0, line.length, epsilon));
+    }
+
+    /**
+     * The Ramer-Douglas-Peucker line smoothing algorithm
+     * @param line
+     * @param epsilon
+     * @return
+     */
     @InterestingAlgorithm
-    public Point2D []   smooth (Point2D [] line) {
+    public List<Point2D> smooth (Point2D [] line, int startIdx, int endIdx, double epsilon) {
         // Ramer-Douglas-Peucker
-        // rectangular smooth
-        return (line); // TODO
+
+        double  maxDistance = 0;
+        int     index = 0;
+        int     end = line.length;
+        for (int i = 2; i < end; i++) {
+            double d = lineSegmentPointDist(new LineSegment2D(line [0], line [end - 1]), line [i]);
+            if (d > maxDistance) {
+                index = i;
+                maxDistance = d;
+            }
+        }
+
+        List<Point2D> results = new ArrayList<Point2D>();
+        if (maxDistance > epsilon) {
+            List<Point2D> results1 = smooth(line, 0, index, epsilon);
+            List<Point2D> results2 = smooth(line, index, end, epsilon);
+        }
+        else {
+            results.add(line [0]);
+            if (end - 1 > 0)
+                results.add(line [end - 1]);
+        }
+        return (results);
     }
 
+    // TODO: rectangular smooth
 }
