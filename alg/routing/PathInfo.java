@@ -8,10 +8,12 @@ public class PathInfo {
 
 	private Map<Vertex, Integer> pathDistances;
 	private Map<Vertex, Vertex> previousVertexPath;
-	
-	public PathInfo (Map<Vertex, Integer> pathDistances, Map<Vertex, Vertex> previousVertexPath) {
+	private Vertex pathStart;
+
+	public PathInfo (Map<Vertex, Integer> pathDistances, Map<Vertex, Vertex> previousVertexPath, Vertex pathStart) {
 		this.pathDistances = pathDistances;
 		this.previousVertexPath = previousVertexPath;
+        this.pathStart = pathStart;
 	}
 	
 	public Map<Vertex, Integer> getPathDistances() {
@@ -26,5 +28,28 @@ public class PathInfo {
 	public void setPreviousVertexPath(Map<Vertex, Vertex> previousVertexPath) {
 		this.previousVertexPath = previousVertexPath;
 	}
-	
+
+    public Vertex getPathStart () {
+        return (pathStart);
+    }
+
+    public String toString () {
+
+        if (previousVertexPath == null)
+            return ("NULL");
+        else {
+            Vertex previous = previousVertexPath.get(pathStart);
+            StringBuilder builder = new StringBuilder();
+
+            do {
+                builder.append(previous.toString());
+                builder.append(" -> ");
+                builder.append("(" + pathDistances.get(previous) + ") ");
+                previous = previousVertexPath.get(previous);
+            }
+            while (previous != null);
+            return (builder.toString());
+        }
+
+    }
 }

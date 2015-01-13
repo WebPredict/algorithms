@@ -1,6 +1,7 @@
 package alg.routing;
 
 import java.util.HashMap;
+import java.util.List;
 
 import alg.graph.Graph;
 import alg.misc.InterestingAlgorithm;
@@ -64,6 +65,23 @@ public class RoutingUtils {
 			}
 			
 		}
-		return (new PathInfo(vertexDistanceMap, vertexPathMap));	
+		return (new PathInfo(vertexDistanceMap, vertexPathMap, source));
 	}
+
+    /**
+     *  Uses heuristics to come up with 95% optimal solution in n^2 time?
+     * @param g
+     * @param source
+     * @return
+     */
+    @InterestingAlgorithm
+    public static PathInfo  travelingSalesman (List<Vertex> toVisit) {
+        if (toVisit == null)
+            return (null);
+
+        // Naive approach: just pick the next closest city that's in the list
+
+
+        return (null); // TODO
+    }
 }
