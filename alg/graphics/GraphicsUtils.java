@@ -17,13 +17,13 @@ import java.util.*;
 public class GraphicsUtils {
 
     /**
-     *   line intersection
-     *   paint fill
-     *   projections
-     *   line smoothing
-     *
+     * Fill with fillColorVal in cells with current color paintableColorVal.
+     * @param image
+     * @param row
+     * @param col
+     * @param fillColorVal
+     * @param paintableColorVal
      */
-
     @InterestingAlgorithm
     public static void paintfill (ImageMap image, int row, int col, int fillColorVal, int paintableColorVal) {
 
@@ -68,11 +68,20 @@ public class GraphicsUtils {
         }
     }
 
+    /**
+     * Computes total area of all rectangles (obviously, minus any intersections).
+     * @param rects
+     * @return
+     */
+    @InterestingAlgorithm
     public double   totalArea (Rectangle [] rects) {
         if (rects == null)
             return (Double.NaN);
 
         double total = 0;
+
+        for (int i = 0; i < rects.length; i++)
+            total += rects [i].area();
 
         /**
          * put in priority queue based on sorted X for efficient line sweep
@@ -97,6 +106,12 @@ public class GraphicsUtils {
         for (int i = 0; i < rects.length; i++) {
             if (prev != null) {
 
+                Rectangle prevInterCur = prev.intersect(rects [i]);
+                if (prevInterCur != null)
+                    total -= prevInterCur.area();
+                /**
+                 * TODO: approach: as long as there are intersections with prev, don't change it?
+                 */
             }
 
             prev = rects [i];
@@ -104,12 +119,24 @@ public class GraphicsUtils {
         return (total);
     }
 
+    /**
+     *
+     * @param rects
+     * @return
+     */
+    @InterestingAlgorithm
     public double   totalPerimeter (Rectangle [] rects) {
-        return (0);
+        return (0);   // TODO
     }
 
-    public double   maxIntersectingArea (Rectangle [] rects) {
-        return (0);
+    /**
+     *
+     * @param rects
+     * @return
+     */
+    @InterestingAlgorithm
+    public int   maxNumIntersectingRectangles (Rectangle [] rects) {
+        return (0);  // TODO
     }
 
     @InterestingAlgorithm
@@ -155,16 +182,16 @@ public class GraphicsUtils {
         return (Math.sqrt(xDiff * xDiff + yDiff * yDiff));
     }
 
+    @InterestingAlgorithm
     public static double lineSegmentPointDist(LineSegment2D segment, Point2D point){
 
-        // TODO: optimize to not have to create all these vectors
-        double dot1 = Vector.fromPoints(point, segment.getEnd()).dot(Vector.fromPoints(segment.getEnd(), segment.getStart()));//(C-B)*(B-A);
+        double dot1 = MathUtils.dotProduct(segment.getEnd(), point, segment.getStart(), segment.getEnd()); //(C-B)*(B-A)
         if(dot1 > 0)
-            return Math.sqrt(Vector.fromPoints(point, segment.getEnd()).dot(Vector.fromPoints(point, segment.getEnd())));
+            return Math.sqrt(MathUtils.dotProduct(segment.getEnd(), point, segment.getEnd(), point));
 
-        double dot2 = Vector.fromPoints(point, segment.getStart()).dot(Vector.fromPoints(segment.getEnd(), segment.getStart())); //(C-A)*(A-B);
+        double dot2 = MathUtils.dotProduct(segment.getStart(), point, segment.getStart(), segment.getEnd()); //(C-A)*(A-B);
         if(dot2 > 0)
-            return Math.sqrt(Vector.fromPoints(point, segment.getStart()).dot(Vector.fromPoints(point, segment.getStart())));
+            return Math.sqrt(MathUtils.dotProduct(segment.getStart(), point, segment.getStart(), point));
 
         double dist = linePointDist(segment.getStart(), segment.getEnd(), point);
         return Math.abs(dist);
@@ -304,6 +331,9 @@ public class GraphicsUtils {
         if (maxDistance > epsilon) {
             List<Point2D> results1 = smooth(line, 0, index, epsilon);
             List<Point2D> results2 = smooth(line, index, end, epsilon);
+
+            results.addAll(results1);
+            results.addAll(results2);
         }
         else {
             results.add(line [0]);
@@ -314,4 +344,38 @@ public class GraphicsUtils {
     }
 
     // TODO: rectangular smooth
+
+    /**
+     *
+     * @param values
+     * @return
+     */
+    @InterestingAlgorithm
+    public List<Integer>    movingAverage (int [] values, int size) {
+
+        if (values == null)
+            return (null);
+
+        List<Integer> ret = new ArrayList<Integer>();
+
+
+        /**
+         * 1, 3, 4, 9, 10, 8, 7, 6, 2, 1
+         *
+         *
+         */
+        ret.add(values [0]); // not sure about that
+        for (int i = size; i < values.length; i += size * 2) {
+            double avg = 0;
+             for (int j = i - size; j <= i + size; j++) {
+                 if (j < values.length)
+                    avg += values [j];
+                 else
+                     break;
+             }
+             ret.add((int)(avg / (double)(size * 2 + 1)));
+        }
+        // TODO: add the last one?
+        return (ret);
+    }
 }
