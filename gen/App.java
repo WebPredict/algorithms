@@ -34,6 +34,15 @@ public class App {
     private SidebarContent  leftSidebarContent;
     private SidebarContent  rightSidebarContent;
     private ArrayList<Blurb>    newsBlurbs = new ArrayList<Blurb>();
+    private boolean generatePlaceholderText; // lorem ipsum for empty sections
+
+    public boolean isGeneratePlaceholderText() {
+        return generatePlaceholderText;
+    }
+
+    public void setGeneratePlaceholderText(boolean generatePlaceholderText) {
+        this.generatePlaceholderText = generatePlaceholderText;
+    }
 
     public boolean isNeedsAddressModel() {
         return needsAddressModel;

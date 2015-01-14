@@ -611,13 +611,33 @@ public class WordUtils {
 
     /**
      * 123 = one hundred twenty three
+     *
+     * 123 350 one hundred twenty three thousand three hundred fifty
      * @param value
      * @return
      */
     @InterestingAlgorithm
     public static String spelledOutInEnglish (int value) {
+        if (value < 20)
+            return (NUM_WORDS[value]);
+        else if (value < 100) {
+            String ret = BIGGER_NUM_WORDS[value / 10];
+            if (value % 10 != 0)
+                ret += " " + NUM_WORDS[value % 10];
+        }
+        else {
+            // hundreds
+            // thousands
+            // millions
+            // billions
+        }
+
         return (null); // TODO
     }
+
+    private static String [] NUM_WORDS = {"zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine",
+            "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen"};
+    private static String [] BIGGER_NUM_WORDS = {"twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety", "hundred", "thousand", "million", "billion"};
 
     /**
      * Makes sure any expression involving (, ), [, ], {, or } is balanced.
@@ -665,7 +685,7 @@ public class WordUtils {
 
         }
 
-        return (true);
+        return (seenParens.isEmpty());
 
     }
 }
