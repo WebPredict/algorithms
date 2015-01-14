@@ -39,6 +39,7 @@ public class TreeUtils {
         }
     }
 
+    @InterestingAlgorithm
     public static BinaryNode<Comparable> mergeSecondIntoFirst(BinaryNode<Comparable> tree1, BinaryNode<Comparable> tree2) {
         if (tree2 == null)
             return (null);         // Nothing to do
@@ -47,6 +48,7 @@ public class TreeUtils {
 
         int comparison = tree1.getData().compareTo(tree2.getData());
 
+        // TODO finish
         if (comparison == 0) {
             //return (tree);
         }
@@ -186,16 +188,16 @@ public class TreeUtils {
         return (right);
     }
 
+    @InterestingAlgorithm
     public static void  balance (BinaryNode treeRoot) {
         // TODO
     }
 
     public static int   height (BinaryNode treeRoot) {
-         if (treeRoot == null)
-             return (0);
-        else return (Math.max(1 + height(treeRoot.getLeft()), 1 + height(treeRoot.getRight())));
+         return (maxHeight(treeRoot));
     }
 
+    @InterestingAlgorithm
     public static int   minHeight (BinaryNode treeRoot) {
        if (treeRoot == null)
            return (0);
@@ -206,6 +208,7 @@ public class TreeUtils {
         return (1 + Math.min(minHeight(left), minHeight(right)));
     }
 
+    @InterestingAlgorithm
     public static int   maxHeight (BinaryNode treeRoot) {
         if (treeRoot == null)
             return (0);
@@ -216,6 +219,7 @@ public class TreeUtils {
         return (1 + Math.max(maxHeight(left), maxHeight(right)));
     }
 
+    @InterestingAlgorithm
     public static boolean isBalanced (BinaryNode root) {
         if (root == null)
             return (true);
@@ -230,6 +234,7 @@ public class TreeUtils {
      * @param head  sorted linked list
      * @return
      */
+    @InterestingAlgorithm
     public static BinaryNode sortedListToBST(LinkNode head) {
         int length = MiscUtils.length(head);
         int middle = length / 2;
@@ -266,6 +271,7 @@ public class TreeUtils {
         return (head);
     }
 
+    @InterestingAlgorithm
     public static void printTree (BinaryNode tree) {
 
         // simple row-by-row or nicely printed tree?
@@ -284,6 +290,7 @@ public class TreeUtils {
 
     }
 
+    @InterestingAlgorithm
     public static void printTreeLineByLine (BinaryNode root, StringBuilder buf) {
 
         LinkedList<BinaryNode> currentLine = new LinkedList<BinaryNode>();
@@ -329,19 +336,23 @@ public class TreeUtils {
         }
     }
 
+    @InterestingAlgorithm
     public static int compareTrees (BinaryNode tree1, BinaryNode tree2) {
           return (0); // TODO
     }
-    
+
+    @InterestingAlgorithm
     public static BinaryNode firstCommonAncestor (BinaryNode node1, BinaryNode node2) {
     	return (null); // TODO
     }
-    
+
+    @InterestingAlgorithm
     public static BinaryNode findNextInOrder (BinaryNode node) {
     	// TODO needs parent pointers?
     	return (null); // TODO
     }
-    
+
+    @InterestingAlgorithm
     public static boolean	isValidBinarySearchTree (BinaryNode node) {
 
         boolean isValid = true;
@@ -361,7 +372,8 @@ public class TreeUtils {
 
         return (isValid);
     }
-    
+
+    @InterestingAlgorithm
     public static BinaryNode	createBinarySearchTreeWithMinHeight (int [] values) {
 
         // One approach: sort the list, then binary search for node creation

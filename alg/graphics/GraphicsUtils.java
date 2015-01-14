@@ -80,15 +80,62 @@ public class GraphicsUtils {
 
         double total = 0;
 
-        for (int i = 0; i < rects.length; i++)
-            total += rects [i].area();
-
         /**
          * put in priority queue based on sorted X for efficient line sweep
          */
-        PriorityQueue queue = new PriorityQueue(0, new Comparator<Rectangle>() {
+        PriorityQueue<Rectangle>    rectsLeftToRight = sortRectsLeftToRight(rects);
+        Set<Rectangle>              activeSet = new HashSet<Rectangle>();
 
-            @Override
+        Double    curX = null;
+        while (!rectsLeftToRight.isEmpty()) {
+             Rectangle next = rectsLeftToRight.poll();
+
+            if (curX == null) {
+                activeSet.add(next);
+            }
+            else {
+                /**
+                 * Cases: this rectangle overlaps with one or more in active set
+                 * this rectangle doesn't overlap with any in the active set
+                 */
+
+                double xDiff = curX - next.getLowerLeft().getX();
+
+                PriorityQueue<Rectangle>    activeRectsTopToBottom = sortRectsTopToBottom(activeSet);
+
+                Double prevY = null;
+                int startAdding = 0;
+                while (!activeRectsTopToBottom.isEmpty()) {
+
+                    Rectangle current = activeRectsTopToBottom.poll();
+                    if (prevY == null) {
+                        prevY = current.getUpperLeft().getY();
+                        startAdding++;
+                    }
+                    else {
+                       // TODO
+                    }
+                }
+
+                // Now remove all from active set before curX:
+                HashSet<Rectangle> newActiveSet = new HashSet<Rectangle>();
+                for (Rectangle rect : activeSet) {
+                    if (rect.getLowerRight().getX() > curX)
+                        newActiveSet.add(rect);
+                }
+                activeSet = newActiveSet;
+            }
+            curX = next.getLowerLeft().getX();
+        }
+
+        return (total);
+    }
+
+    public static PriorityQueue<Rectangle>    sortRectsLeftToRight (Rectangle [] rects) {
+        /**
+         * put in priority queue based on sorted X for efficient line sweep
+         */
+        PriorityQueue<Rectangle> queue = new PriorityQueue<Rectangle>(0, new Comparator<Rectangle>() {
             public int compare(Rectangle o1, Rectangle o2) {
                 if (o1.getLowerLeft().getX() < o2.getLowerLeft().getX())
                     return (-1);
@@ -102,21 +149,28 @@ public class GraphicsUtils {
         for (Rectangle rect : rects)
             queue.add(rect);
 
-        Rectangle prev = null;
-        for (int i = 0; i < rects.length; i++) {
-            if (prev != null) {
+        return (queue);
+    }
 
-                Rectangle prevInterCur = prev.intersect(rects [i]);
-                if (prevInterCur != null)
-                    total -= prevInterCur.area();
-                /**
-                 * TODO: approach: as long as there are intersections with prev, don't change it?
-                 */
+    public static PriorityQueue<Rectangle>    sortRectsTopToBottom (Set<Rectangle> rects) {
+        /**
+         * put in priority queue based on sorted Y for efficient line sweep
+         */
+        PriorityQueue<Rectangle> queue = new PriorityQueue<Rectangle>(0, new Comparator<Rectangle>() {
+            public int compare(Rectangle o1, Rectangle o2) {
+                if (o1.getUpperLeft().getY() > o2.getUpperLeft().getY())
+                    return (-1);
+                else if (o1.getLowerLeft().getY() < o2.getLowerLeft().getY())
+                    return (1);
+                else
+                    return (0);
             }
+        });
 
-            prev = rects [i];
-        }
-        return (total);
+        for (Rectangle rect : rects)
+            queue.add(rect);
+
+        return (queue);
     }
 
     /**
