@@ -17,6 +17,28 @@ public class MathTest {
 
     public static void main (String [] args) {
 
+        int n = 1000;
+        int ctr = 0;
+        // Hmm supposedly this is O(n^2) as opposed to O(n^3)... not really clear why
+//        for (int i = 0; i < n - 2; ++i) {
+//            for (int j = i + 1; j < n - 1; ++j) {
+//                for (int k = j + 1; k < n; ++k) {
+//                    ctr++;
+//                }
+//            }
+//        }
+
+        ctr = 0;
+        for (int i = 0; i < n; ++i) {
+            for (int j = i + 1; j < n; ++j) {
+
+                    ctr++;
+
+            }
+        }
+
+        System.out.println("Ctr: " + ctr + " N^2: " + (n*n) + " N^3: " + (n*n*n));
+
         int compare = MiscUtils.compareVersions("1", "1.1");
         compare = MiscUtils.compareVersions("2", "1");
         compare = MiscUtils.compareVersions("2.3", "1.4");

@@ -587,4 +587,85 @@ public class WordUtils {
         // perhaps a recursive approach and take min length of solutions?
         return (ret);
     }
+
+
+    /**
+     *
+     * @param value
+     * @return
+     */
+    @InterestingAlgorithm
+    public static String toRomanNumeral (int value) {
+        return (null); // TODO
+    }
+
+    /**
+     *
+     * @param numeral
+     * @return
+     */
+    @InterestingAlgorithm
+    public static int fromRomanNumeral (String numeral) {
+        return (0); // TODO
+    }
+
+    /**
+     * 123 = one hundred twenty three
+     * @param value
+     * @return
+     */
+    @InterestingAlgorithm
+    public static String spelledOutInEnglish (int value) {
+        return (null); // TODO
+    }
+
+    /**
+     * Makes sure any expression involving (, ), [, ], {, or } is balanced.
+     * @param value
+     * @return
+     */
+    public static boolean validParens (String value) {
+
+        if (value == null)
+            return (true);
+
+        Stack<Character> seenParens = new Stack<Character>();
+
+        for (int i = 0; i < value.length(); i++) {
+            char c = value.charAt(i);
+            if (c == '(' || c == '{' || c == '[')
+                seenParens.push(c);
+            else if (c == ')') {
+                if (seenParens.empty())
+                    return (false);
+                else {
+                    char matched = seenParens.pop();
+                    if (matched != '(')
+                        return (false);
+                }
+            }
+            else if (c == '}') {
+                    if (seenParens.empty())
+                        return (false);
+                    else {
+                        char matched = seenParens.pop();
+                        if (matched != '{')
+                            return (false);
+                    }
+            }
+            else if (c == ']') {
+                if (seenParens.empty())
+                    return (false);
+                else {
+                    char matched = seenParens.pop();
+                    if (matched != '[')
+                        return (false);
+                }
+            }
+
+        }
+
+        return (true);
+
+    }
 }

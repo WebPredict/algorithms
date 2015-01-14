@@ -114,7 +114,19 @@ public class GraphicsUtils {
                     }
                     else {
                        // TODO
+                        if (startAdding > 0) {
+                            // something
+                        }
+
+//                        if (reached the end of a rectangle)
+//                            startAdding--;
+
+                        if (startAdding > 0) {
+                            total += (current.getUpperLeft().getY() - prevY) * xDiff;
+                        }
                     }
+
+
                 }
 
                 // Now remove all from active set before curX:
