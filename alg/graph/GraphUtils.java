@@ -56,6 +56,11 @@ public class GraphUtils {
     }
 
     @InterestingAlgorithm
+    public static int   computeDiameter (Graph input) {
+        return (0); // TODO
+    }
+
+    @InterestingAlgorithm
     public static void breadthFirstSearch (Graph input, VertexVisitor visitor) {
     	// TODO
     }

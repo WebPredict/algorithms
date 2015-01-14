@@ -57,4 +57,12 @@ public class Histogram {
 
         }
     }
+
+    enum HistogramCharacter {
+        SKEWED_RIGHT,
+        SKEWED_LEFT,
+        MULTI_MODAL,
+        SYMMETRIC,
+        BIMODAL
+    }
 }

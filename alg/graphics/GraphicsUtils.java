@@ -299,6 +299,16 @@ public class GraphicsUtils {
         return (ret);
     }
 
+    /**
+     *
+     * @param points
+     * @return
+     */
+    @InterestingAlgorithm
+    public Point2D [] closestPair (Point2D [] points) {
+        return (null); // TODO
+    }
+
     public List<Point2D> smooth (Point2D [] line, double epsilon) {
         if (line == null)
             return (null);

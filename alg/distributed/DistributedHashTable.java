@@ -24,4 +24,8 @@ public class DistributedHashTable<K, V> {
     // TODO: how to indicate how this is distributed across machines, and across which machines?
 
     // Error detection, failover, etc.
+
+    // key-based routing: each hope to the next machine should bring us closer to the machine with the value
+    // duplicate key/value pairs for redundancy
+
 }
