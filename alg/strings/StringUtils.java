@@ -384,4 +384,44 @@ public class StringUtils {
     public static int		shortestDistanceBetweenWords (String text, String word1, String word2) {
     	return (0); // TODO
     }
+
+    @InterestingAlgorithm
+    public static String longestCommonPrefix (String[] strs) {
+        if (strs == null)
+            return (null);
+        else if (strs.length == 0)
+            return ("");
+
+        int commonIdx = 0;
+
+        boolean allMatched;
+        do {
+            Character c = null;
+            allMatched = false;
+            for (int i = 0; i < strs.length; i++) {
+                if (commonIdx < strs [i].length()) {
+                    if (c == null) {
+                        c = strs [i].charAt(commonIdx);
+                        allMatched = true;
+                    }
+                    else if (c != strs [i].charAt(commonIdx)) {
+                        allMatched = false;
+                        break;
+                    }
+                }
+                else {
+                    allMatched = false;
+                    break;
+                }
+            }
+            if (allMatched)
+                commonIdx++;
+            else
+                break;
+        } while (allMatched);
+
+        if (commonIdx == 0)
+            return ("");
+        return (strs [0].substring(0, commonIdx));
+    }
 }
