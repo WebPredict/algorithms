@@ -787,4 +787,7 @@ public class MathUtils {
 
     public static double epsilon = 0.0000001d;
 
+    public static double distance (double x, double y, double x2, double y2) {
+        return (Math.sqrt((x - x2) * (x - x2) + (y - y2) * (y - y2)));
+    }
 }

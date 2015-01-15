@@ -62,7 +62,10 @@ public class GeneticAlgorithm {
         });
 
         // TODO: breeding, for example:
-
+        // For each pair of fit individuals:
+        // randomly choose either first or second's weights for a particular factor
+        // sprinkle in the mutations
+        // add to population
 
         return (newPopulation); // TODO
     }
