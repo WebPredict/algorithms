@@ -11,10 +11,19 @@ public class Gene {
 
     protected Double []   traits;
     protected Double []   weights;
+    protected Double fitness;
 
     public Gene (Double [] traits, Double [] weights) {
         this.traits = traits;
         this.weights = weights;
+    }
+
+    public Double getFitness() {
+        return fitness;
+    }
+
+    public void setFitness(Double fitness) {
+        this.fitness = fitness;
     }
 
     public Double[] getTraits() {
