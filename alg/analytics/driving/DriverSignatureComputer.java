@@ -1,8 +1,13 @@
 package alg.analytics.driving;
 
+import alg.graphics.util.BasicDataDisplayer;
+import alg.io.FileUtils;
 import alg.machlearn.genetic.FitnessEvaluator;
 import alg.machlearn.genetic.Gene;
 import alg.math.MathUtils;
+
+import javax.swing.*;
+import java.text.DecimalFormat;
 
 /**
  * Created with IntelliJ IDEA.
@@ -13,7 +18,7 @@ import alg.math.MathUtils;
  */
 public class DriverSignatureComputer implements FitnessEvaluator {
 
-    private double [][][] tripsData;
+    private Double [][][] tripsData;
 
     // Computed data from analysis:
     private double [][] speedData;
@@ -38,7 +43,7 @@ public class DriverSignatureComputer implements FitnessEvaluator {
      *                   Greater than 0 but Less than N/2 will be from some other driver! This should appear as distinct from the rest of the routes
      *                   during analysis.
      */
-    public DriverSignatureComputer(double[][][] tripsData) {
+    public DriverSignatureComputer(Double[][][] tripsData) {
         this.tripsData = tripsData;
     }
 
@@ -61,26 +66,50 @@ public class DriverSignatureComputer implements FitnessEvaluator {
          *
          * ANOTHER issue: how to deal with discontinuities? Take note of them, as they could represent going
          * through tunnels or something. Afterwards, may want to do some smoothing?
+         *
+         * Will probably want some runs with variable amount of smoothing, to see how those results are. Perhaps amount of smoothing is a
+         * gene factor as well to evolve
          */
+        for (int i = 0; i < tripsData.length; i++) {
+            analyzeTrip(tripsData [i]);
+        }
+
     }
 
 
-    private void analyzeTrip (double [][] trip) {
+    public static Double MAX_POSSIBLE_SPEED = 200000d / 3600d; // 200km/h
+    public static Double MAX_POSSIBLE_ACCEL = 9.8 * 5d; // 5gs seems reasonable!
+
+    public DriverSignature analyzeTrip (Double [][] trip) {
+        if (trip.length == 0)
+            return (new DriverSignature()); // TODO what are we doing with this case?
 
         // TODO:
-        double [] speedData = new double [trip.length];
-        double [] accelData = new double [trip.length];
+        double [] speedData = new double [trip.length - 1];
+        double [] accelData = new double [trip.length == 1 ? 0 : trip.length - 2];
 
         Double maxSpeed = null;
         Double maxAccel = null;
         Double minAccel = null;
         Double averageSpeed = null;
         Double averageAccel = null;
+        Double averageDecel = null;
+        Double maxDecel = null;
+        Double minDecel = null;
+        Double tripLength = null;
 
         Double lastX = null;
         Double lastY = null;
         Double lastSpeed = null;
         Double accel = null;
+        Double decel = null;
+        Double totalAccel = null;
+        Double totalDecel = null;
+
+        int stopped = 0;
+        int distinctStops = 0;
+        Double previousDistance = null;
+
         for (int i = 0; i < trip.length; i++) {
             double x = trip [i][0];
             double y = trip [i][1];
@@ -89,19 +118,79 @@ public class DriverSignatureComputer implements FitnessEvaluator {
                 double distance = MathUtils.distance(x, y, lastX, lastY);
                 speed = distance; // m/s
 
-                if (lastSpeed != null) {
-                    accel = speed - lastSpeed;
-                    if (maxAccel == null)
-                        maxAccel = accel;
-                    else if (maxAccel < accel)
-                        maxAccel = accel;
-
-                    if (minAccel == null)
-                        minAccel = accel;
-                    else if (minAccel > accel)
-                        minAccel = accel;
+                if (speed > MAX_POSSIBLE_SPEED) {
+                    System.out.println("truncating excessive speed: " + metersToKmh(speed) + " for point " + i);
+                    speed = MAX_POSSIBLE_SPEED;
                 }
 
+                if (distance == 0) {
+                    stopped++;
+                    if (previousDistance != null && previousDistance > 0)
+                        distinctStops++;
+                }
+
+                if (lastSpeed != null) {
+                    Double curAccel = speed - lastSpeed;
+                    if (curAccel >= 0)
+                        accel = curAccel;
+                    else
+                        decel = -curAccel;
+
+                    if (accel != null && accel > MAX_POSSIBLE_ACCEL) {
+                        System.out.println("truncating excessive accel: " + accel + " for point " + i);
+                        accel = MAX_POSSIBLE_ACCEL;
+                    }
+                    else if (decel != null && decel > MAX_POSSIBLE_ACCEL) {
+                        System.out.println("truncating excessive decel: " + decel + " for point " + i);
+                        decel = MAX_POSSIBLE_ACCEL;
+                    }
+
+                    if (curAccel >= 0) {
+                        if (maxAccel == null)
+                            maxAccel = accel;
+                        else if (maxAccel < accel)
+                            maxAccel = accel;
+
+                        if (minAccel == null && accel > 0)
+                            minAccel = accel;
+                        else if (minAccel != null && minAccel > accel && accel > 0)
+                            minAccel = accel;
+
+                        if (totalAccel == null)
+                            totalAccel = accel;
+                        else
+                            totalAccel += accel;
+                    }
+                    else {
+                        if (maxDecel == null)
+                            maxDecel = decel;
+                        else if (maxDecel < decel)
+                            maxDecel = decel;
+
+                        if (minDecel == null && decel > 0)
+                            minDecel = decel;
+                        else if (minDecel != null && minDecel > decel && decel > 0)
+                            minDecel = decel;
+
+                        if (totalDecel == null)
+                            totalDecel = decel;
+                        else
+                            totalDecel += decel;
+                    }
+
+                    if (maxSpeed == null)
+                        maxSpeed = speed;
+                    else if (maxSpeed < speed)
+                        maxSpeed = speed;
+
+                    if (tripLength == null)
+                        tripLength = distance;
+                    else
+                        tripLength += distance;
+
+                }
+
+                previousDistance = distance;
                 lastSpeed = speed;
             }
 
@@ -109,6 +198,51 @@ public class DriverSignatureComputer implements FitnessEvaluator {
             lastY = y;
             lastSpeed = speed;
         }
+
+        averageSpeed = tripLength / trip.length;
+        averageAccel = totalAccel / trip.length;
+        averageDecel = totalDecel / trip.length;
+
+        System.out.println("Max speed: " + metersToKmh(maxSpeed) + "  Avg speed: " + metersToKmh(averageSpeed) + "  Max accel: " +
+                metersPerSecSec(maxAccel) + "  Min accel (not stopped): " + metersPerSecSec(minAccel) +
+                "  Avg accel: " + metersPerSecSec(averageAccel) + "  Max decel: " + metersPerSecSec(maxDecel) + "  Avg decel: " + metersPerSecSec(averageDecel) +
+                "  Trip length: " + metersToKm(tripLength) + "  Minutes stopped: " + toMinutes(stopped) + "  Minutes total: " + toMinutes(trip.length));
+
+        DriverSignature ret = new DriverSignature();
+        ret.setAverageAccel(averageAccel);
+        ret.setAverageDecel(averageDecel);
+        ret.setMaxAccel(maxAccel);
+        ret.setMaxDecel(maxDecel);
+        ret.setMinAccel(minAccel);
+        ret.setMaxSpeed(maxSpeed);
+        ret.setAverageSpeed(averageSpeed);
+        ret.setStoppedSeconds(stopped);
+        ret.setNumDistinctStops(distinctStops);
+        ret.setTripLengthSeconds(trip.length);
+
+        return (ret);
+    }
+
+    public static DecimalFormat FORMATTER = new DecimalFormat("#.###");
+
+    public static String    metersToKm (double meters) {
+        return (FORMATTER.format(meters / 1000d) + " km");
+    }
+
+    public static String    metersToKmh (double metersPerSec) {
+        return (FORMATTER.format(3600d * metersPerSec / 1000d) + " km/h");
+    }
+
+    public static String    metersPerSecSec (double meters) {
+        return (FORMATTER.format(meters) + " m/s^2");
+    }
+
+    public static String    metersPerSec (double meters) {
+        return (FORMATTER.format(meters) + " m/s");
+    }
+
+    public static String    toMinutes (int seconds) {
+        return (FORMATTER.format((double)seconds / 60d) + " min");
     }
 
     /**
@@ -131,5 +265,26 @@ public class DriverSignatureComputer implements FitnessEvaluator {
         // TODO: evaluate this gene by determining how well the factors help divide the list of trips into
         // two distinct groups: "this driver" and "other drivers"
         return 0;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public static void main (String [] args) throws Exception {
+
+        int numToLoad = 200;
+        final Double [][][] allData = new Double[numToLoad][][];
+
+        for (int i = 1; i <= numToLoad; i++) {
+            allData [i - 1] =  FileUtils.readNumericCSV("C:/Users/jsanchez/Downloads/drivers/11/" + i + ".csv");
+        }
+
+        DriverSignatureComputer computer = new DriverSignatureComputer(allData);
+
+        final double zoom = 1d;
+
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                new BasicDataDisplayer(allData, 800, 800, zoom).setVisible(true);
+            }
+        });
     }
 }

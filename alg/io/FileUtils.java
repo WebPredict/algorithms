@@ -5,6 +5,7 @@ import alg.misc.InterestingAlgorithm;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringTokenizer;
 
 /**
  * Created with IntelliJ IDEA.
@@ -358,5 +359,42 @@ public class FileUtils {
             if (pw != null)
                 pw.close();
         }
+    }
+
+    public static Double [][]  readNumericCSV (String filename) throws Exception {
+
+        ArrayList<Double []> results = new ArrayList<Double []>();
+
+        BufferedReader br = null;
+        try {
+            br = new BufferedReader(new FileReader(filename));
+            String line;
+            while ((line = br.readLine()) != null) {
+                String [] values = line.split(",");
+                Double [] doubleValues = new Double[values.length];
+                boolean invalid = false;
+                for (int i = 0; i < values.length; i++) {
+                    try {
+                        doubleValues [i] = Double.parseDouble(values [i]);
+                    }
+                    catch (NumberFormatException e) {
+                         invalid = true;
+                    }
+                }
+                if (!invalid)
+                    results.add(doubleValues);
+            }
+        }
+        finally {
+            if (br != null)
+                br.close();
+        }
+
+        Double [][] resultsArr = new Double[results.size()][];
+        for (int i = 0; i < results.size(); i++)
+            resultsArr[i] = results.get(i);
+
+
+        return (resultsArr);
     }
 }

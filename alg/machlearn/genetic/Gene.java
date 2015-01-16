@@ -9,27 +9,27 @@ package alg.machlearn.genetic;
  */
 public class Gene {
 
-    private double []   traits;
-    private double []   weights;
+    private Double []   traits;
+    private Double []   weights;
 
-    public Gene (double [] traits, double [] weights) {
+    public Gene (Double [] traits, Double [] weights) {
         this.traits = traits;
         this.weights = weights;
     }
 
-    public double[] getTraits() {
+    public Double[] getTraits() {
         return traits;
     }
 
-    public void setTraits(double[] traits) {
+    public void setTraits(Double[] traits) {
         this.traits = traits;
     }
 
-    public double[] getWeights() {
+    public Double[] getWeights() {
         return weights;
     }
 
-    public void setWeights(double[] weights) {
+    public void setWeights(Double[] weights) {
         this.weights = weights;
     }
 }
