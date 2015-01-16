@@ -1,5 +1,7 @@
 package alg.machlearn.genetic;
 
+import java.util.Random;
+
 /**
  * Created with IntelliJ IDEA.
  * User: jsanchez
@@ -16,6 +18,16 @@ public class Gene {
     public Gene (Double [] traits, Double [] weights) {
         this.traits = traits;
         this.weights = weights;
+    }
+
+    public void mutate (double mutationRate) {
+        Random random = new Random();
+        for (int i = 0; i < weights.length; i++) {
+            if (random.nextDouble() < mutationRate) {
+                // hmm how much mutation?
+                weights [i] = random.nextDouble();
+            }
+        }
     }
 
     public Double getFitness() {

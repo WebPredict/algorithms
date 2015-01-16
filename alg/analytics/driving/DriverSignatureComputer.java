@@ -9,6 +9,8 @@ import alg.math.MathUtils;
 import javax.swing.*;
 import java.text.DecimalFormat;
 import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Random;
 
 /**
  * Created with IntelliJ IDEA.
@@ -65,25 +67,35 @@ public class DriverSignatureComputer implements FitnessEvaluator {
          */
 
         int numGenerations = 10;
-        int numGenes = 10;
+        int numGenes = 20;
         double mutationRate = .01d;
+        double fractionToPromote = .5d;
 
         DriverSignature [] signatures = new DriverSignature[numGenes];
         for (int i = 0; i < signatures.length; i++) {
             signatures [i] = DriverSignature.randomSignature();
         }
 
+        TripData [][] driversTripsDataAnalyzed = new TripData[drivers.length][];
+        for (int k = 0; k < drivers.length; k++) {
+            System.out.println("Driver: " + k);
+            driversTripsDataAnalyzed [k] = new TripData[drivers [k].trips.length];
+            for (int i = 0; i < drivers [k].trips.length; i++) {
+                driversTripsDataAnalyzed [k][i] = analyzeTrip(drivers [k].trips [i]);
+            }
+        }
+
         for (int gen = 0; gen < numGenerations; gen++) {
+            System.out.println("Generation: " + gen);
+
             for (int k = 0; k < drivers.length; k++) {
-                TripData [] tripsDataAnalyzed = new TripData[drivers [k].trips.length];
-                for (int i = 0; i < drivers [k].trips.length; i++) {
-                    tripsDataAnalyzed [i] = analyzeTrip(drivers [k].trips [i]);
-                }
+                System.out.println("Driver: " + k);
 
                 for (int i = 0; i < signatures.length; i++) {
+                    System.out.println("Gene/Signature: " + i);
                     Double [] totals = new Double[drivers [k].trips.length];
                     for (int j = 0; j < drivers [k].trips.length; j++) {
-                        Double total = signatures [i].computeTotalWeightsAndValues(tripsDataAnalyzed [j]);
+                        Double total = signatures [i].computeTotalWeightsAndValues(driversTripsDataAnalyzed[k] [j]);
                         totals [j] = total;
                     }
 
@@ -92,17 +104,70 @@ public class DriverSignatureComputer implements FitnessEvaluator {
                     Double avgDiff = null;
                     Double totalDiff = null;
                     for (int iDiff = 1; iDiff < totals.length; iDiff++) {
-                        totalDiff += (totals [i] - totals [i - 1]);
+                        double diff = totals [iDiff] - totals [iDiff - 1];
+                        if (totalDiff == null)
+                            totalDiff = diff;
+                        else
+                            totalDiff += diff;
+                       // System.out.println("trip diff: " + (iDiff - 1) + " is: " + diff);
                     }
                     avgDiff = totalDiff / totals.length;
 
                     // TODO: sort totals, then try to find two distinct groups, one of which has more similar trips
-                    // score the gene based on how well this has happened
+                    Double biggestDiffSoFar = null;
+                    Double gapSize = null;
+                    for (int iDiff = 1; iDiff < totals.length; iDiff++) {
+                        double curDiff = totals [iDiff] - totals [iDiff - 1];
+                        if (biggestDiffSoFar == null)
+                            biggestDiffSoFar = curDiff;
+                        else if (biggestDiffSoFar < curDiff)
+                            biggestDiffSoFar = curDiff;
 
+                        if (iDiff > totals.length / 2) {
+                            // we can start to look for gap of potential other driver trips
+                            // TODO look at rate of change of diffs?
+                        }
+                    }
+
+                    // score the gene based on how well this has happened
+                    Double fitness = .5d; // TODO
+                    if (gapSize != null) {
+                        fitness += .5d * (gapSize / totalDiff);
+                    }
+
+                    signatures [i].setFitness(fitness);
                 }
             }
 
-            // breed genes, then adjust with mutations, then do next generation
+            Arrays.sort(signatures, new Comparator<DriverSignature>() {
+                @Override
+                public int compare(DriverSignature o1, DriverSignature o2) {
+                    if (o1.getFitness() < o2.getFitness())
+                        return (-1);
+                    else if (o1.getFitness() > o2.getFitness())
+                        return (1);
+                    else
+                        return (0);
+                }
+            });
+
+            DriverSignature [] nextGen = new DriverSignature[numGenes];
+
+            int numPromoted = (int)(fractionToPromote * (double)signatures.length);
+            for (int i = 0; i < numPromoted; i++) {
+                nextGen [i] = signatures [i];
+            }
+            Random random = new Random();
+            for (int i = numPromoted; i < nextGen.length; i++) {
+                nextGen [i] = signatures [random.nextInt(numPromoted)].mateWith(signatures[random.nextInt(numPromoted)]);
+            }
+
+            // Hmm... mutate the parents too or just children?
+            for (int iNext = 0; iNext < nextGen.length; iNext++) {
+                signatures [iNext].mutate(mutationRate);
+            }
+
+            signatures = nextGen;
         }
     }
 

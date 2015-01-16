@@ -37,11 +37,21 @@ public class DriverSignature extends Gene {
         super(traits, weights);
     }
 
-//    public Double computeTotalWeightsAndValues () {
-//        return (maxSpeed * weights [0] + maxAccel * weights [1] + minAccel * weights [2] + averageSpeed * weights [3] +
-//                averageAccel * weights [4] + maxDecel * weights [5] + averageDecel * weights [6] + tripLengthSeconds * weights [7] +
-//                stoppedSeconds * weights [8] + numDistinctStops * weights [9]);
-//    }
+    public DriverSignature  mateWith (DriverSignature signature) {
+        DriverSignature child = new DriverSignature();
+        // Hmm best way to choose which gene? coin flip for each weight at the moment:
+
+        Random random = new Random();
+
+        for (int i = 0; i < weights.length; i++) {
+            if (random.nextDouble() > .5)
+                child.weights [i] = weights [i];
+            else
+                child.weights [i] = signature.weights [i];
+        }
+
+        return (child);
+    }
 
     public Double computeTotalWeightsAndValues (TripData data) {
         return (data.getMaxSpeed() * weights [0] + data.getMaxAccel() * weights [1] + data.getMinAccel() * weights [2] + data.getAverageSpeed() * weights [3] +
