@@ -9,8 +9,8 @@ package alg.machlearn.genetic;
  */
 public class Gene {
 
-    private Double []   traits;
-    private Double []   weights;
+    protected Double []   traits;
+    protected Double []   weights;
 
     public Gene (Double [] traits, Double [] weights) {
         this.traits = traits;

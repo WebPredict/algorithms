@@ -31,6 +31,8 @@ public class DriverSignatureComputer implements FitnessEvaluator {
     private double []averageAccel;
 
     private DriverSignature bestSignature;
+    private Double threshholdOfSimilarity;
+    private Double expectedSignatureTotal;
 
     /**
     * Goal: from list of X,Y position data for N trips, build up a 'driver signature' such that the question:
@@ -70,19 +72,41 @@ public class DriverSignatureComputer implements FitnessEvaluator {
          * Will probably want some runs with variable amount of smoothing, to see how those results are. Perhaps amount of smoothing is a
          * gene factor as well to evolve
          */
-        for (int i = 0; i < tripsData.length; i++) {
-            analyzeTrip(tripsData [i]);
+
+        int numGenerations = 10;
+        int numGenes = 10;
+        double mutationRate = .01d;
+
+        DriverSignature [] signatures = new DriverSignature[numGenes];
+        for (int i = 0; i < signatures.length; i++) {
+            signatures [i] = DriverSignature.randomSignature();
         }
 
+        TripData [] tripsDataAnalyzed = new TripData[tripsData.length];
+        for (int i = 0; i < tripsData.length; i++) {
+            tripsDataAnalyzed [i] = analyzeTrip(tripsData [i]);
+        }
+
+        Double [] totals = new Double[tripsData.length];
+        for (int i = 0; i < signatures.length; i++) {
+            for (int j = 0; j < tripsData.length; j++) {
+                Double total = signatures [i].computeTotalWeightsAndValues(tripsDataAnalyzed [j]);
+                totals [i] = total;
+            }
+
+            // TODO: sort totals, then try to find two distinct groups, one of which has more similar trips
+            // score the gene based on how well this has happened
+            // breed genes, then adjust with mutations, then do next generation
+        }
     }
 
 
     public static Double MAX_POSSIBLE_SPEED = 200000d / 3600d; // 200km/h
     public static Double MAX_POSSIBLE_ACCEL = 9.8 * 5d; // 5gs seems reasonable!
 
-    public DriverSignature analyzeTrip (Double [][] trip) {
+    public TripData analyzeTrip (Double [][] trip) {
         if (trip.length == 0)
-            return (new DriverSignature()); // TODO what are we doing with this case?
+            return (new TripData()); // TODO what are we doing with this case?
 
         // TODO:
         double [] speedData = new double [trip.length - 1];
@@ -108,6 +132,7 @@ public class DriverSignatureComputer implements FitnessEvaluator {
 
         int stopped = 0;
         int distinctStops = 0;
+        int discontinuities = 0;
         Double previousDistance = null;
 
         for (int i = 0; i < trip.length; i++) {
@@ -120,7 +145,8 @@ public class DriverSignatureComputer implements FitnessEvaluator {
 
                 if (speed > MAX_POSSIBLE_SPEED) {
                     System.out.println("truncating excessive speed: " + metersToKmh(speed) + " for point " + i);
-                    speed = MAX_POSSIBLE_SPEED;
+                    speed = lastSpeed;
+                    discontinuities++;
                 }
 
                 if (distance == 0) {
@@ -131,18 +157,22 @@ public class DriverSignatureComputer implements FitnessEvaluator {
 
                 if (lastSpeed != null) {
                     Double curAccel = speed - lastSpeed;
-                    if (curAccel >= 0)
-                        accel = curAccel;
-                    else
-                        decel = -curAccel;
-
-                    if (accel != null && accel > MAX_POSSIBLE_ACCEL) {
-                        System.out.println("truncating excessive accel: " + accel + " for point " + i);
-                        accel = MAX_POSSIBLE_ACCEL;
+                    if (curAccel >= 0) {
+                        if (curAccel < MAX_POSSIBLE_ACCEL)
+                            accel = curAccel;
                     }
-                    else if (decel != null && decel > MAX_POSSIBLE_ACCEL) {
-                        System.out.println("truncating excessive decel: " + decel + " for point " + i);
-                        decel = MAX_POSSIBLE_ACCEL;
+                    else {
+                        if (-curAccel < MAX_POSSIBLE_ACCEL)
+                            decel = -curAccel;
+                    }
+
+                    if (curAccel > MAX_POSSIBLE_ACCEL) {
+                        System.out.println("truncating excessive accel: " + curAccel + " for point " + i);
+                        //accel = MAX_POSSIBLE_ACCEL;
+                    }
+                    else if (-curAccel > MAX_POSSIBLE_ACCEL) {
+                        System.out.println("truncating excessive decel: " + (curAccel) + " for point " + i);
+                        //decel = MAX_POSSIBLE_ACCEL;
                     }
 
                     if (curAccel >= 0) {
@@ -206,9 +236,9 @@ public class DriverSignatureComputer implements FitnessEvaluator {
         System.out.println("Max speed: " + metersToKmh(maxSpeed) + "  Avg speed: " + metersToKmh(averageSpeed) + "  Max accel: " +
                 metersPerSecSec(maxAccel) + "  Min accel (not stopped): " + metersPerSecSec(minAccel) +
                 "  Avg accel: " + metersPerSecSec(averageAccel) + "  Max decel: " + metersPerSecSec(maxDecel) + "  Avg decel: " + metersPerSecSec(averageDecel) +
-                "  Trip length: " + metersToKm(tripLength) + "  Minutes stopped: " + toMinutes(stopped) + "  Minutes total: " + toMinutes(trip.length));
+                "  Trip length: " + metersToKm(tripLength) + "  Num discontinuities: " + discontinuities + "  Num distinct stops: " + distinctStops + "  Minutes stopped: " + toMinutes(stopped) + "  Minutes total: " + toMinutes(trip.length));
 
-        DriverSignature ret = new DriverSignature();
+        TripData ret = new TripData();
         ret.setAverageAccel(averageAccel);
         ret.setAverageDecel(averageDecel);
         ret.setMaxAccel(maxAccel);
@@ -218,6 +248,7 @@ public class DriverSignatureComputer implements FitnessEvaluator {
         ret.setAverageSpeed(averageSpeed);
         ret.setStoppedSeconds(stopped);
         ret.setNumDistinctStops(distinctStops);
+        ret.setDiscontinuities(discontinuities);
         ret.setTripLengthSeconds(trip.length);
 
         return (ret);
@@ -247,16 +278,19 @@ public class DriverSignatureComputer implements FitnessEvaluator {
 
     /**
      * Returns probability that tripData could represent a trip by this driver.
-     * @param tripData
+     * @param rawTripData
      * @return
      */
-    public double isTripByThisDriver (double [][] tripData) {
-        if (bestSignature == null)
+    public boolean isTripByThisDriver (Double [][] rawTripData) {
+        if (expectedSignatureTotal == null)
             throw new RuntimeException("Need to run analysis first");
         else {
-            // TODO
+            //Double expected = bestSignature.computeTotalWeightsAndValues(); // TODO cache this
+            TripData tripData = analyzeTrip(rawTripData);
+            Double thisTrip = bestSignature.computeTotalWeightsAndValues(tripData);
+
+            return (Math.abs(thisTrip - expectedSignatureTotal) < threshholdOfSimilarity);
         }
-        return (0); // TODO
     }
 
     @Override
@@ -273,10 +307,11 @@ public class DriverSignatureComputer implements FitnessEvaluator {
         final Double [][][] allData = new Double[numToLoad][][];
 
         for (int i = 1; i <= numToLoad; i++) {
-            allData [i - 1] =  FileUtils.readNumericCSV("C:/Users/jsanchez/Downloads/drivers/11/" + i + ".csv");
+            allData [i - 1] =  FileUtils.readNumericCSV("C:/Users/jsanchez/Downloads/drivers/2/" + i + ".csv");
         }
 
         DriverSignatureComputer computer = new DriverSignatureComputer(allData);
+        computer.doAnalysis();
 
         final double zoom = 1d;
 

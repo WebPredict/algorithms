@@ -1,18 +1,13 @@
 package alg.analytics.driving;
 
-import alg.machlearn.genetic.Gene;
-import alg.math.MathUtils;
-
-import java.util.Random;
-
 /**
  * Created with IntelliJ IDEA.
  * User: jsanchez
- * Date: 1/15/15
- * Time: 4:41 PM
+ * Date: 1/16/15
+ * Time: 2:34 PM
  * To change this template use File | Settings | File Templates.
  */
-public class DriverSignature extends Gene {
+public class TripData {
 
     // Computed data from analysis:
     private Double maxSpeed;
@@ -26,38 +21,6 @@ public class DriverSignature extends Gene {
     private int stoppedSeconds;
     private int numDistinctStops;
     private int discontinuities;
-
-    private static Double [] defaultWeights = new Double[] {1d, 1d, 1d, 1d, 1d, 1d, 1d, 1d, 1d, 1d, 1d};
-
-    public DriverSignature () {
-        super(null, defaultWeights); // TODO
-    }
-
-    public DriverSignature (Double [] traits, Double [] weights) {
-        super(traits, weights);
-    }
-
-//    public Double computeTotalWeightsAndValues () {
-//        return (maxSpeed * weights [0] + maxAccel * weights [1] + minAccel * weights [2] + averageSpeed * weights [3] +
-//                averageAccel * weights [4] + maxDecel * weights [5] + averageDecel * weights [6] + tripLengthSeconds * weights [7] +
-//                stoppedSeconds * weights [8] + numDistinctStops * weights [9]);
-//    }
-
-    public Double computeTotalWeightsAndValues (TripData data) {
-        return (data.getMaxSpeed() * weights [0] + data.getMaxAccel() * weights [1] + data.getMinAccel() * weights [2] + data.getAverageSpeed() * weights [3] +
-                data.getAverageAccel() * weights [4] + data.getMaxDecel() * weights [5] + data.getAverageDecel() * weights [6] + data.getTripLengthSeconds() * weights [7] +
-                data.getStoppedSeconds() * weights [8] + data.getNumDistinctStops() * weights [9] + data.getDiscontinuities() * weights [10]);
-    }
-
-    public static DriverSignature   randomSignature () {
-        DriverSignature ret = new DriverSignature();
-
-        Random random = new Random();
-        for (int i = 0; i < ret.getWeights().length; i++) {
-            ret.weights [i] = random.nextDouble();
-        }
-        return (ret);
-    }
 
     public int getDiscontinuities() {
         return discontinuities;
