@@ -73,6 +73,9 @@ public class Model extends Type {
             else if (fieldName.equals("disabled")) {
                 sawDisabled = true;
             }
+            else if (fieldName.equals("email")) {
+                email = true;
+            }
             else if (fieldName.equals("password_confirmation")) {
                 sawPWConf = true;
             }
@@ -88,10 +91,10 @@ public class Model extends Type {
         }
 
         if (app.getAppConfig().isIncludeCreatedUpdatedBy()) {
-            fields.add(new Field("createdBy", Type.SHORT_STRING));
-            fields.add(new Field("createdAt", Type.DATETIME));
-            fields.add(new Field("updatedBy", Type.SHORT_STRING));
-            fields.add(new Field("updatedAt", Type.DATETIME));
+            fields.add(new Field("created_by", Type.SHORT_STRING));
+            fields.add(new Field("created_at", Type.DATETIME));
+            fields.add(new Field("updated_by", Type.SHORT_STRING));
+            fields.add(new Field("updated_at", Type.DATETIME));
         }
 
         // TODO: make sure all references to models are existing models

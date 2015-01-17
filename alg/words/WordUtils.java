@@ -153,12 +153,17 @@ public class WordUtils {
         return (ret);
     }
 
+    /**
+     * Takes camelCase or under_score word and produces "Camel Case"
+     * @param camelCaseWord
+     * @return
+     */
     @InterestingAlgorithm
-    public static String    capitalizeAndSpace (String camelCaseWord) {
+    public static String    capitalizeAndSpace (String camelOrUnderscore) {
         ArrayList<Character> chars = new ArrayList<Character>();
         boolean sawLower = false;
-        for (int i = 0; i < camelCaseWord.length(); i++) {
-            char c = camelCaseWord.charAt(i);
+        for (int i = 0; i < camelOrUnderscore.length(); i++) {
+            char c = camelOrUnderscore.charAt(i);
             if (c >= 'a' && c <= 'z') {
                 if (!sawLower) {
                     sawLower = true;
@@ -167,14 +172,15 @@ public class WordUtils {
                         c = Character.toUpperCase(c);
                 }
             }
-            else if (c >= 'A' && c <= 'Z') {
+            else if (c == '_' || (c >= 'A' && c <= 'Z')) {
                 if (sawLower) {
                     chars.add(' ');
                     sawLower = false;
                 }
             }
 
-            chars.add(c);
+            if (c != '_')
+            	chars.add(c);
         }
 
         char [] charArr = new char[chars.size()];

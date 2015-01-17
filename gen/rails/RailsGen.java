@@ -81,6 +81,42 @@ public class RailsGen extends Generator {
         HTMLUtils.addLineBreak(buf);
         FileUtils.write(buf, app.getWebAppDir() + "/app/views/" + userModelName + "_mailer/contact_admin.html.erb", true);
 
+        buf = new StringBuilder();
+        String capName = WordUtils.capitalize(userModelName);
+        StringUtils.addLine(buf, "class " + capName + "Mailer < ActionMailer::Base");
+        tabbed (buf, "default from: \"admin@website.com\"");
+
+        StringUtils.addLineBreak(buf);
+        tabbed (buf, "def registration_confirmation(breeder)");
+        tabbed (buf, "@" + userModelName + " = " + userModelName, 2);
+        tabbed (buf, "mail(:to => " + userModelName + ".email, :subject => \"" + capName + " Registered\")", 2);
+        tabbed (buf, "end");
+
+        StringUtils.addLineBreak(buf);
+        tabbed (buf, "def send_password(" + userModelName + ", newpassword)");
+        tabbed (buf, "@" + userModelName + " = " + userModelName, 2);
+    	tabbed (buf, "@newpassword = newpassword", 2);
+    	tabbed (buf, "mail(:to => " + userModelName + ".email, :subject => \"Your Password\")", 2);
+    	tabbed (buf, "end");
+
+        StringUtils.addLineBreak(buf);
+    	tabbed (buf, "def notify_admin(" + userModelName + ")");
+    	tabbed (buf, "@" + userModelName + " = " + userModelName, 2);
+    	tabbed (buf, "mail(:to => \"something@somewhere.com\", :subject => \"New " + capName + " Signed Up\")", 2);
+    	tabbed (buf, "end");
+
+        StringUtils.addLineBreak(buf);
+    	tabbed (buf, "def contact_admin(email, name, comment)");
+    	tabbed (buf, "@name = name", 2);
+    	tabbed (buf, "@email = email", 2);
+    	tabbed (buf, "@comment = comment", 2);
+    	tabbed (buf, "mail(:to => \"something@somewhere.com\", :subject => \"Contact Us\", :from => email)", 2);
+    	tabbed (buf, "end");
+
+    	StringUtils.addLine (buf, "end");
+
+        FileUtils.write(buf, app.getWebAppDir() + "/app/mailers/" + userModelName + "_mailer.html.erb", true);
+
     }
 
     public void generateImageUploaders () throws Exception {
@@ -505,7 +541,7 @@ public class RailsGen extends Generator {
 
         StringUtils.addLine(buf, "end ");
 
-        FileUtils.write(buf, app.getWebAppDir() + "/app/helpers/session_helper.rb", true);
+        FileUtils.write(buf, app.getWebAppDir() + "/app/helpers/sessions_helper.rb", true);
     }
 
 
@@ -752,8 +788,8 @@ public class RailsGen extends Generator {
                     }
 
                     if (model.isSecure()) {
-                        tabbed(buf, "validates :password, presence: true, if => should_validate_password?, length: { minimum: 6 }");
-                        tabbed(buf, "validates :password_confirmation, presence: true, if => should_validate_password?");
+                        tabbed(buf, "validates :password, presence: true, :if => should_validate_password?, length: { minimum: 6 }");
+                        tabbed(buf, "validates :password_confirmation, presence: true, :if => should_validate_password?");
                         StringUtils.addLineBreak(buf);
 
                         tabbed(buf, "def should_validate_password?");
@@ -805,6 +841,9 @@ public class RailsGen extends Generator {
         ArrayList<Rel>      rels = model.getRelationships();
 
         StringBuilder       buf = new StringBuilder();
+        
+        // TODO: need to not hardcode this
+        StringUtils.addLine(buf, "<% provide(:title, @" + name + ".name) %>");
         ModelLayout         modelLayout = app.getAppConfig().getComplexModelLayout();
         StringBuilder       bodyContent = new StringBuilder();
 
@@ -814,15 +853,47 @@ public class RailsGen extends Generator {
                 String  fName = f.getName();
                 Type    fType = f.getTheType();
 
-                if (fName.startsWith("password"))
+                // TODO: allow to optionally skip updated/created by fields
+                
+                if (fName.startsWith("password") || fName.startsWith("disabled"))
                     continue;
 
+                // TODO: different layout for all these different types
+                // TODO: add method for section generation
+                // TODO: sets, lists, range generation
+                // TODO: collections as tables generation (partial renderer calls?)
+                
                 if (fName.equals("name")) {
                     HTMLUtils.addH3(bodyContent, "<%= @" + name + "." + fName + " %>");
                 }
                 else if (fType.getName().equals(Type.IMAGE.getName())) {
                     StringUtils.addLine(bodyContent, "<section><h4>" + WordUtils.capitalizeAndSpace(fName) + "</h4>");
                     rubyout(bodyContent, "image_for(@" + fName + ")");
+                    StringUtils.addLine(bodyContent, "</section>");
+                }
+                else if (fType.getName().equals(Type.DATETIME.getName())) {
+                    StringUtils.addLine(bodyContent, "<section><h4>" + WordUtils.capitalizeAndSpace(fName) + "</h4>");
+                    HTMLUtils.addRubyOutput(bodyContent, "@" + name + "." + fName);
+                    StringUtils.addLine(bodyContent, "</section>");
+                }
+                else if (fType.getName().equals(Type.CURRENCY.getName())) {
+                    StringUtils.addLine(bodyContent, "<section><h4>" + WordUtils.capitalizeAndSpace(fName) + "</h4>");
+                    HTMLUtils.addRubyOutput(bodyContent, "@" + name + "." + fName);
+                    StringUtils.addLine(bodyContent, "</section>");
+                }
+                else if (fType.getName().equals(Type.ADDRESS.getName())) {
+                    StringUtils.addLine(bodyContent, "<section><h4>" + WordUtils.capitalizeAndSpace(fName) + "</h4>");
+                    HTMLUtils.addRubyOutput(bodyContent, "@" + name + "." + fName);
+                    StringUtils.addLine(bodyContent, "</section>");
+                }
+                else if (fType.getName().equals(Type.URL.getName())) {
+                    StringUtils.addLine(bodyContent, "<section><h4>" + WordUtils.capitalizeAndSpace(fName) + "</h4>");
+                    HTMLUtils.addRubyOutput(bodyContent, "@" + name + "." + fName);
+                    StringUtils.addLine(bodyContent, "</section>");
+                }
+                else if (fType.getName().equals(Type.BOOLEAN.getName())) {
+                    StringUtils.addLine(bodyContent, "<section><h4>" + WordUtils.capitalizeAndSpace(fName) + "</h4>");
+                    HTMLUtils.addRubyOutput(bodyContent, "@" + name + "." + fName);
                     StringUtils.addLine(bodyContent, "</section>");
                 }
                 else {
@@ -962,7 +1033,8 @@ public class RailsGen extends Generator {
 
              for (Field f : fields) {
                  String fName = f.getName();
-                 if (fName.equals("createdAt") || fName.equals("createdBy") || fName.equals("updatedAt") || fName.equals("updatedBy"))
+                 if (fName.equals("created_at") || fName.equals("created_by") || fName.equals("updated_at") || 
+                		 fName.equals("updated_by"))
                      continue; // TODO don't hardcode this list here
 
                  Type fType = f.getTheType();
@@ -1216,10 +1288,12 @@ public class RailsGen extends Generator {
                 createLines.add("if @" + name + ".save");
                 createLines.add("\tredirect_to root_path");
                 createLines.add("else");
-                createLines.add("\trender new");
+                createLines.add("\trender 'new'");
                 createLines.add("end");
 
+                StringUtils.addLineBreak(buf);
                 addMethod(buf, "create", createLines);
+                StringUtils.addLineBreak(buf);
                 addMethod(buf, "new", new String[] {"@" + name + " = " + capName + ".new"});
 
                 ArrayList<String> showMethod = new ArrayList<String>();
@@ -1248,16 +1322,20 @@ public class RailsGen extends Generator {
                         }
                     }
                 }
+                StringUtils.addLineBreak(buf);
                 addMethod(buf, "show", showMethod);
 
                 ArrayList<String> indexMethod = new ArrayList<String>();
                 indexMethod.add("query = \"(disabled = 'f' or disabled is null)\"");
                 indexMethod.add("condarr = [query]");
                 indexMethod.add("@" + names + " = " + capName + ".paginate(:page => params[:page], :conditions => condarr, :order => sort_column + \" \" + sort_direction)");
+                
+                StringUtils.addLineBreak(buf);
                 addMethod(buf, "index", indexMethod);
 
+                StringUtils.addLineBreak(buf);
                 addMethod(buf, "destroy", new String[] {capName + ".find(params[:id]).destroy",
-                        "flash[:success] = " + capName + " removed from system.\"",
+                        "flash[:success] = \"" + capName + " removed from system.\"",
                         "redirect_to " + names + "_path"});
 
                 StringUtils.addLineBreak(buf);
@@ -1308,6 +1386,16 @@ public class RailsGen extends Generator {
                 StringUtils.addLine(buf, "end");
 
                 FileUtils.write(buf, app.getWebAppDir() + "/app/controllers/sessions_controller.rb", true);
+                
+                buf = new StringBuilder();
+               
+                StringUtils.addLine(buf, "class ApplicationController < ActionController::Base");
+                tabbed(buf, "protect_from_forgery");
+                tabbed(buf, "include SessionsHelper");
+                StringUtils.addLine(buf, "end");
+
+                FileUtils.write(buf, app.getWebAppDir() + "/app/controllers/application_controller.rb", true);
+
             }
         }
     }

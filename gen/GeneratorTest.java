@@ -60,8 +60,8 @@ public class GeneratorTest {
 
         Model [] models = Model.parseModels(new String[] {
                 "user: username string, email, password, premium boolean, avatar image",
-                "company: name, address, phone, billingAddress address",
-                "contact: firstName, lastName, photo list(image), email short_string REQUIRED, home phone, cell phone, sex fixed_list(male|female), contactType fixed_list(personal|sales|presales)"
+                "company: name, address, phone, billing_address address",
+                "contact: first_name, last_name, photo list(image), email short_string REQUIRED, home phone, cell phone, sex fixed_list(male|female), contact_type fixed_list(personal|sales|presales)"
         });
 
         Model user = models [0];
