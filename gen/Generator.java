@@ -37,6 +37,22 @@ public abstract class Generator {
 
     }
 
+    public static String runCommandWithEnv (String startingDir, String [] command, String [] env) throws Exception {
+
+        Process p = Runtime.getRuntime().exec(command, env, new File(startingDir));
+
+        InputStream inputStream = p.getInputStream();
+        BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
+
+        String line;
+        while ((line = br.readLine()) != null)
+            System.out.println(line);
+
+        br.close();
+        return (String.valueOf(p.exitValue()));
+
+    }
+    
 //    public static String runCommand (String startingDir, String... command) throws Exception {
 //        ProcessBuilder  pb = new ProcessBuilder(command);
 //        pb.directory(new File(startingDir));

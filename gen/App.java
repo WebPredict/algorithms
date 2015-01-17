@@ -35,8 +35,18 @@ public class App {
     private SidebarContent  rightSidebarContent;
     private ArrayList<Blurb>    newsBlurbs = new ArrayList<Blurb>();
     private boolean generatePlaceholderText; // lorem ipsum for empty sections
+    private boolean windows;
+    
+    
+    public boolean isWindows() {
+		return windows;
+	}
 
-    public boolean isGeneratePlaceholderText() {
+	public void setWindows(boolean windows) {
+		this.windows = windows;
+	}
+
+	public boolean isGeneratePlaceholderText() {
         return generatePlaceholderText;
     }
 

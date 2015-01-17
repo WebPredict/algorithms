@@ -38,14 +38,16 @@ public class GeneratorTest {
     }
 
     public static void main (String [] args) throws Exception {
-        salesTest();
+    	boolean windows = false;
+        salesTest(windows);
     }
 
-    public static void salesTest () throws Exception {
+    public static void salesTest (boolean windows) throws Exception {
 
         App app = new App();
+        app.setWindows(windows);
         app.setTechnologyStack(TechnologyStack.rails);
-        app.setRootDir("C:/Users/jsanchez/Downloads/apps");
+        app.setRootDir(windows ? "C:/Users/jsanchez/Downloads/apps" : "/Users/jeffreysanchez/rails_projects/generated");
         app.setName("sales");
         app.setTagLine("Sell Sell Sell");
 

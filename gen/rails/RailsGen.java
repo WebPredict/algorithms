@@ -1433,11 +1433,11 @@ public class RailsGen extends Generator {
         /**
          * run: rails new 'app name'
          */
-    	boolean windows = true;
-    	String 	railsCmd = windows ? "C:/RailsInstaller/Ruby2.1.0/bin/rails.bat" : "rails";
+    	String 	railsCmd = app.isWindows() ? "C:/RailsInstaller/Ruby2.1.0/bin/rails.bat" : "rails";
     	
-        String result = runCommand(app.getRootDir(), railsCmd, "new", app.getName());
-        System.out.println(result);
+    	String result = runCommand(app.getRootDir(), railsCmd, "new", app.getName());
+    	
+    	System.out.println(result);
     }
 
 
