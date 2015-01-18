@@ -186,6 +186,9 @@ public class DriverSignatureComputer implements FitnessEvaluator {
         }
 
         bestSignature = signatures [0]; // hmm
+        expectedSignatureTotal = bestSignature.computeTotalWeightsAndValues(driversTripsDataAnalyzed [0][0]);
+
+        // TODO: need to set threshholdOfSimilarity... should be average of farthest apart two trips can be and still be from same driver?
     }
 
 
@@ -373,7 +376,6 @@ public class DriverSignatureComputer implements FitnessEvaluator {
         if (expectedSignatureTotal == null)
             throw new RuntimeException("Need to run analysis first");
         else {
-            //Double expected = bestSignature.computeTotalWeightsAndValues(); // TODO cache this
             TripData tripData = analyzeTrip(rawTripData);
             Double thisTrip = bestSignature.computeTotalWeightsAndValues(tripData);
 

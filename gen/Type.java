@@ -37,6 +37,19 @@ public class Type {
     public static final Type CODE = new Type("code");
     public static final Type VIDEO = new Type("video");
 
+    public boolean isPrimitive () {
+        return (name.equals(Type.BOOLEAN.getName()) ||
+                name.equals(Type.EMAIL.getName()) ||
+                name.equals(Type.PHONE.getName()) ||
+                name.equals(Type.DATETIME.getName()) ||
+                name.equals(Type.TIME.getName()) ||
+                name.equals(Type.DATE.getName()) ||
+                name.equals(Type.STRING.getName()) ||
+                name.equals(Type.INT.getName()) ||
+                name.equals(Type.FLOAT.getName()) ||
+                name.equals(Type.LONG_STRING.getName()) ||
+                name.equals(Type.SHORT_STRING.getName()));
+    }
     public static Type findByName (String name) {
 
         if (name.equals(LONG_STRING.name))

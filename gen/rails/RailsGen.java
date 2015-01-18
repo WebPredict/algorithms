@@ -627,6 +627,56 @@ public class RailsGen extends Generator {
         tabbed(buf, "end   ", 2);
         StringUtils.addLineBreak(buf);
         tabbed(buf, "end  ");
+
+        StringUtils.addLineBreak(buf);
+        tabbed(buf, "def yesno(value)");
+        tabbed(buf, "if value", 2);
+        tabbed(buf, "\"Yes\"", 3);
+        tabbed(buf, "else", 2);
+        tabbed(buf, "\"No\"", 3);
+        tabbed(buf, "end", 2);
+        StringUtils.addLine(buf, "end");
+        StringUtils.addLineBreak(buf);
+
+        tabbed(buf, "def image_for_options(imageholder, options)");
+        tabbed(buf, "if imageholder.nil? or imageholder.image_url.nil?", 2);
+        tabbed(buf, "image_tag(\"ImagePlaceholderSmall.png\", options)", 3);
+        tabbed(buf, "else", 2);
+        tabbed(buf, "image_tag(imageholder.image_url, options)", 3);
+        tabbed(buf, "end", 2);
+        tabbed(buf, "end");
+
+        StringUtils.addLineBreak(buf);
+        tabbed(buf, "def image_for(imageholder)");
+        tabbed(buf, "if imageholder.nil? or imageholder.image_url.nil?", 2);
+        tabbed(buf, "image_tag(\"ImagePlaceholderSmall.png\")", 3);
+        tabbed(buf, "else", 2);
+        tabbed(buf, "image_tag(imageholder.image_url)", 3);
+        tabbed(buf, "end", 2);
+        tabbed(buf, "end");
+
+        ArrayList<String> methodLines = new ArrayList<String>();
+
+        methodLines.add("ret = ''");
+        methodLines.add("if website != nil");
+        methodLines.add("if website[0..7] == \"http://\" ");
+        methodLines.add("ret = website");
+        methodLines.add("else");
+        methodLines.add(" ret = \"http://\" + website ");
+        methodLines.add("end");
+
+        addMethod(buf, "render_website(website)", methodLines);
+
+        methodLines.clear();
+        methodLines.add("addr = ''");
+        methodLines.addAll(generateIf("address != nil", "addr = address"));
+        //String [] addrLines = {"if addr != ''", "addr += ' '", "end"};
+        methodLines.addAll(generateIf("city != nil", "addr != '' ? addr += ' ' + city : city"));
+        methodLines.addAll(generateIf("state != nil", "addr != '' ? addr += ', ' + state : state"));
+        methodLines.addAll(generateIf("postal != nil", "addr != '' ? addr += ', ' + postal : postal"));
+
+        addMethod(buf, "render_address(address)", methodLines);
+
         StringUtils.addLine(buf, "end");
 
         FileUtils.write(buf, app.getWebAppDir() + "/app/helpers/application_helper.rb", true);
@@ -852,6 +902,7 @@ public class RailsGen extends Generator {
 
                 String  fName = f.getName();
                 Type    fType = f.getTheType();
+                String  fTypeName = fType.getName();
 
                 // TODO: allow to optionally skip updated/created by fields
                 
@@ -859,47 +910,55 @@ public class RailsGen extends Generator {
                     continue;
 
                 // TODO: different layout for all these different types
-                // TODO: add method for section generation
                 // TODO: sets, lists, range generation
                 // TODO: collections as tables generation (partial renderer calls?)
-                
-                if (fName.equals("name")) {
-                    HTMLUtils.addH3(bodyContent, "<%= @" + name + "." + fName + " %>");
+
+                String nameFName = name + "." + fName;
+                String capName = WordUtils.capitalize(fName);
+                if (fTypeName.equals(Type.SET_ONE_OR_MORE) || fTypeName.equals(Type.LIST)) {
+                    if (fType.getSubtype().isPrimitive()) {
+                        // TODO: display collection of strings, dates, ints, etc.
+                    }
+                    else {
+                        StringUtils.addLine(bodyContent, "<% if @" + name + "." + capName + ".any? %>");
+
+                        tabbed(bodyContent, "<%= render @" + capName + " %>");
+                        tabbed(bodyContent, "<% else %>");
+                        tabbed(bodyContent, "<p> No " + capName + " for this " + name + " yet.</p>");
+                        tabbed(bodyContent, "<% end %>");
+                        tabbed(bodyContent, "<% if signed_in? && current_" + name + "?(@" + name + ") %>");
+                        tabbed(bodyContent, "<%= link_to \"Add " + fName + "\", new_" + fName + "_path, class: \"btn btn-large btn-primary\" %>");
+                        tabbed(bodyContent, "<% end %>");
+                    }
+
                 }
-                else if (fType.getName().equals(Type.IMAGE.getName())) {
-                    StringUtils.addLine(bodyContent, "<section><h4>" + WordUtils.capitalizeAndSpace(fName) + "</h4>");
-                    rubyout(bodyContent, "image_for(@" + fName + ")");
-                    StringUtils.addLine(bodyContent, "</section>");
+                else if (fName.equals("name")) {
+                    HTMLUtils.addH3(bodyContent, "<%= @" + nameFName + " %>");
                 }
-                else if (fType.getName().equals(Type.DATETIME.getName())) {
-                    StringUtils.addLine(bodyContent, "<section><h4>" + WordUtils.capitalizeAndSpace(fName) + "</h4>");
-                    HTMLUtils.addRubyOutput(bodyContent, "@" + name + "." + fName);
-                    StringUtils.addLine(bodyContent, "</section>");
+                else if (fTypeName.equals(Type.IMAGE.getName())) {
+                    generateReadOnlySection(bodyContent, "image_for(@" + nameFName + ")", fName);
                 }
-                else if (fType.getName().equals(Type.CURRENCY.getName())) {
-                    StringUtils.addLine(bodyContent, "<section><h4>" + WordUtils.capitalizeAndSpace(fName) + "</h4>");
-                    HTMLUtils.addRubyOutput(bodyContent, "@" + name + "." + fName);
-                    StringUtils.addLine(bodyContent, "</section>");
+                else if (fTypeName.equals(Type.DATETIME.getName())) {
+                    generateReadOnlySection(bodyContent, "@" + nameFName, fName);
                 }
-                else if (fType.getName().equals(Type.ADDRESS.getName())) {
-                    StringUtils.addLine(bodyContent, "<section><h4>" + WordUtils.capitalizeAndSpace(fName) + "</h4>");
-                    HTMLUtils.addRubyOutput(bodyContent, "@" + name + "." + fName);
-                    StringUtils.addLine(bodyContent, "</section>");
+                else if (fTypeName.equals(Type.CURRENCY.getName())) {
+                    generateReadOnlySection(bodyContent, "number_to_currency(@" + nameFName + ", :unit => \"$\")", fName);
                 }
-                else if (fType.getName().equals(Type.URL.getName())) {
-                    StringUtils.addLine(bodyContent, "<section><h4>" + WordUtils.capitalizeAndSpace(fName) + "</h4>");
-                    HTMLUtils.addRubyOutput(bodyContent, "@" + name + "." + fName);
-                    StringUtils.addLine(bodyContent, "</section>");
+                else if (fTypeName.equals(Type.ADDRESS.getName())) {
+
+                    generateReadOnlySection(bodyContent, "render_address(@" + nameFName + ")", fName);
                 }
-                else if (fType.getName().equals(Type.BOOLEAN.getName())) {
-                    StringUtils.addLine(bodyContent, "<section><h4>" + WordUtils.capitalizeAndSpace(fName) + "</h4>");
-                    HTMLUtils.addRubyOutput(bodyContent, "@" + name + "." + fName);
-                    StringUtils.addLine(bodyContent, "</section>");
+                else if (fTypeName.equals(Type.URL.getName())) {
+                    String content = " <% if @" + nameFName + "!= nil %>\n" +
+                            "        <a href=\"<%= render_website(@" + nameFName + ") %>\" target=\"_blank\"><%= @" + nameFName +" %></a>\n" +
+                            "        <% end %>\n";
+                    generateReadOnlySection(bodyContent, content, fName);
+                }
+                else if (fTypeName.equals(Type.BOOLEAN.getName())) {
+                    generateReadOnlySection(bodyContent, "yesno(@" + nameFName + ")", fName);
                 }
                 else {
-                    StringUtils.addLine(bodyContent, "<section><h4>" + WordUtils.capitalizeAndSpace(fName) + "</h4>");
-                    HTMLUtils.addRubyOutput(bodyContent, "@" + name + "." + fName);
-                    StringUtils.addLine(bodyContent, "</section>");
+                    generateReadOnlySection(bodyContent, "@" + nameFName, fName);
                 }
 
                 StringUtils.addLineBreak(bodyContent);
@@ -948,6 +1007,12 @@ public class RailsGen extends Generator {
         }
 
         writeViewFile(buf, names, "show");
+    }
+
+    private void generateReadOnlySection (StringBuilder bodyContent, String fieldDetails, String fieldName) {
+        StringUtils.addLine(bodyContent, "<section><h4>" + WordUtils.capitalizeAndSpace(fieldName) + "</h4>");
+        HTMLUtils.addRubyOutput(bodyContent, fieldDetails);
+        StringUtils.addLine(bodyContent, "</section>");
     }
 
     public void generateListView (Model model) throws Exception {
@@ -1248,7 +1313,26 @@ public class RailsGen extends Generator {
         buf.append("\tend\n");
     }
 
+    protected List<String> generateIf (String condition, String content, String elseCond, String elseContent) {
+        ArrayList<String> ret = new ArrayList<String>();
+
+        ret.add("if " + condition);
+        ret.add("\t" + content);
+        if (elseCond != null) {
+            ret.add("else if " + elseCond);
+            ret.add("\t" + elseContent);
+        }
+        ret.add("end");
+
+        return (ret);
+    }
+
+    protected List<String> generateIf (String condition, String content) {
+         return (generateIf(condition, content, null, null));
+    }
+
     protected void addMethodTabbed (StringBuilder buf, String name, String [] contentLines) {
+        StringUtils.addLineBreak(buf);
         buf.append("\t\tdef " + name + "\n");
         if (contentLines != null) {
             for (String line : contentLines) {
@@ -1259,6 +1343,7 @@ public class RailsGen extends Generator {
     }
 
     protected void addMethod (StringBuilder buf, String name, List<String> contentLines) {
+        StringUtils.addLineBreak(buf);
         buf.append("\tdef " + name + "\n");
         if (contentLines != null) {
             for (String line : contentLines) {
@@ -1291,9 +1376,7 @@ public class RailsGen extends Generator {
                 createLines.add("\trender 'new'");
                 createLines.add("end");
 
-                StringUtils.addLineBreak(buf);
                 addMethod(buf, "create", createLines);
-                StringUtils.addLineBreak(buf);
                 addMethod(buf, "new", new String[] {"@" + name + " = " + capName + ".new"});
 
                 ArrayList<String> showMethod = new ArrayList<String>();
@@ -1322,7 +1405,6 @@ public class RailsGen extends Generator {
                         }
                     }
                 }
-                StringUtils.addLineBreak(buf);
                 addMethod(buf, "show", showMethod);
 
                 ArrayList<String> indexMethod = new ArrayList<String>();
@@ -1330,10 +1412,8 @@ public class RailsGen extends Generator {
                 indexMethod.add("condarr = [query]");
                 indexMethod.add("@" + names + " = " + capName + ".paginate(:page => params[:page], :conditions => condarr, :order => sort_column + \" \" + sort_direction)");
                 
-                StringUtils.addLineBreak(buf);
                 addMethod(buf, "index", indexMethod);
 
-                StringUtils.addLineBreak(buf);
                 addMethod(buf, "destroy", new String[] {capName + ".find(params[:id]).destroy",
                         "flash[:success] = \"" + capName + " removed from system.\"",
                         "redirect_to " + names + "_path"});
@@ -1379,7 +1459,6 @@ public class RailsGen extends Generator {
                 tabbed(buf, "render 'new'", 3);
                 tabbed(buf, "end", 2);
                 tabbed(buf, "end");
-                StringUtils.addLineBreak(buf);
 
                 addMethod(buf, "destroy", new String[] {"sign_out", "redirect_to root_path"});
 

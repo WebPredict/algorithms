@@ -38,7 +38,7 @@ public class GeneratorTest {
     }
 
     public static void main (String [] args) throws Exception {
-    	boolean windows = false;
+    	boolean windows = true;
         salesTest(windows);
     }
 
