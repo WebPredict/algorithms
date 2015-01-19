@@ -181,14 +181,21 @@ public class RailsGen extends Generator {
     	StringUtils.addLine(buf, "<li><%= link_to \"About\", about_path %></li>");
     	StringUtils.addLine(buf, "<% end %>");
     	// TODO: needs to be configurable
-    	StringUtils.addLine(buf, "<li><%= link_to \"Users\", users_path %></li>");
-    	StringUtils.addLine(buf, "<% if signed_in? %>");
-    	StringUtils.addLine(buf, "<li><%= link_to \"Edit Profile\", edit_user_path(current_user) %></li>");
-    	StringUtils.addLine(buf, "<li class=\"divider\"></li>");
-    	StringUtils.addLine(buf, "<li><%= link_to \"Sign out\", signout_path, method: \"delete\" %></li>");
-    	StringUtils.addLine(buf, "<% else %>");
-    	StringUtils.addLine(buf, "<li><%= link_to \"Sign In\", signin_path %></li>");
-    	StringUtils.addLine(buf, "<% end %>");
+
+        Model userModel = app.getUserModel();
+        if (userModel != null) {
+            String modelName = userModel.getName();
+
+            StringUtils.addLine(buf, "<li><%= link_to \"" + WordUtils.pluralize(WordUtils.capitalize(modelName)) + "\", " + WordUtils.pluralize(modelName) + "_path %></li>");
+            StringUtils.addLine(buf, "<% if signed_in? %>");
+            StringUtils.addLine(buf, "<li><%= link_to \"Edit Profile\", edit_" + modelName + "_path(current_" + modelName + ") %></li>");
+            StringUtils.addLine(buf, "<li class=\"divider\"></li>");
+            StringUtils.addLine(buf, "<li><%= link_to \"Sign out\", signout_path, method: \"delete\" %></li>");
+            StringUtils.addLine(buf, "<% else %>");
+            StringUtils.addLine(buf, "<li><%= link_to \"Sign In\", signin_path %></li>");
+            StringUtils.addLine(buf, "<% end %>");
+        }
+
     	StringUtils.addLine(buf, "<li><%= link_to \"Help\", help_path %></li>");
     	StringUtils.addLine(buf, "</ul>");
         HTMLUtils.closeDiv(buf);
@@ -388,7 +395,7 @@ public class RailsGen extends Generator {
                 }
                 else if (fType.equals(Type.URL))
                     line += "<td><%= " + modelName + "." + fieldName + " %></td>";
-                else if (fieldName.equals("createdAt"))
+                else if (fieldName.equals("created_at"))
                     line += "<td><%= time_ago_in_words(" + modelName + "." + fieldName + ") %></td>";
                 else if (fieldName.equals("name"))
                     line += "<td><%= link_to " + modelName + "." + fieldName + ", " + modelName + " %></td>";
@@ -904,9 +911,7 @@ public class RailsGen extends Generator {
                 Type    fType = f.getTheType();
                 String  fTypeName = fType.getName();
 
-                // TODO: allow to optionally skip updated/created by fields
-                
-                if (fName.startsWith("password") || fName.startsWith("disabled"))
+                if (fName.startsWith("password") || f.isAdminOnly())
                     continue;
 
                 // TODO: different layout for all these different types
@@ -1090,17 +1095,16 @@ public class RailsGen extends Generator {
 
         StringBuilder   bodyContent = new StringBuilder();
 
-
         if (fields != null) {
 
              HTMLUtils.addRubyOutput(bodyContent, "form_for @" + name + ", :html => {:multipart => true} do |f|");
              HTMLUtils.addRubyOutput(bodyContent, "render 'shared/error_messages', object: f.object");
 
              for (Field f : fields) {
+                 if (f.isReadOnly())
+                     continue;
+
                  String fName = f.getName();
-                 if (fName.equals("created_at") || fName.equals("created_by") || fName.equals("updated_at") || 
-                		 fName.equals("updated_by"))
-                     continue; // TODO don't hardcode this list here
 
                  Type fType = f.getTheType();
                  String capitalized = WordUtils.capitalizeAndSpace(fName);
@@ -1255,6 +1259,7 @@ public class RailsGen extends Generator {
             break;
         }
 
+        // TODO: how should new differ from edit here?
         writeViewFile(buf, names, "new");
 
         writeViewFile(buf, names, "edit");
@@ -1449,9 +1454,11 @@ public class RailsGen extends Generator {
                 tabbed(buf, "end", 2);
                 StringUtils.addLineBreak(buf);
 
-                // TODO: don't hardcode user maybe?
-                tabbed(buf, "user = User.find_by_email(email)", 2);
-                tabbed(buf, "if user && user.authenticate(params[:session][:password])", 2);
+                Model   userModel = app.getUserModel();
+                String  userModelName = userModel.getName();
+
+                tabbed(buf, userModelName + " = " + WordUtils.capitalize(userModelName) + ").find_by_email(email)", 2);
+                tabbed(buf, "if " + userModelName + " && " + userModelName + ".authenticate(params[:session][:password])", 2);
                 tabbed(buf, "sign_in user", 3);
                 tabbed(buf, "redirect_back_or root_path ", 3);
                 tabbed(buf, "else", 2);
@@ -1560,6 +1567,7 @@ public class RailsGen extends Generator {
     }
 
     public void generateGems () throws Exception {
+
         /**
          * retrieve file
          */
@@ -1574,7 +1582,8 @@ public class RailsGen extends Generator {
 //        boolean didIt = FileUtils.insertAfter(gemfileLines, new String[] {"group :assets do"},
 //                new String[] {"  gem 'sass-rails', '~> 3.2.3'"}, true, true);
 
-        // if using AWS for images:
+        // TODO: if using AWS for images:
+        // if (app.hasImages()))
         addGem(gemfileLines, "fog");
 
         //addGem(gemfileLines, "carrierwave")
@@ -1588,12 +1597,11 @@ public class RailsGen extends Generator {
         addGem(gemfileLines, "faker", "1.0.1", true);
 
         FileUtils.putLines(gemfileLines, app.getWebAppDir() + "/Gemfile");
-        /**
-         * TODO:
-         * test data support
-         * date selector support
-         */
-        //String result = runCommand(app.getWebAppDir(), "bundle.exe", "install");
+
+        // TODO: not working on windows at the moment:
+        if (!app.isWindows()) {
+            String result = runCommand(app.getWebAppDir(), "bundle.exe", "install");
+        }
     }
 
     public void generateAppStructure () throws Exception {

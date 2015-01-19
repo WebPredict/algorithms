@@ -79,7 +79,7 @@ public class Model extends Type {
             else if (fieldName.equals("password_confirmation")) {
                 sawPWConf = true;
             }
-            else if (fieldName.equals("address")) {
+            else if (f.getTheType().getName().equals("address")) {
                 app.setNeedsAddressModel(true);
             }
         }
@@ -87,14 +87,14 @@ public class Model extends Type {
              fields.add(new Field("password_confirmation", Type.SHORT_STRING));
         }
         if (!sawDisabled) {
-            fields.add(new Field("disabled", Type.BOOLEAN));
+            fields.add(new Field("disabled", Type.BOOLEAN, false, true));
         }
 
         if (app.getAppConfig().isIncludeCreatedUpdatedBy()) {
-            fields.add(new Field("created_by", Type.SHORT_STRING));
-            fields.add(new Field("created_at", Type.DATETIME));
-            fields.add(new Field("updated_by", Type.SHORT_STRING));
-            fields.add(new Field("updated_at", Type.DATETIME));
+            fields.add(new Field("created_by", Type.SHORT_STRING, true, false));
+            fields.add(new Field("created_at", Type.DATETIME, true, false));
+            fields.add(new Field("updated_by", Type.SHORT_STRING, true, false));
+            fields.add(new Field("updated_at", Type.DATETIME, true, false));
         }
 
         // TODO: make sure all references to models are existing models

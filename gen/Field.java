@@ -16,6 +16,24 @@ public class Field {
     private String name;
     private String defaultVal;
     private List<Validation> validations;
+    private boolean readOnly;
+    private boolean adminOnly;
+
+    public boolean isReadOnly() {
+        return readOnly;
+    }
+
+    public void setReadOnly(boolean readOnly) {
+        this.readOnly = readOnly;
+    }
+
+    public boolean isAdminOnly() {
+        return adminOnly;
+    }
+
+    public void setAdminOnly(boolean adminOnly) {
+        this.adminOnly = adminOnly;
+    }
 
     public List<Validation> getValidations() {
         return validations;
@@ -42,6 +60,13 @@ public class Field {
     public Field (String name, Type theType) {
         this.name = name;
         this.theType = theType;
+    }
+
+    public Field (String name, Type theType, boolean readOnly, boolean adminOnly) {
+        this.name = name;
+        this.theType = theType;
+        this.readOnly = readOnly;
+        this.adminOnly = adminOnly;
     }
 
     public Type getTheType() {
