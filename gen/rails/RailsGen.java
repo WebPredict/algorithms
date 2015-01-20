@@ -496,61 +496,31 @@ public class RailsGen extends Generator {
         StringBuilder buf = new StringBuilder();
         StringUtils.addLine(buf, "module SessionsHelper");
         StringUtils.addLineBreak(buf);
-        tabbed(buf, "def sign_in(" + name + ")");
-        tabbed(buf, "cookies.permanent[:remember_token] = " + name + ".remember_token", 2);
-        tabbed(buf, "self.current_" + name + " = " + name, 2);
-        tabbed(buf, "end");
-        StringUtils.addLineBreak(buf);
 
-        tabbed(buf, "def current_" + name + "=(" + name + ")");
-        tabbed(buf, "@current_" + name + " = " + name, 2);
-        tabbed(buf, "end");
-        StringUtils.addLineBreak(buf);
+        addMethod(buf, "signed_in?", new String[] {"!current_" + name + ".nil?"});
 
-        tabbed(buf, "def current_" + name);
-        tabbed(buf, "@current_" + name + " ||= " + capName + ".find_by_remember_token(cookies[:remember_token])", 2);
-        tabbed(buf, "end ");
-        StringUtils.addLineBreak(buf);
+        addMethod(buf, "sign_out", new String[] {"self.current_" + name + " = nil", "cookies.delete(:remember_token)"});
 
-        tabbed(buf, "def current_" + name + "?(" + name + ")");
-        tabbed(buf, "" + name + " == current_" + name + "", 2);
-        tabbed(buf, "end");
-        StringUtils.addLineBreak(buf);
+        addMethod(buf, "current_" + name, new String[] {"@current_" + name + " ||= " + capName + ".find_by_remember_token(cookies[:remember_token])"});
 
-        tabbed(buf, "def signed_in?");
-        tabbed(buf, "!current_" + name + ".nil? ", 2);
-        tabbed(buf, "end ");
-        StringUtils.addLineBreak(buf);
+        addMethod(buf, "current_" + name + "?(" + name + ")", new String[] {name + " == current_" + name});
 
-        tabbed(buf, "def sign_out");
-        tabbed(buf, "self.current_" + name + " = nil", 2);
-        tabbed(buf, "cookies.delete(:remember_token)", 2);
-        tabbed(buf, "end ");
-        StringUtils.addLineBreak(buf);
+        addMethod(buf, "current_" + name + "=(" + name + ")", new String[] {"@current_" + name + " = " + name});
 
-        tabbed(buf, "def redirect_back_or(default) ");
-        tabbed(buf, "redirect_to(session[:return_to] || default)  ", 2);
-        tabbed(buf, "session.delete(:return_to)   ", 2);
-        tabbed(buf, "end  ");
-        StringUtils.addLineBreak(buf);
+        addMethod(buf, "redirect_back_or(default)", new String[] {"redirect_to(session[:return_to] || default)", "session.delete(:return_to)"});
 
-        tabbed(buf, "def store_location");
-        tabbed(buf, "session[:return_to] = request.fullpath ", 2);
-        tabbed(buf, "end");
-        StringUtils.addLineBreak(buf);
+        addMethod(buf, "sign_in(" + name + ")", new String[] {"cookies.permanent[:remember_token] = " + name + ".remember_token", "self.current_" + name + " = " + name});
 
-        tabbed(buf, "def signed_in_" + name + "  ");
-        tabbed(buf, "unless signed_in? ", 2);
-        tabbed(buf, "store_location ", 2);
-        tabbed(buf, "redirect_to signin_path, notice: \"Please sign in.\" ", 2);
-        tabbed(buf, "end", 2);
-        tabbed(buf, "end ");
+        addMethod(buf, "redirect_back_or(default)", new String[] {"redirect_to(session[:return_to] || default)", "session.delete(:return_to)"});
+
+        addMethod(buf, "store_location", new String[] {"session[:return_to] = request.fullpath"});
+
+        addMethod(buf, "signed_in_" + name, new String[] {"unless signed_in?", "\tstore_location", "\tredirect_to signin_path, notice: \"Please sign in.\"", "end"});
 
         StringUtils.addLine(buf, "end ");
 
         FileUtils.write(buf, app.getWebAppDir() + "/app/helpers/sessions_helper.rb", true);
     }
-
 
     public void generateRoutes () throws Exception {
         StringBuilder buf = new StringBuilder();
@@ -677,7 +647,7 @@ public class RailsGen extends Generator {
         methodLines.clear();
         methodLines.add("addr = ''");
         methodLines.addAll(generateIf("address != nil", "addr = address"));
-        //String [] addrLines = {"if addr != ''", "addr += ' '", "end"};
+
         methodLines.addAll(generateIf("city != nil", "addr != '' ? addr += ' ' + city : city"));
         methodLines.addAll(generateIf("state != nil", "addr != '' ? addr += ', ' + state : state"));
         methodLines.addAll(generateIf("postal != nil", "addr != '' ? addr += ', ' + postal : postal"));
@@ -709,6 +679,7 @@ public class RailsGen extends Generator {
                 addStyle(new String[] {".hero-unit {", "\tbackground-image: url('" + app.getJumbotronImageUrl() + "');", "}"});
         }
 
+        runCommand("rake assets precompile");
     }
 
     public void addStyle (String [] styleInfo) throws Exception {
@@ -1316,6 +1287,7 @@ public class RailsGen extends Generator {
             }
         }
         buf.append("\tend\n");
+        StringUtils.addLineBreak(buf);
     }
 
     protected List<String> generateIf (String condition, String content, String elseCond, String elseContent) {
@@ -1554,6 +1526,15 @@ public class RailsGen extends Generator {
                 FileUtils.write(buf, app.getWebAppDir() + "/db/migrate/" + fileName, true);
             }
         }
+
+        runCommand("bundle exec rake db:migrate");
+    }
+
+    private void runCommand (String command) throws Exception {
+        if (!app.isWindows()) {
+            String [] cmd = command.split(" ");
+            String result = runCommandWithEnv(app.getWebAppDir(), cmd, null);
+        }
     }
 
     private void addGem (List<String> gemfileLines, String gemName) {
@@ -1582,9 +1563,9 @@ public class RailsGen extends Generator {
 //        boolean didIt = FileUtils.insertAfter(gemfileLines, new String[] {"group :assets do"},
 //                new String[] {"  gem 'sass-rails', '~> 3.2.3'"}, true, true);
 
-        // TODO: if using AWS for images:
-        // if (app.hasImages()))
-        addGem(gemfileLines, "fog");
+        // if using AWS for images:
+        if (app.hasImages())
+            addGem(gemfileLines, "fog");
 
         //addGem(gemfileLines, "carrierwave")
         addGem(gemfileLines, "actionmailer");
@@ -1598,10 +1579,7 @@ public class RailsGen extends Generator {
 
         FileUtils.putLines(gemfileLines, app.getWebAppDir() + "/Gemfile");
 
-        // TODO: not working on windows at the moment:
-        if (!app.isWindows()) {
-            String result = runCommand(app.getWebAppDir(), "bundle.exe", "install");
-        }
+        runCommand("bundle install -without production");
     }
 
     public void generateAppStructure () throws Exception {
@@ -1618,7 +1596,9 @@ public class RailsGen extends Generator {
 
     public void generateDeploymentScript () {
         /**
-         * rake assets precompile
+         * bundle install --without production   done
+         * bundle exec rake db:migrate               done
+         * rake assets precompile       done
          * git add .
          * git commit -m "more changes"
          * git push heroku master

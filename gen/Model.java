@@ -69,6 +69,7 @@ public class Model extends Type {
             }
             else if (f.getTheType().getName().equals("image")) {
                 imageFields.add(f);
+                app.setHasImages(true);
             }
             else if (fieldName.equals("disabled")) {
                 sawDisabled = true;

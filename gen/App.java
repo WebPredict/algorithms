@@ -36,8 +36,16 @@ public class App {
     private ArrayList<Blurb>    newsBlurbs = new ArrayList<Blurb>();
     private boolean generatePlaceholderText; // lorem ipsum for empty sections
     private boolean windows;
-    
-    
+    private boolean hasImages;
+
+    public void setHasImages (boolean hasImages) {
+        this.hasImages = hasImages;
+    }
+
+    public boolean hasImages () {
+        return (hasImages);
+    }
+
     public boolean isWindows() {
 		return windows;
 	}
