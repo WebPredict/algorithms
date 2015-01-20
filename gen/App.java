@@ -142,6 +142,12 @@ public class App {
                 errors.addAll(modelErrors);
         }
 
+        for (Model model : models) {
+            List<String> modelErrors = model.resolveReferences(this);
+            if (modelErrors != null)
+                errors.addAll(modelErrors);
+        }
+
         if (errors.isEmpty()) {
             if (needsAddressModel) {
                 Model addressModel = Model.parseModel("address: adddressLine1, addressLine2, addressLine3, city, state, zip, country");
@@ -150,6 +156,7 @@ public class App {
                 if (addressModelErrors != null)
                     errors.addAll(addressModelErrors);
                 nameToModelMap.put(addressModel.getName(), addressModel);
+                models.add(addressModel);
             }
         }
         return (errors);
@@ -215,6 +222,20 @@ public class App {
 
     public void setModels(ArrayList<Model> models) {
         this.models = models;
+    }
+
+    public void setModels (Model... modelList) {
+        for (Model model : modelList) {
+            models.add(model);
+            nameToModelMap.put(model.getName(), model);
+        }
+    }
+
+    public void setTopLevelModels (String... modelNameList) {
+        for (String modelName : modelNameList) {
+            Model found = nameToModelMap.get(modelName);
+            topLevelModels.add(found);
+        }
     }
 
     public boolean isGenerateCRUDByDefault() {

@@ -740,6 +740,9 @@ public class RailsGen extends Generator {
                         else if (relType.equals(RelType.MANY_TO_ONE)) {
                             tabbed(buf, "belongs_to :" + WordUtils.pluralize(relModel.getName()));
                         }
+                        else if (relType.equals(RelType.ONE_TO_ONE)) {
+                            tabbed(buf, "has_one :" + relModel.getName());
+                        }
                         else if (relType.equals(RelType.MANY_TO_MANY)) {
                             String  toAdd =  "has_many :" + WordUtils.pluralize(relModel.getName());
                             if (rel.getThrough() != null) {
@@ -861,6 +864,20 @@ public class RailsGen extends Generator {
         }
     }
 
+    public boolean useTabs (Model model) {
+        boolean useTabs;
+        switch (app.getAppConfig().getComplexModelLayout()) {
+             case TABS:
+                 return (false);
+
+            case DYNAMIC:
+                return (model.getRelationships() != null && model.getRelationships().size() > 3);
+
+            default:
+                return (false);
+        }
+    }
+
     public void generateShowView (Model model) throws Exception {
 
         String name = model.getName();
@@ -872,8 +889,9 @@ public class RailsGen extends Generator {
         
         // TODO: need to not hardcode this
         StringUtils.addLine(buf, "<% provide(:title, @" + name + ".name) %>");
-        ModelLayout         modelLayout = app.getAppConfig().getComplexModelLayout();
         StringBuilder       bodyContent = new StringBuilder();
+
+        boolean useTabs = useTabs(model);
 
         if (fields != null) {
             for (Field f : fields) {
@@ -885,6 +903,10 @@ public class RailsGen extends Generator {
                 if (fName.startsWith("password") || f.isAdminOnly())
                     continue;
 
+                if (model.isDependent()) {
+                    if (fName.equals("updated_by") || fName.equals("created_by") || fName.equals("updated_at") || fName.equals("created_at"))
+                        continue;
+                }
                 // TODO: different layout for all these different types
                 // TODO: sets, lists, range generation
                 // TODO: collections as tables generation (partial renderer calls?)
@@ -1061,9 +1083,7 @@ public class RailsGen extends Generator {
         ArrayList<Rel>      rels = model.getRelationships();
 
         StringBuilder   buf = new StringBuilder();
-
-        ModelLayout     modelLayout = app.getAppConfig().getComplexModelLayout();
-
+        boolean         useTabs = useTabs(model);
         StringBuilder   bodyContent = new StringBuilder();
 
         if (fields != null) {

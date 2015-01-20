@@ -11,8 +11,17 @@ public class Rel {
 
     private RelType relType;
     private Model model;
+    private String modelName;
     private boolean dependent;
     private Model through;
+
+    public String getModelName() {
+        return modelName;
+    }
+
+    public void setModelName(String modelName) {
+        this.modelName = modelName;
+    }
 
     public Model getThrough() {
         return through;
@@ -33,6 +42,11 @@ public class Rel {
     public Rel(RelType relType, Model model) {
         this.relType = relType;
         this.model = model;
+    }
+
+    public Rel(RelType relType, String modelName) {
+        this.relType = relType;
+        this.modelName = modelName;
     }
 
     public Rel(RelType relType, Model model, boolean dependent) {

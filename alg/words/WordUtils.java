@@ -267,6 +267,9 @@ public class WordUtils {
         else if (s.endsWith("y")) {
             return (s.substring(0, s.length() - 1) + "ies");
         }
+        else if (s.endsWith("s")) {
+            return (s.substring(0, s.length()) + "es");
+        }
         else
             return (s + "s");
     }

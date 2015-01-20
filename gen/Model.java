@@ -102,6 +102,23 @@ public class Model extends Type {
         return (null);
     }
 
+    public List<String> resolveReferences (App app) {
+
+        ArrayList<String> errors = new ArrayList<String>();
+        if (relationships != null) {
+            for (Rel rel : relationships) {
+                if (rel.getModel() == null) {
+                    Model found = app.getNameToModelMap().get(rel.getModelName());
+                    if (found == null)
+                        errors.add("Could not resolve model by name: " + rel.getModelName());
+                    else
+                        rel.setModel(found);
+                }
+            }
+        }
+        return (errors);
+    }
+
     public boolean isSecure() {
         return secure;
     }
@@ -166,9 +183,9 @@ public class Model extends Type {
         String rest = parts [1].trim();
         StringTokenizer tok = new StringTokenizer(rest, ",");
         while (tok.hasMoreTokens()) {
-            String next = tok.nextToken().trim();
-            String [] details = next.split(" ");
-            Field f;
+            String      next = tok.nextToken().trim();
+            String []   details = next.split(" ");
+            Field       f = null;
             if (details.length == 1) {
                 if (details [0].equals("email"))
                     f = new Field(details [0], Type.EMAIL);
@@ -184,14 +201,27 @@ public class Model extends Type {
                     f = new Field(details [0], Type.STRING);
             }
             else {
-                f = new Field(details [0], details [1]);
-            }
-            if (details.length > 2) {
-                String validation = details [2];
-                f.addValidation(Validation.parseValidation(validation));
+                if (details [0].equals("has_many")) {
+                    Rel r = new Rel(RelType.ONE_TO_MANY, details[1]);
+                    ret.addRel(r);
+                }
+                else if (details [0].equals("has_one")) {
+                    Rel r = new Rel(RelType.ONE_TO_ONE, details[1]);
+                    ret.addRel(r);
+                }
+                else {
+                    f = new Field(details [0], details [1]);
+                }
             }
 
-            ret.addField(f);
+            if (f != null) {
+                if (details.length > 2) {
+                    String validation = details [2];
+                    f.addValidation(Validation.parseValidation(validation));
+                }
+
+                ret.addField(f);
+            }
 
         }
         return (ret);

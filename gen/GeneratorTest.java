@@ -59,23 +59,16 @@ public class GeneratorTest {
         appConfig.setNeedsAuth(true);
 
         Model [] models = Model.parseModels(new String[] {
-                "user: username string, email, password, premium boolean, avatar image",
-                "company: name, address, phone, billing_address address",
+                "user: username string, email, password, premium boolean, avatar image, has_many contact, has_one company, has_many opportunity",
+                "company: name, address, phone, billing_address address, mailing_address address, description string, has_many contact",
+                "opportunity: name, address, phone, has_one company, website url, value currency, case_number integer, description long_string, priority fixed_list(low|medium|high)",
                 "contact: first_name, last_name, photo list(image), email short_string REQUIRED, home phone, cell phone, sex fixed_list(male|female), contact_type fixed_list(personal|sales|presales)"
         });
 
-        Model user = models [0];
-        Model company = models [1];
-        Model contact = models [2];
-
-        user.hasMany(contact);
-        contact.belongsTo(company);
-
+        app.setModels(models);
         app.setAppConfig(appConfig);
-        app.addTopLevelModel(user);
-        app.addTopLevelModel(contact);
-        app.setFrontPageListModel(contact);
-        app.addModel(company);
+        app.setTopLevelModels("user", "contact");
+        app.setFrontPageListModel(models [1]);   // TODO more realistic example of good front page list content
 
         Generator.createAndGen(app, true);
         /**
