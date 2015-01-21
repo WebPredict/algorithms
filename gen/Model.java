@@ -104,6 +104,7 @@ public class Model extends Type {
 
     public List<String> resolveReferences (App app) {
 
+        // TODO: the relationships need to become fields
         ArrayList<String> errors = new ArrayList<String>();
         if (relationships != null) {
             for (Rel rel : relationships) {

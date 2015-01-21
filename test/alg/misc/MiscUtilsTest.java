@@ -21,6 +21,15 @@ public class MiscUtilsTest {
 
     public static void main (String [] args) {
 
+        String simplified = MiscUtils.simplifyUnixPath("/a/.//b");
+
+        simplified = MiscUtils.simplifyUnixPath("/home/user//path/../other/");
+
+        simplified = MiscUtils.simplifyUnixPath("/../");
+        simplified = MiscUtils.simplifyUnixPath("/");
+
+        MiscUtils.fizzbuzz();
+
         LinkNode list1 = generateList(5);
         BinaryNode tree = TreeUtils.sortedListToBST(list1);
 

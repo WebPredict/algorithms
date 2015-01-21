@@ -5,6 +5,7 @@ import alg.util.LinkNode;
 
 import java.util.List;
 import java.util.Random;
+import java.util.Stack;
 
 /**
  * Created with IntelliJ IDEA.
@@ -384,5 +385,96 @@ public class MiscUtils {
         list [firstIdx] = list [secondIdx];
 
         list [secondIdx] = tmp;
+    }
+
+    /**
+     * Removes redundant Unix path elements, e.g. duplicate slashes
+     * @param path
+     * @return
+     */
+    public static String simplifyUnixPath (String path) {
+        if (path == null)
+            return (null);
+
+        String ret = null;
+        Stack<String> directories = new Stack<String>();
+
+        int state = 0;
+        int startIdx = -1;
+        int goneNeg = 0;
+        for (int i = 0; i < path.length(); i++) {
+            char c = path.charAt(i);
+
+            switch (c) {
+                case '/':
+                    if (state == 3) {
+                        directories.push(path.substring(startIdx, i));
+                        startIdx = -1;
+                    }
+                    else if (i == path.length() - 1 && directories.empty()) // special case for root
+                        directories.push(""); // no name
+
+//                    else if (state == 4) {
+//                        directories.pop();
+//                    }
+                    if (goneNeg < 0)
+                        goneNeg++;
+
+                    state = 1;
+                    break;
+
+                case '.':
+                    if (state == 2) {
+                        if (directories.size() > 0) {
+                            directories.pop();
+                        }
+                        else
+                            goneNeg--;
+                        state = 4; // ..
+                    }
+                    else
+                        state = 2;
+                    break;
+
+                default:
+                    if (state != 3) {
+                        startIdx = i;
+                    }
+
+                    if (i == path.length() - 1) {
+                        directories.push(path.substring(startIdx, path.length()));
+                    }
+                    state = 3;
+                    break;
+            }
+        }
+
+        if (goneNeg < 0)
+            throw new RuntimeException("Invalid path: " + path);
+
+        while (!directories.empty()) {
+            if (ret == null)
+                ret = "/" + directories.pop();
+            else
+                ret = "/" + directories.pop() + ret;
+        }
+        return (ret);
+    }
+
+
+    /**
+     * Jeff Atwood's legendary FizzBuzz. If you can't write this in 15 seconds or less you are bad, and should feel bad.
+     */
+    public static void fizzbuzz () {
+        for (int i = 1; i <= 100; i++) {
+            if (i % 15 == 0)
+                System.out.println("fizzbuzz");
+            else if (i % 5 == 0)
+                System.out.println("buzz");
+            else if (i % 3 == 0)
+                System.out.println("fizz");
+            else
+                System.out.println(i);
+        }
     }
 }
