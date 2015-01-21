@@ -21,6 +21,8 @@ public class MiscUtilsTest {
 
     public static void main (String [] args) {
 
+        List<List<Integer>>    perms = ArrayUtils.listPermutations(new int[] {1, 2, 3});
+
         int [][]    matrix = ArrayUtils.generateSpiralMatrix(1);
 
         String simplified = MiscUtils.simplifyUnixPath("/."); //("/a/.//b");

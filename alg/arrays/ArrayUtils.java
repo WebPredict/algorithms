@@ -45,6 +45,31 @@ public class ArrayUtils {
 
     }
 
+    public static int []        join (int [] nums, int num) {
+        int numsLen = nums == null ? 0 : nums.length;
+        int [] ret = new int[numsLen + num];
+
+        for (int i = 0; i < numsLen; i++) {
+            ret [i] = nums [i];
+        }
+        ret [ret.length - 1] = num;
+        return (ret);
+    }
+
+    public static int []        join (int [] nums, int [] nums2) {
+        if (nums == null)
+            return (nums2);
+        else if (nums2 == null)
+            return (nums);
+
+        int len = nums.length + nums2.length;
+        int [] ret = new int[len];
+
+        System.arraycopy(nums, 0, ret, 0, nums.length);
+        System.arraycopy(nums2, 0, ret, nums.length, nums2.length);
+
+        return (ret);
+    }
 
     @InterestingAlgorithm
     public static Comparable [] removeDuplicates (Comparable [] inArray) {
@@ -285,6 +310,43 @@ public class ArrayUtils {
         int [] ret = new int[array.length];
         System.arraycopy(array, 0, ret, 0, array.length);
         return (ret);
+    }
+
+    @InterestingAlgorithm
+    public static List<List<Integer>> listPermutations (int [] num) {
+        if (num == null)
+            return (null);
+        else if (num.length == 0)
+            return (new ArrayList<List<Integer>>());
+        else if (num.length == 1) {
+             List<List<Integer>> ret = new ArrayList<List<Integer>>();
+             ArrayList<Integer> retArr = new ArrayList<Integer>();
+            retArr.add(num [0]);
+            ret.add(retArr);
+            return (ret);
+        }
+
+        int []  subArr = new int[num.length - 1];
+        System.arraycopy(num, 1, subArr, 0, num.length - 1);
+        List<List<Integer>>    subPermutations = listPermutations(subArr); // TODO fix to take an index to avoid this arrray copy
+        List<List<Integer>>    retPermutations = new ArrayList<List<Integer>>();
+
+        for (int i = 0; i < subPermutations.size(); i++) {
+            List<Integer> subPermutation = subPermutations.get(i);
+            for (int j = 0; j < subPermutation.size(); j++) {
+                ArrayList<Integer> curPerm = new ArrayList<Integer>();
+                curPerm.addAll(subPermutation.subList(0, j));
+                curPerm.add(num[0]);
+                curPerm.addAll(subPermutation.subList(j, subPermutation.size()));
+                retPermutations.add(curPerm);
+            }
+            ArrayList<Integer> lastPerm = new ArrayList<Integer>();
+            lastPerm.addAll(subPermutation);
+            lastPerm.add(num[0]);
+            retPermutations.add(lastPerm);
+        }
+
+        return (retPermutations);
     }
 
     @InterestingAlgorithm
