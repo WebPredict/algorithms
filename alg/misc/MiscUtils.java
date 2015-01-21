@@ -415,14 +415,10 @@ public class MiscUtils {
                         startIdx = -1;
                     }
 
-                    if (goneNeg < 0)
-                        goneNeg++;
-
                     state = 1;
                     break;
 
                 case '.':
-                    // TODO: what about this odd case: "/..." = "/..."
                     if (state == 2) {
                         if (directories.size() > 0) {
                             directories.pop();
@@ -430,11 +426,22 @@ public class MiscUtils {
                         else {
                             if (!sawRoot)
                                 directories.push("..");
+                            else {
+                                // more to come?
+                                if (i < path.length() - 1)
+                                    directories.push("..");
+                            }
                         }
                         state = 4; // ..
                     }
-                    else
+                    else {
+                        // try to handle this odd case: "/..." = "/..."  - not sure this is even a valid case to support
+                        if (state == 4 && directories.size() > 0) {
+                            String adjust = directories.pop();
+                            directories.push(adjust + ".");
+                        }
                         state = 2;
+                    }
                     break;
 
                 default:
@@ -462,7 +469,7 @@ public class MiscUtils {
             }
         }
         if (sawRoot)
-            return ("/" + ret);
+            return (ret == null || ret.equals("..") ? "/" : "/" + ret);
         else
             return (ret);
     }

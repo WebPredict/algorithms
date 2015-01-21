@@ -21,14 +21,18 @@ public class MiscUtilsTest {
 
     public static void main (String [] args) {
 
+        int [][]    matrix = ArrayUtils.generateSpiralMatrix(1);
+
         String simplified = MiscUtils.simplifyUnixPath("/."); //("/a/.//b");
         simplified = MiscUtils.simplifyUnixPath("..//b");
 
         simplified = MiscUtils.simplifyUnixPath("/a/.//b");
         simplified = MiscUtils.simplifyUnixPath("/home/user//path/../other/");
 
-        simplified = MiscUtils.simplifyUnixPath("/../");
         simplified = MiscUtils.simplifyUnixPath("/..");
+
+        simplified = MiscUtils.simplifyUnixPath("/../");
+        simplified = MiscUtils.simplifyUnixPath("/...");
 
         MiscUtils.fizzbuzz();
 

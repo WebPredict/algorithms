@@ -2,10 +2,7 @@ package alg.strings;
 
 import alg.misc.InterestingAlgorithm;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -226,6 +223,43 @@ public class StringUtils {
         }
 
         return (retAnagrams);
+    }
+
+    /**
+     * Returns all groups of strings that have anagrams in this list, in no particular order, flattened array.
+     * @param strs
+     * @return
+     */
+    @InterestingAlgorithm
+    public static List<String> listAnagrams (String [] strs) {
+        if (strs == null)
+            return (null);
+        else if (strs.length == 0)
+            return (new ArrayList<String>());
+
+        HashMap<String, List<String>> sortedToListMap = new HashMap<String, List<String>>();
+
+        for (String s : strs) {
+
+            char [] chars = s.toCharArray();
+            Arrays.sort(chars);
+            String key = new String(chars);
+            List<String> list = sortedToListMap.get(key);
+            if (list == null) {
+                list = new ArrayList<String>();
+                sortedToListMap.put(key, list);
+            }
+            list.add(s);
+        }
+
+        List<String> all = new ArrayList<String>();
+
+        for (List<String> value : sortedToListMap.values()) {
+           if (value.size() > 1)
+               all.addAll(value);
+        }
+
+        return (all);
     }
 
     @InterestingAlgorithm

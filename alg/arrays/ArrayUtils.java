@@ -154,6 +154,73 @@ public class ArrayUtils {
         return (numbers);
     }
 
+    @InterestingAlgorithm
+    public static int [][] generateSpiralMatrix (int n) {
+        if (n == 0)
+            return (new int[0][0]);
+
+        int [][] matrix = new int[n][n];
+        int rows = n;
+        int cols = n;
+        int rowIdx = 0;
+        int colIdx = 0;
+        int maxRowIdx = rows - 1;
+        int minRowIdx = 1;
+        int maxColIdx = cols - 1;
+        int minColIdx = 0;
+
+        int direction = 0;
+        int nextNum = 1;
+        while (nextNum <= rows * cols) {
+            matrix[rowIdx][colIdx] = nextNum++;
+
+            switch (direction) {
+                case 0:
+                    if (colIdx < maxColIdx)
+                        colIdx++;
+                    else {
+                        maxColIdx--;
+                        rowIdx++;
+                        direction = 1;
+                    }
+                    break;
+
+                case 1:
+                    if (rowIdx < maxRowIdx)
+                        rowIdx++;
+                    else {
+                        colIdx--;
+                        maxRowIdx--;
+                        direction = 2;
+                    }
+                    break;
+
+                case 2:
+                    if (colIdx > minColIdx)
+                        colIdx--;
+                    else {
+                        minColIdx++;
+                        direction = 3;
+                        rowIdx--;
+                    }
+                    break;
+
+                case 3:
+                    if (rowIdx > minRowIdx)
+                        rowIdx--;
+                    else {
+                        minRowIdx++;
+                        colIdx++;
+                        direction = 0;
+                    }
+                    break;
+
+            }
+        }
+
+        return (matrix);
+    }
+
     /**
      *
      * @param array1
@@ -262,6 +329,17 @@ public class ArrayUtils {
             String next = tok.nextToken();
             intervals.add(Interval.parse(next));
         }
+        return (merge(intervals));
+    }
+
+    /**
+     * Merges overlapping intervals
+     * @param intervals
+     * @return
+     */
+    @InterestingAlgorithm
+    public static List<Interval>    insert(List<Interval> intervals, Interval newInterval) {
+        intervals.add(newInterval);
         return (merge(intervals));
     }
 
