@@ -396,27 +396,25 @@ public class MiscUtils {
         if (path == null)
             return (null);
 
-        String ret = null;
-        Stack<String> directories = new Stack<String>();
+        String          ret = null;
+        Stack<String>   directories = new Stack<String>();
 
-        int state = 0;
-        int startIdx = -1;
-        int goneNeg = 0;
+        int             state = 0;
+        int             startIdx = -1;
+        boolean         sawRoot = false;
         for (int i = 0; i < path.length(); i++) {
             char c = path.charAt(i);
 
             switch (c) {
                 case '/':
+                    if (directories.empty())
+                        sawRoot = true;
+
                     if (state == 3) {
                         directories.push(path.substring(startIdx, i));
                         startIdx = -1;
                     }
-                    else if (i == path.length() - 1 && directories.empty()) // special case for root
-                        directories.push(""); // no name
 
-//                    else if (state == 4) {
-//                        directories.pop();
-//                    }
                     if (goneNeg < 0)
                         goneNeg++;
 
@@ -424,12 +422,15 @@ public class MiscUtils {
                     break;
 
                 case '.':
+                    // TODO: what about this odd case: "/..." = "/..."
                     if (state == 2) {
                         if (directories.size() > 0) {
                             directories.pop();
                         }
-                        else
-                            goneNeg--;
+                        else {
+                            if (!sawRoot)
+                                directories.push("..");
+                        }
                         state = 4; // ..
                     }
                     else
@@ -449,16 +450,21 @@ public class MiscUtils {
             }
         }
 
-        if (goneNeg < 0)
-            throw new RuntimeException("Invalid path: " + path);
+        if (directories.empty() && sawRoot)
+            return ("/"); // special case
 
         while (!directories.empty()) {
-            if (ret == null)
-                ret = "/" + directories.pop();
-            else
-                ret = "/" + directories.pop() + ret;
+            if (ret == null) {
+                ret = directories.pop();
+            }
+            else {
+                ret = directories.pop() + "/" + ret;
+            }
         }
-        return (ret);
+        if (sawRoot)
+            return ("/" + ret);
+        else
+            return (ret);
     }
 
 
