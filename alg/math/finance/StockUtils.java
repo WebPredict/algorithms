@@ -100,18 +100,21 @@ public class StockUtils {
         int ret = 0;
 
         /**
-         * Approach: Just add up all the climbs/runs I guess?
+         * Approach: Just add up all the climbs/runs
          *
          */
         Integer startIdx = null;
 
         for (int i = 0; i < prices.length; i++) {
-            if (i < prices.length - 1 && prices [i + 1] > prices [i] && startIdx == null) {
-                startIdx = i;
+            if (i > 0 && prices [i] > prices [i - 1] && startIdx == null) {
+                startIdx = i - 1;
             }
-            if (i > 0 && prices [i - 1] > prices [i] && startIdx != null) {
-                ret += prices [startIdx] - prices [i - 1];
+            if (i > 0 && prices [i] < prices [i - 1] && startIdx != null) {
+                ret += prices [i - 1] - prices [startIdx];
                 startIdx = null;
+            }
+            else if (i == prices.length - 1 && startIdx != null) {
+                ret += prices [i] - prices [startIdx];
             }
         }
 
@@ -181,6 +184,7 @@ public class StockUtils {
         return (maxProfitWithOneTransaction(prices, 0, prices.length));
     }
 
+
     /**
      * @param prices
      * @return
@@ -199,26 +203,39 @@ public class StockUtils {
          * monotonically up, return last - first
          *
          */
-        int currentLowest = Integer.MAX_VALUE;
-        int currentLowestIdx = -1;
-        int currentHighest = Integer.MIN_VALUE;
-        int currentHighestIdx = -1;
+        int runStartIdx = -1;
+        int curRunSize = 0;
+        int maxRunSize = 0;
+        int maxRunStartIdx = -1;
+        int maxRunEndIdx = -1;
 
         for (int i = startIdx; i < endIdx; i++) {
             if (i > startIdx) {
-                if (prices [i] < currentLowest) {
-                    currentLowest = prices [i];
-                    currentLowestIdx = i;
+                if (prices [i] > prices [i - 1]) {
+                    // we have a run
+                    if (runStartIdx == -1) {
+                        runStartIdx = i - 1;
+                        curRunSize = 0; //prices [i] - prices [i - 1];
+                    }
                 }
-                else if (prices [i] > currentHighest) {
-                    currentHighest = prices [i];
-                    currentHighestIdx = i;
+
+                curRunSize +=  prices [i] - prices [i - 1];
+
+                if (curRunSize < 0) {
+                    // should consider a new run
+                    runStartIdx = -1;
+                }
+
+                if (curRunSize > maxRunSize) {
+                    maxRunSize = curRunSize;
+                    maxRunStartIdx = runStartIdx;
+                    maxRunEndIdx = i;
                 }
             }
         }
 
-        if (currentLowestIdx != -1 && currentLowestIdx < currentHighestIdx) {
-            ret = prices [currentHighestIdx] - prices [currentLowestIdx];
+        if (maxRunStartIdx != -1 && maxRunEndIdx != -1) {
+            ret = prices [maxRunEndIdx] - prices [maxRunStartIdx];
         }
         return (ret);
     }
@@ -231,6 +248,8 @@ public class StockUtils {
         if (prices == null)
             return (null);
 
+        int ret = 0;
+
         /**
          * some cases:
          * length 0, return 0
@@ -238,26 +257,39 @@ public class StockUtils {
          * monotonically up, return last - first
          *
          */
-        int currentLowest = Integer.MAX_VALUE;
-        int currentLowestIdx = -1;
-        int currentHighest = Integer.MIN_VALUE;
-        int currentHighestIdx = -1;
+        int runStartIdx = -1;
+        int curRunSize = 0;
+        int maxRunSize = 0;
+        int maxRunStartIdx = -1;
+        int maxRunEndIdx = -1;
 
         for (int i = startIdx; i < endIdx; i++) {
             if (i > startIdx) {
-                if (prices [i] < currentLowest) {
-                    currentLowest = prices [i];
-                    currentLowestIdx = i;
+                if (prices [i] > prices [i - 1]) {
+                    // we have a run
+                    if (runStartIdx == -1) {
+                        runStartIdx = i - 1;
+                        curRunSize = 0; //prices [i] - prices [i - 1];
+                    }
                 }
-                else if (prices [i] > currentHighest) {
-                    currentHighest = prices [i];
-                    currentHighestIdx = i;
+
+                curRunSize +=  prices [i] - prices [i - 1];
+
+                if (curRunSize < 0) {
+                    // should consider a new run
+                    runStartIdx = -1;
+                }
+
+                if (curRunSize > maxRunSize) {
+                    maxRunSize = curRunSize;
+                    maxRunStartIdx = runStartIdx;
+                    maxRunEndIdx = i;
                 }
             }
         }
 
-        if (currentLowestIdx != -1 && currentLowestIdx < currentHighestIdx) {
-            return (new int[] {currentLowestIdx, currentHighestIdx});
+        if (maxRunStartIdx != -1 && maxRunEndIdx != -1) {
+            return new int[] {maxRunStartIdx, maxRunEndIdx};
         }
         return (null);
     }

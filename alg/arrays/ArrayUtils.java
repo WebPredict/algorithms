@@ -646,4 +646,29 @@ public class ArrayUtils {
         }
         return (null);
     }
+
+    /**
+     * Removes duplicates in place, and returns length of de-duped array.
+     * @param values
+     * @return
+     */
+    @InterestingAlgorithm
+    public static int   removeDuplicatesFromSortedArray (int [] values) {
+        if (values == null)
+            return (0);
+
+        int idx = -1;
+
+        Integer last = null;
+        for (int i = 0; i < values.length; i++) {
+            if (last == null || values [i] != last)
+                idx++;
+
+            if (idx != i)
+                values [idx] = values [i];
+            last = values [i];
+        }
+
+        return (idx + 1);
+    }
 }

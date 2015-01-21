@@ -2,6 +2,7 @@ package test.alg.misc;
 
 import alg.arrays.ArrayUtils;
 import alg.arrays.Interval;
+import alg.math.finance.StockUtils;
 import alg.misc.MiscUtils;
 import alg.strings.StringUtils;
 import alg.trees.TreeUtils;
@@ -21,7 +22,17 @@ public class MiscUtilsTest {
 
     public static void main (String [] args) {
 
-        List<List<Integer>>    perms = ArrayUtils.listPermutations(new int[] {1, 2, 3});
+        int max = StockUtils.maxProfitWithOneTransaction(new int [] {1, 2, 3, 2});
+        max = StockUtils.maxProfitWithOneTransaction(new int [] {1, 2, 3});
+        max = StockUtils.maxProfitWithOneTransaction(new int [] {1});
+        max = StockUtils.maxProfitWithOneTransaction(new int [] {3, 2, 1});
+        max = StockUtils.maxProfitWithOneTransaction(new int [] {1, 2, 3, 2});
+        max = StockUtils.maxProfitWithMaxTransactions(new int [] {2, 1, 5});
+
+        int     len = ArrayUtils.removeDuplicatesFromSortedArray(new int[] {1, 1, 1, 2, 2, 3, 6, 7, 7});
+        List<List<Integer>>    perms = ArrayUtils.listPermutations(new int[] {1, 2, 3, 4});
+
+        System.out.println(perms);
 
         int [][]    matrix = ArrayUtils.generateSpiralMatrix(1);
 
