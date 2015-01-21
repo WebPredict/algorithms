@@ -671,4 +671,28 @@ public class ArrayUtils {
 
         return (idx + 1);
     }
+
+    /**
+     * Removes all instances of elem in the array in place and returns new size.
+     * @param values
+     * @return
+     */
+    @InterestingAlgorithm
+    public static int   removeElement (int [] values, int elem) {
+        if (values == null)
+            return (0);
+
+        int idx = -1;
+
+        for (int i = 0; i < values.length; i++) {
+            if (values [i] != elem) {
+                idx++;
+
+                if (idx != i)
+                    values [idx] = values [i];
+            }
+        }
+
+        return (idx + 1);
+    }
 }

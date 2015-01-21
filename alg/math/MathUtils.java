@@ -46,13 +46,6 @@ public class MathUtils {
         for (int i = 0; i < trimmed.length(); i++) {
             char c = trimmed.charAt(i);
 
-            // possible states:
-            // initial = 0
-            // parsing a number = 1
-
-            // parsing an operator = 2
-            // computing a sub-result   ?
-
             // "3 + (3 * (4 / (5 - 2))) * -1.2"
 
             switch (state) {
@@ -60,58 +53,65 @@ public class MathUtils {
                     if ((c >= '0' && c <= '9') || c == '-' || c == '+' || c == '.') {
                         tokenStartIdx = i;
                         state = 1; // parsing a number, possibly negative
+                        if (i == trimmed.length() - 1) {
+                            if (firstOperand == null)
+                                firstOperand = atod(trimmed.substring(i, i + 1));
+                            else
+                                secondOperand = atod(trimmed.substring(i, i + 1));
+                        }
                     }
                     else if (c == ' ') {
                         // nothing to do
                     }
                     else if (c == '(') {
                         EvalInfo info =  evaluateArithmeticSubExpression(trimmed.substring(i + 1));
-                        i = info.strIdx;
+                        i += info.strLen;
                         if (firstOperand == null)
                             firstOperand = info.value;
                         else if (secondOperand == null) {
                             secondOperand = info.value;
+                            firstOperand = computeValue(firstOperand, secondOperand, operation);
+
+                            operation = null;
+                            secondOperand = null;
+
                         }
-                        // state = ??
+                        state = 2;
                     }
                     else
                         throw new Exception("Syntax error in " + trimmed + " at position " + i);
                     break;
 
                 case 1: // parsing a number
-                    if (c == ' ') {  // finished parsing number
-                        double num = atod(trimmed.substring(tokenStartIdx, i));
-                        if (operation != null) {
-                            if (firstOperand == null) {
-                                firstOperand = num;
-                                state = 2;
-                            }
-                            else if (secondOperand == null) {
-                                secondOperand = num;
-                                // TODO the operation
+                    if (c == ' ' || i == trimmed.length() - 1) {  // finished parsing number
+                        double num;
+                        if (c == ')')
+                            num = atod(trimmed.substring(tokenStartIdx, i));
+                        else
+                             num = atod(trimmed.substring(tokenStartIdx, i == trimmed.length() - 1 ? i + 1 : i));
 
-                                switch (operation.charAt(0)) {
-                                    case '+':
-                                        firstOperand += secondOperand;
-                                        break;
-
-                                    case '-':
-                                        firstOperand -= secondOperand;
-                                        break;
-
-                                    case '/':
-                                        firstOperand /= secondOperand;
-                                        break;
-
-                                    case '*':
-                                        firstOperand *= secondOperand;
-                                        break;
-                                }
-                                operation = null;
-                                secondOperand = null;
-                                state = 0;
-                            }
+                        if (firstOperand == null) {
+                            firstOperand = num;
                         }
+                        else if (secondOperand == null) {
+                            secondOperand = num;
+                            if (operation == null)
+                                throw new RuntimeException("Syntax error: missing operation at index " + i);
+
+                           firstOperand = computeValue(firstOperand, secondOperand, operation);
+
+                            operation = null;
+                            secondOperand = null;
+                        }
+
+                        if (c == ')') {   // TODO: need to make sure we should be completing a paren expression otherwise syntax error here
+                            EvalInfo info = new EvalInfo();
+                            info.value = firstOperand;
+
+                            info.strLen = i + 1;
+                            return (info);
+                        }
+                        state = 2;
 
                     }
                     else if (c == '(') {
@@ -120,8 +120,14 @@ public class MathUtils {
                     }
                     else if (c == ')') {   // This only is valid if we're already in a paren expression
                         EvalInfo info = new EvalInfo();
-                        info.value = atod(trimmed.substring(tokenStartIdx, i));
-                        info.strIdx = i;
+                        if (firstOperand == null) {
+                            info.value = atod(trimmed.substring(tokenStartIdx, i));
+                        }
+                        else {
+                            secondOperand = atod(trimmed.substring(tokenStartIdx, i));
+                            info.value = computeValue(firstOperand, secondOperand, operation);
+                        }
+                        info.strLen = i + 1;
                         return (info);
                     }
                     break;
@@ -131,23 +137,46 @@ public class MathUtils {
                         operation = String.valueOf(c);
                         state = 0;
                     }
-                    else
-                        throw new Exception("Syntax error in " + trimmed + " at position " + i + " expecting operator");
+                    else if (c != ' ')
+                        throw new Exception("Syntax error in " + trimmed + " at position " + i + " expecting operator instead of char " + c);
                     break;
             }
         }
 
         EvalInfo resultInfo = new EvalInfo();
-        if (firstOperand != null)
+        if (firstOperand != null && operation != null && secondOperand != null)
+            resultInfo.value = computeValue(firstOperand, secondOperand, operation);
+        else
             resultInfo.value = firstOperand;
 
-        resultInfo.strIdx = trimmed.length() - 1;
+        resultInfo.strLen = trimmed.length();
         return (resultInfo);
+    }
+
+    private static double computeValue (Double firstOperand, Double secondOperand, String operation) {
+        switch (operation.charAt(0)) {
+            case '+':
+                firstOperand += secondOperand;
+                break;
+
+            case '-':
+                firstOperand -= secondOperand;
+                break;
+
+            case '/':
+                firstOperand /= secondOperand;
+                break;
+
+            case '*':
+                firstOperand *= secondOperand;
+                break;
+        }
+        return (firstOperand);
     }
 
     static class EvalInfo {
         public double value = Double.NaN;
-        public int strIdx;
+        public int strLen;
     }
 
     /**
@@ -706,7 +735,7 @@ public class MathUtils {
         for (int i = 0; i < decIdx; i++) {
             char c = asciiNum.charAt(i);
             if (c >= '0' && c <= '9') {
-                total += Math.pow(10, asciiNum.length() - (1 + i)) * (c - '0');
+                total += Math.pow(10, decIdx - (1 + i)) * (c - '0');
             }
             else if (c == '-' && i == 0) {
                 negate = true;
