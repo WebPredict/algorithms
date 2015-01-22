@@ -25,6 +25,8 @@ public class MiscUtilsTest {
 
     public static void main (String [] args) throws Exception {
 
+        double value = MathUtils.evaluateArithmeticExpression("2 * (3 + ((4 - 2) + 1))");
+
         String roman = WordUtils.toRomanNumeral(3434);
 
         int [] values = {100,3,2,1};        //{1, 3, 2, 12, 10, 231, 112};
@@ -32,7 +34,7 @@ public class MiscUtilsTest {
         int maxGap = MiscUtils.maximumGap(values);
 
 
-        double value = MathUtils.evaluateArithmeticExpression("2");
+        value = MathUtils.evaluateArithmeticExpression("2");
 
         value = MathUtils.evaluateArithmeticExpression("(3)");
 

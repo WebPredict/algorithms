@@ -137,6 +137,12 @@ public class MathUtils {
                         operation = String.valueOf(c);
                         state = 0;
                     }
+                    else if (c == ')') {    // TODO: this could be a syntax error - detect it
+                        EvalInfo resultInfo = new EvalInfo();
+                        resultInfo.value = firstOperand;
+                        resultInfo.strLen = i;
+                        return (resultInfo);
+                    }
                     else if (c != ' ')
                         throw new Exception("Syntax error in " + trimmed + " at position " + i + " expecting operator instead of char " + c);
                     break;
