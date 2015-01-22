@@ -84,6 +84,9 @@ public class StringUtils {
 
     @InterestingAlgorithm
     public static String repeat (char c, int num) {
+        if (num == 0)
+            return ("");
+
         char []     repeated = new char[num];
         for (int i = 0; i < num; i++) {
             repeated [i] = c;

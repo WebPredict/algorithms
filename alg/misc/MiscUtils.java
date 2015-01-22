@@ -1,5 +1,6 @@
 package alg.misc;
 
+import alg.sort.SortUtils;
 import alg.strings.StringUtils;
 import alg.util.LinkNode;
 
@@ -280,14 +281,34 @@ public class MiscUtils {
     /**
      *    find the max difference between successive elements in sorted form, but computed in linear time & space.
      *
-     * @param unsortedNonNegIntegers   Non negative integers
+     * @param num   Non negative integers
      * @return
      */
     @InterestingAlgorithm
-    public static int       maximumGap (List<Integer> unsortedNonNegIntegers) {
+    public static int       maximumGap (int [] num) {
+        if (num == null || num.length < 2)
+            return (0);
+
+        // This isn't really right for linear time/space, but close!
+        SortUtils.radixSort(num);
+
+        Integer max = null;
+
+        for (int i = 0; i < num.length - 1; i++) {
+            int diff = Math.abs(num [i + 1] - num [i]);
+            if (max == null) {
+                max = diff;
+            }
+            else if (max < diff) {
+                max = diff;
+            }
+        }
         // Hard part is doing it without sorting i.e. in linear time
 
-        return (0);
+        /**
+         * 3 5 10 9 2 1 8
+         */
+        return (max);
     }
 
     /**

@@ -5,10 +5,12 @@ import alg.arrays.Interval;
 import alg.math.MathUtils;
 import alg.math.finance.StockUtils;
 import alg.misc.MiscUtils;
+import alg.sort.SortUtils;
 import alg.strings.StringUtils;
 import alg.trees.TreeUtils;
 import alg.util.BinaryNode;
 import alg.util.LinkNode;
+import alg.words.WordUtils;
 
 import java.util.List;
 
@@ -22,6 +24,13 @@ import java.util.List;
 public class MiscUtilsTest {
 
     public static void main (String [] args) throws Exception {
+
+        String roman = WordUtils.toRomanNumeral(3434);
+
+        int [] values = {100,3,2,1};        //{1, 3, 2, 12, 10, 231, 112};
+
+        int maxGap = MiscUtils.maximumGap(values);
+
 
         double value = MathUtils.evaluateArithmeticExpression("2");
 
@@ -37,7 +46,6 @@ public class MiscUtilsTest {
 
         value = MathUtils.evaluateArithmeticExpression("2 * (3 + ((4 - 2) + 1))");
 
-        int [] values = {1, 1, 2};
         int     len = ArrayUtils.removeElement(values, 1);
 
         int max = StockUtils.maxProfitWithOneTransaction(new int[]{1, 2, 3, 2});

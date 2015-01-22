@@ -39,34 +39,7 @@ public class TreeUtils {
         }
     }
 
-    @InterestingAlgorithm
-    public static BinaryNode<Comparable> mergeSecondIntoFirst(BinaryNode<Comparable> tree1, BinaryNode<Comparable> tree2) {
-        if (tree2 == null)
-            return (null);         // Nothing to do
-        else if (tree1 == null)
-            return (tree2);
-
-        int comparison = tree1.getData().compareTo(tree2.getData());
-
-        // TODO finish
-        if (comparison == 0) {
-            //return (tree);
-        }
-        else if (comparison < 0) {
-//            if (tree1.getLeft() != null)
-//                merge(tree1.getLeft(), tree2);
-//            else {
-//                tree1.setLeft(tree2);
-//            }
-        }
-        else {
-//            if (tree1.getRight() != null)
-//                merge(tree1.getRight(), tree2);
-        }
-        return (null);
-    }
-
-    @InterestingAlgorithm
+   @InterestingAlgorithm
     public static BinaryNode    find (BinaryNode<? extends Comparable> tree, Comparable value) {
         if (tree == null)
             return (null);
@@ -93,7 +66,6 @@ public class TreeUtils {
             preorderTraversal(tree.getRight(), visitor);
     }
 
-    // TODO hard way: do it iteratively
     @InterestingAlgorithm
     public static void postorderTraversal (BinaryNode tree, NodeVisitor visitor) {
         if (tree.getLeft() != null)
@@ -103,19 +75,68 @@ public class TreeUtils {
         visitor.visit(tree);
     }
 
+    @InterestingAlgorithm
+    public static void preorderTraversalIterative (BinaryNode node, NodeVisitor visitor) {
+        Stack<BinaryNode> nodes = new Stack<BinaryNode>();
+
+        while (!nodes.empty() || node != null) {
+            if (node != null) {
+                visitor.visit(node);
+                if (node.getRight() != null)
+                    nodes.push(node.getRight());
+                node = node.getLeft();
+            }
+            else
+                node = nodes.pop();
+        }
+    }
+
+    @InterestingAlgorithm
+    public static void inorderTraversalIterative (BinaryNode node, NodeVisitor visitor) {
+        Stack<BinaryNode> nodes = new Stack<BinaryNode>();
+
+        while (!nodes.empty() || node != null) {
+            if (node != null) {
+                nodes.push(node);
+                node = node.getLeft();
+            }
+            else {
+                node = nodes.pop();
+                visitor.visit(node);
+                node = node.getRight();
+            }
+        }
+    }
+
+    @InterestingAlgorithm
+    public static void postorderTraversalIterative (BinaryNode node, NodeVisitor visitor) {
+        Stack<BinaryNode> nodes = new Stack<BinaryNode>();
+        BinaryNode previous = null;
+
+        while (!nodes.empty() || node != null) {
+            if (node != null) {
+                nodes.push(node);
+                node = node.getLeft();
+            }
+            else {
+                BinaryNode topOfStack = nodes.peek();
+                if (topOfStack.getRight() != null && previous != topOfStack.getRight()) {
+                    node = topOfStack.getRight();
+                }
+                else {
+                    visitor.visit(topOfStack);
+                    previous = nodes.pop();
+                }
+            }
+        }
+    }
+
     public static void inorderTraversal (BinaryNode tree, NodeVisitor visitor) {
         if (tree.getLeft() != null)
             inorderTraversal(tree.getLeft(), visitor);
         visitor.visit(tree);
         if (tree.getRight() != null)
             inorderTraversal(tree.getRight(), visitor);
-    }
-
-    public static BinaryNode [] split (BinaryNode treeRoot) {
-        if (treeRoot == null)
-            return (null);
-        // TODO: account for nulls
-        return (new BinaryNode[] {treeRoot.getLeft(), treeRoot.getRight()});
     }
 
     public static BinaryNode [] splitOn (BinaryNode<? extends Comparable> treeRoot, Comparable val) {
@@ -191,6 +212,7 @@ public class TreeUtils {
     @InterestingAlgorithm
     public static void  balance (BinaryNode treeRoot) {
         // TODO
+        // One easy to follow approach: find and sort all nodes, then recreate tree from sorted array
     }
 
     public static int   height (BinaryNode treeRoot) {
@@ -337,6 +359,33 @@ public class TreeUtils {
     }
 
     @InterestingAlgorithm
+    public static BinaryNode<Comparable> mergeSecondIntoFirst(BinaryNode<Comparable> tree1, BinaryNode<Comparable> tree2) {
+        if (tree2 == null)
+            return (null);         // Nothing to do
+        else if (tree1 == null)
+            return (tree2);
+
+        int comparison = tree1.getData().compareTo(tree2.getData());
+
+        // TODO finish
+        if (comparison == 0) {
+            //return (tree);
+        }
+        else if (comparison < 0) {
+//            if (tree1.getLeft() != null)
+//                merge(tree1.getLeft(), tree2);
+//            else {
+//                tree1.setLeft(tree2);
+//            }
+        }
+        else {
+//            if (tree1.getRight() != null)
+//                merge(tree1.getRight(), tree2);
+        }
+        return (null);
+    }
+
+    @InterestingAlgorithm
     public static int compareTrees (BinaryNode tree1, BinaryNode tree2) {
         if (tree1 == null)
             return (tree2 == null ? 0 : -1);
@@ -353,7 +402,7 @@ public class TreeUtils {
     }
 
     @InterestingAlgorithm
-    public static boolean symmetric (BinaryNode tree) {
+    public static boolean isSymmetric (BinaryNode tree) {
         if (tree == null)
             return (true);
 
@@ -361,8 +410,34 @@ public class TreeUtils {
         BinaryNode right = tree.getRight();
 
         // approach: left DFS on left, right DFS on right, and at each step make sure they agree
+        while (left != null && right != null) {
+            if (!left.getData().equals(right.getData()))
+               return (false);
 
-        return (false); // TODO
+            if (left.getLeft() != null) {
+                left = left.getLeft();
+                if (right.getRight() == null)
+                    return (false);
+                else
+                    right = right.getRight();
+                continue;
+            }
+            else if (right.getRight() != null)
+                return (false); // asymmetric
+            else if (left.getRight() != null) {
+                left = left.getRight();
+                if (right.getLeft() == null)
+                    return (false);
+                else
+                    right = right.getLeft();
+                continue;
+            }
+            else if (right.getLeft() != null)
+                return (false); // asymmetric
+            break;
+        }
+
+        return (left == null ? right == null : right != null);
     }
 
     @InterestingAlgorithm
@@ -371,9 +446,20 @@ public class TreeUtils {
     }
 
     @InterestingAlgorithm
-    public static BinaryNode findNextInOrder (BinaryNode node) {
-    	// TODO needs parent pointers?
-    	return (null); // TODO
+    public static BinaryNode findPreviousInOrder (BinaryNode node) {
+        if (node == null)
+            return (null);
+
+        BinaryNode left = node.getLeft();
+        if (left == null)
+            return (null);
+
+        BinaryNode current = left;
+        while (current.getRight() != null) {
+            current = current.getRight();
+        }
+
+    	return (current);
     }
 
     @InterestingAlgorithm
@@ -399,8 +485,39 @@ public class TreeUtils {
 
     @InterestingAlgorithm
     public static BinaryNode	createBinarySearchTreeWithMinHeight (int [] values) {
+        if (values == null)
+            return (null);
 
-        // One approach: sort the list, then binary search for node creation
-    	 return (null); // TODO
+        Arrays.sort(values);
+        return (sortedArrayToBST(values));
+    }
+
+    public static BinaryNode sortedArrayToBST(int [] values) {
+        int length = values.length;
+        int middle = length / 2;
+
+        int val = values [middle];
+
+        BinaryNode root = new BinaryNode(val);
+        root.setLeft(sortedArrayToBST(values, 0, middle, root));
+        root.setRight(sortedArrayToBST(values, middle + 1, length, root));
+        return (root);
+    }
+
+    public static BinaryNode sortedArrayToBST(int [] values, int start, int end, BinaryNode root) {
+        int length = end - start;
+        if (length == 0)
+            return (null);
+
+        int middle = length / 2;
+
+        int val = values [middle];
+        BinaryNode ret = new BinaryNode(val);
+
+        if (middle > 0) {
+            ret.setLeft(sortedArrayToBST(values, 0, middle, root));
+            ret.setRight(sortedArrayToBST(values, middle + 1, length, root));
+        }
+        return (ret);
     }
 }

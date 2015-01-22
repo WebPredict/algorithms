@@ -297,7 +297,7 @@ public class SortUtils {
     }
 
     public static void      sortInts (int [] values) {
-    	// TODO
+    	radixSort(values);   // Hmm
     }
 
     @InterestingAlgorithm
@@ -305,7 +305,7 @@ public class SortUtils {
     	if (values == null || values.length < 2)
             return;
 
-        int     numDigits = (int)Math.ceil(Math.log10(MathUtils.max(values)));
+        int     numDigits = String.valueOf(MathUtils.max(values)).length();
 
         for (int i = 0; i < numDigits; i++) {
             ArrayList<Integer> []    lists = new ArrayList[10];

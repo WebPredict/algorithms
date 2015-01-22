@@ -605,7 +605,69 @@ public class WordUtils {
      */
     @InterestingAlgorithm
     public static String toRomanNumeral (int value) {
-        return (null); // TODO
+        /**
+         * M = 1000
+         * D = 500
+         * C = 100
+         * L = 50
+         * X = 10
+         * V = 5
+         * I = 1
+         */
+
+        int thousands = value / 1000;
+        int fiveHundreds = (value % 1000) / 500;
+        int hundreds = (value % 500) / 100;
+        int fifties = (value % 100) / 50;
+        int tens = (value % 50) / 10;
+        int fives = (value % 10) / 5;
+        int ones = value % 5;
+
+        if (fiveHundreds == 1 && hundreds == 4) {
+            fiveHundreds = 0;
+            hundreds = 9;
+        }
+
+        if (fifties == 1 && tens == 4) {
+            fifties = 0;
+            tens = 9;
+        }
+
+        if (fives == 1 && ones == 4) {
+            fives = 0;
+            ones = 9;
+        }
+
+        StringBuilder builder = new StringBuilder();
+        builder.append(StringUtils.repeat('M', thousands));
+        builder.append(StringUtils.repeat('D', fiveHundreds));
+
+        if (hundreds == 4)
+            builder.append("CD");
+        else if (hundreds == 9)
+            builder.append("CM");
+        else
+            builder.append(StringUtils.repeat('C', hundreds));
+
+        builder.append(StringUtils.repeat('L', fifties));
+
+        if (tens == 4)
+            builder.append("XL");
+        else if (tens == 9)
+            builder.append("XC");
+        else
+            builder.append(StringUtils.repeat('X', tens));
+
+        builder.append(StringUtils.repeat('V', fives));
+
+        if (ones == 4)
+            builder.append("IV");
+        else if (ones == 9)
+            builder.append("IX");
+        else
+            builder.append(StringUtils.repeat('I', ones));
+
+        return (builder.toString());
     }
 
     /**
