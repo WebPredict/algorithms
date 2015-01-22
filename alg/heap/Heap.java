@@ -20,100 +20,133 @@ public class Heap<T extends Comparable> {
 
         HeapNode<T> ret = root;
 
-        /**
-         * TODO: pull the greatest child from either root's left or right as the new root, then recursively do that
-         */
-        HeapNode<T> newRoot = root;
-        while (newRoot != null) {
-            HeapNode next = newRoot.getLeft();
-            if (next == null) {
-                HeapNode<T> tmp = newRoot;
-                newRoot = next;
-                tmp.setLeft(null);
-                break;
-            }
-            newRoot = next;
-        }
-
-        if (newRoot == null) {
+        if (root.getLeft() == null) {
             root = null;
-            return (null);
         }
+        else if (root.getRight() == null) {
+            root = root.getLeft();
+        }
+        else {
+            T left = root.getLeft().getData();
+            T right = root.getRight().getData();
 
-        root.setData(newRoot.getData());
-        HeapNode<T> current = root;
-
-        while (true) {
-           HeapNode<T> left = current.getLeft();
-           HeapNode<T> right = current.getRight();
-
-           if (left != null && left.getData().compareTo(current.getData()) > 0) {
-               T tmp = current.getData();
-               current.setData(left.getData());
-               left.setData(tmp);
-               current = left;
-           }
-            else if (right != null && right.getData().compareTo(current.getData()) > 0) {
-               T tmp = current.getData();
-               current.setData(right.getData());
-               right.setData(tmp);
-               current = right;
-           }
-            else
-               break;
-       }
+            if (left.compareTo(right) < 0) {
+                HeapNode<T> rightmost = removeRightmost(root.getLeft());
+                root.setData(rightmost.getData());
+            }
+            else {
+                HeapNode<T> leftmost = removeLeftmost(root.getRight());
+                root.setData(leftmost.getData());
+            }
+            heapify();
+        }
 
         return (root.getData());
     }
 
+    private HeapNode<T>  removeRightmost(HeapNode<T> node) {
+        if (node == null)
+            return (null);
+        else if (node.getRight() != null)
+            return (removeRightmost(node.getRight()));
+        else if (node.getLeft() != null)
+            return (removeRightmost(node.getLeft()));
+        else {
+            HeapNode<T> parent = node.getParent();
+            if (node == parent.getLeft())
+                parent.setLeft(null);
+            else
+                parent.setRight(null);
+            node.setParent(null);
+            return (node);
+        }
+    }
+
+    private HeapNode<T>  removeLeftmost(HeapNode<T> node) {
+        if (node == null)
+            return (null);
+        else if (node.getLeft() != null)
+            return (removeLeftmost(node.getLeft()));
+        else if (node.getRight() != null)
+            return (removeLeftmost(node.getRight()));
+        else {
+            HeapNode<T> parent = node.getParent();
+            if (node == parent.getLeft())
+                parent.setLeft(null);
+            else
+                parent.setRight(null);
+            node.setParent(null);
+            return (node);
+        }
+    }
+
     public void insert (T value) {
-        // TODO
+        pushDown(value);
     }
 
     private void pushDown (T data) {
-
-        HeapNode<T> newNode = new HeapNode<T>(null, data);
-
         if (root == null)
-            root = newNode;
+            root = new HeapNode<T>(data);
         else {
+
             HeapNode<T> current = root;
-            if (root.getData().compareTo(data) > 0) {
-                // right place:
-                if (current.getLeft() == null)
-                    current.setLeft(newNode);
-                else if (current.getRight() == null)
-                    current.setRight(newNode);
-                else {
 
+            while (current.getLeft() != null && current.getRight() != null) {
+                current = current.getLeft();
+            }
+
+            if (current.getLeft() == null) {
+                current.setLeft(new HeapNode<T>(data));
+            }
+            else if (current.getRight() == null) {
+                current.setRight(new HeapNode<T>(data));
+            }
+
+            HeapNode<T> parent = current.getParent();
+            // Now: bubble up to root and swap if needed
+            while (parent != null) {
+                if ( current.getData().compareTo(parent.getData()) > 0) {
+                    // need swap, then go up
+                    T tmp = parent.getData();
+                    parent.setData(current.getData());
+                    current.setData(tmp);
                 }
-            }
-            else {
-                newNode.setLeft(root);
-            }
-        }
 
-//        HeapNode<T> current = root;
-//
-//        while (true) {
-//            HeapNode<T> left = current.getLeft();
-//            HeapNode<T> right = current.getRight();
-//
-//            if (left != null && left.getData().compareTo(current.getData()) > 0) {
-//                T tmp = current.getData();
-//                current.setData(left.getData());
-//                left.setData(tmp);
-//                current = left;
-//            }
-//            else if (right != null && right.getData().compareTo(current.getData()) > 0) {
-//                T tmp = current.getData();
-//                current.setData(right.getData());
-//                right.setData(tmp);
-//                current = right;
-//            }
-//            else
-//                break;
-//        }
+                current = parent;
+                parent = parent.getParent();
+            }
+
+        }
+    }
+
+    private void heapify () {
+        if (root != null) {
+            HeapNode<T> current = root;
+
+            // Find the right place to put it:
+            while (current != null) {
+                HeapNode<T> left = current.getLeft();
+                HeapNode<T> right = current.getRight();
+
+                if (left != null && current.getData().compareTo(left.getData()) < 0) {
+                    // need swap, then go up
+                    T tmp = left.getData();
+                    left.setData(current.getData());
+                    current.setData(tmp);
+                    current = left;
+                }
+                else if (right !=null && current.getData().compareTo(right.getData()) < 0) {
+                    // need swap, then go up
+                    T tmp = right.getData();
+                    right.setData(current.getData());
+                    current.setData(tmp);
+                    current = right;
+                }
+                else
+                    break; // in the right place
+            }
+
+        }
     }
 
     public T    checkMax () {

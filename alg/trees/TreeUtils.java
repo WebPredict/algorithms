@@ -353,6 +353,19 @@ public class TreeUtils {
     }
 
     @InterestingAlgorithm
+    public static boolean symmetric (BinaryNode tree) {
+        if (tree == null)
+            return (true);
+
+        BinaryNode left = tree.getLeft();
+        BinaryNode right = tree.getRight();
+
+        // approach: left DFS on left, right DFS on right, and at each step make sure they agree
+
+        return (false); // TODO
+    }
+
+    @InterestingAlgorithm
     public static BinaryNode firstCommonAncestor (BinaryNode node1, BinaryNode node2) {
     	return (null); // TODO
     }
