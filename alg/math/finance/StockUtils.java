@@ -32,7 +32,7 @@ public class StockUtils {
         ArrayList<Integer> valleyIndices = new ArrayList<Integer>();
 
         for (int i = 0; i < prices.length; i++) {
-
+            // TODO
         }
         return (null);
     }
@@ -55,6 +55,7 @@ public class StockUtils {
      */
     @InterestingAlgorithm
     public static int [][]  getTopNPeakAndValleyIndicesSorted (int [] prices, int n) {
+        // TODO
         return (null);
     }
 
@@ -70,9 +71,6 @@ public class StockUtils {
             return (0);
 
         for (int i = 0; i < num.length; i++) {
-
-//            if (i == 1 && num[0] > num[1])
-//                return (num[0]);// special case
 
             if (i > 0 && i < num.length - 1) {
                 if (num [i - 1] < num [i] && num [i] > num[i + 1])

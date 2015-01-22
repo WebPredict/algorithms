@@ -8,4 +8,5 @@ package alg.math.prob;
  * To change this template use File | Settings | File Templates.
  */
 public class MarkovChain {
+    // collection of events with some probability of transitioning from one state to the next
 }

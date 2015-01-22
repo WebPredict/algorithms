@@ -155,7 +155,7 @@ public class WordUtils {
 
     /**
      * Takes camelCase or under_score word and produces "Camel Case"
-     * @param camelCaseWord
+     * @param camelOrUnderscore
      * @return
      */
     @InterestingAlgorithm

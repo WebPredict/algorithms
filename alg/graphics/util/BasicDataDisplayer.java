@@ -20,6 +20,7 @@ public class BasicDataDisplayer  extends JFrame {
     private Double maxY;
     private int sideOffset = 20;
     private double zoom = 1.5;
+    private boolean labels;
 
     public BasicDataDisplayer(Double [][][] dataPoints, int width, int height, double zoom) {
         super("Basic Line Drawing for " + dataPoints.length + " line(s) with zoom factor " + zoom);
@@ -69,7 +70,8 @@ public class BasicDataDisplayer  extends JFrame {
         double  scaleX = (double)(width - sideOffset * 2) / (xRange * (1d / zoom));
         double  scaleY = (double)(height - sideOffset * 2) / (yRange * (1d / zoom));
 
-        //g2d.drawString("ORIGIN", xOffset, yOffset);
+        if (labels)
+            g2d.drawString("ORIGIN", xOffset, yOffset);
 
         Color [] colors = new Color[] {Color.black, Color.blue, Color.red, Color.orange, Color.yellow, Color.green, Color.cyan, Color.pink, Color.magenta};
         for (int i = 0; i < dataPoints.length; i++) {
@@ -79,15 +81,17 @@ public class BasicDataDisplayer  extends JFrame {
 
                 double xCur = dataPoints[i][j][0] * scaleX;
                 double yCur = dataPoints[i][j][1] * scaleY;
-                //g2d.drawString(String.valueOf(i), xOffset + (int)xPrev, yOffset + (int)yPrev);
+
+                if (labels)
+                    g2d.drawString(String.valueOf(i), xOffset + (int)xPrev, yOffset + (int)yPrev);
 
                 //System.out.println("ith line: " + i + "from X: " + xPrev + " from Y: " + yPrev + " to X: " + xCur + " to Y: " + yCur);
 
                 g2d.setColor(colors [i % colors.length]);
                 g2d.drawLine(xOffset + (int)xPrev, yOffset + (int)yPrev, xOffset + (int)xCur, yOffset + (int)yCur);
 
-                //if (j == dataPoints.length - 1)
-                //    g2d.drawString("END " + i, xOffset + (int)xCur, yOffset + (int)yCur);
+                if (labels && j == dataPoints.length - 1)
+                   g2d.drawString("END " + i, xOffset + (int)xCur, yOffset + (int)yCur);
 
                 xPrev = xCur;
                 yPrev = yCur;

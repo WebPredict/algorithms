@@ -8,4 +8,6 @@ package alg.heap;
  * To change this template use File | Settings | File Templates.
  */
 public class BinomialHeap {
+    // A collection of binomial trees (trees with 0 - k children for tree of degree k)
+    // easy to merge trees
 }
