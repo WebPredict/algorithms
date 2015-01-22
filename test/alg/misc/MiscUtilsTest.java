@@ -29,6 +29,8 @@ public class MiscUtilsTest {
 
         String roman = WordUtils.toRomanNumeral(3434);
 
+        int fromRoman = WordUtils.fromRomanNumeral(roman);
+
         int [] values = {100,3,2,1};        //{1, 3, 2, 12, 10, 231, 112};
 
         int maxGap = MiscUtils.maximumGap(values);

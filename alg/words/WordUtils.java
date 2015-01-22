@@ -677,7 +677,73 @@ public class WordUtils {
      */
     @InterestingAlgorithm
     public static int fromRomanNumeral (String numeral) {
-        return (0); // TODO
+        if (numeral == null)
+            return (0);
+
+        int total = 0;
+
+        for (int i = 0; i < numeral.length(); i++) {
+            char c = numeral.charAt(i);
+            if (c == 'M') {
+                total += 1000;
+            }
+            else if (c == 'D') {
+                total += 500;
+            }
+            else if (c == 'C') {
+                if (i < numeral.length() - 1) {
+                    if (numeral.charAt(i + 1) == 'M') {
+                        i++;
+                        total += 900;
+                        continue;
+                    }
+                    else if (numeral.charAt(i + 1) == 'D') {
+                        i++;
+                        total += 400;
+                        continue;
+                    }
+                }
+                total += 100;
+            }
+            else if (c == 'L') {
+                total += 50;
+            }
+            else if (c == 'X') {
+                if (i < numeral.length() - 1) {
+                    if (numeral.charAt(i + 1) == 'C') {
+                        i++;
+                        total += 90;
+                        continue;
+                    }
+                    else if (numeral.charAt(i + 1) == 'L') {
+                        i++;
+                        total += 40;
+                        continue;
+                    }
+                }
+                total += 10;
+            }
+            else if (c == 'V') {
+                total += 5;
+            }
+            else if (c == 'I') {
+                if (i < numeral.length() - 1) {
+                    if (numeral.charAt(i + 1) == 'X') {
+                        i++;
+                        total += 9;
+                        continue;
+                    }
+                    else if (numeral.charAt(i + 1) == 'V') {
+                        i++;
+                        total += 4;
+                        continue;
+                    }
+                }
+                total += 1;
+            }
+        }
+
+        return (total);
     }
 
     /**
