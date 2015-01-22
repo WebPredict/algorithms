@@ -338,7 +338,18 @@ public class TreeUtils {
 
     @InterestingAlgorithm
     public static int compareTrees (BinaryNode tree1, BinaryNode tree2) {
-          return (0); // TODO
+        if (tree1 == null)
+            return (tree2 == null ? 0 : -1);
+        else if (tree2 == null)
+            return (tree1 == null ? 0 : 1);
+
+        int dataCompare = tree1.getData().compareTo(tree2.getData());
+        if (dataCompare != 0)
+            return (dataCompare);
+        int leftCompare = compareTrees(tree1.getLeft(), tree2.getLeft());
+        if (leftCompare != 0)
+            return (leftCompare);
+        return (compareTrees(tree1.getRight(), tree2.getRight()));
     }
 
     @InterestingAlgorithm

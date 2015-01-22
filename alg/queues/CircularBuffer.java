@@ -10,29 +10,43 @@ package alg.queues;
 public class CircularBuffer {
 
     private int []  buffer;
-    private int currentIdx;
+    private int writeIdx;
+    private int readIdx;
+    private boolean writeFlipped;
+    private boolean readFlipped;
 
     public CircularBuffer(int size) {
         buffer = new int[size];
     }
 
     public void write (int data) {
-        // TODO
-    }
+        if (isFull())
+            throw new RuntimeException("Buffer is full");
 
-    public void delete () {
-        // TODO
+        buffer[writeIdx++] = data;
+        if (writeIdx >= buffer.length) {
+            writeIdx = 0;
+            writeFlipped = !writeFlipped;
+        }
     }
 
     public int read () {
-        return (0); // TODO
+        if (isEmpty())
+            throw new RuntimeException("Buffer is empty");
+
+        int ret = buffer[readIdx++];
+        if (readIdx >= buffer.length) {
+            readIdx = 0;
+            readFlipped = !readFlipped;
+        }
+        return (ret);
     }
 
     public boolean  isEmpty () {
-        return (false); // TODO
+        return (readIdx == writeIdx && writeFlipped == readFlipped);
     }
 
     public boolean isFull () {
-         return (false); // TODO
+        return (readIdx == writeIdx && writeFlipped != readFlipped);
     }
 }
