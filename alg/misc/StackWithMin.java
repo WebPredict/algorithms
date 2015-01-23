@@ -4,22 +4,22 @@ import alg.queues.MinPriorityQueue;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
 public class StackWithMin<T extends Comparable> {
 
     private List<T> list = new ArrayList<T>();
-    private int     minIdx = -1;
+    private Stack<Integer> minIdxes = new Stack<Integer>();
 
     public StackWithMin () {
     }
 
     @InterestingAlgorithm
     public T    min () {
-        if (minIdx == -1)
+        if (minIdxes.empty())
             throw new RuntimeException("Empty stack");
 
-        T value = list.remove(minIdx);
-        return (value);
+        return (list.get(minIdxes.peek()));
     }
 
     @InterestingAlgorithm
@@ -30,32 +30,19 @@ public class StackWithMin<T extends Comparable> {
 
         T value = list.remove(size - 1);
 
-        // TODO: can we easily eliminate this linear search?
-        if (minIdx == size - 1) {
-            T newMin = null;
-            int newMinIdx = -1;
-            for (int i = 0; i < list.size(); i++) {
-                if (newMin == null) {
-                    newMin = list.get(i);
-                    newMinIdx = i;
-                }
-                else if (list.get(i).compareTo(newMin) < 0) {
-                    newMin = list.get(i);
-                    newMinIdx = i;
-                }
-            }
-            minIdx = newMinIdx;
+        if (minIdxes.peek() == size - 1) {
+            minIdxes.pop();
         }
         return (value);
     }
 
     @InterestingAlgorithm
     public void push (T value) {
-        if (minIdx == -1)
-            minIdx = 0;
+        if (minIdxes.empty())
+            minIdxes.push(0);
         else {
-            if (list.get(minIdx).compareTo(value) > 0) {
-                minIdx = list.size();
+            if (list.get(minIdxes.peek()).compareTo(value) > 0) {
+                minIdxes.push(list.size());
             }
         }
         list.add(value);

@@ -1,5 +1,7 @@
 package gen;
 
+import alg.words.WordUtils;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,7 +15,7 @@ import java.util.List;
  */
 public class App {
 
-    private AppConfig appConfig;
+    private AppConfig appConfig = new AppConfig();
     private TechnologyStack technologyStack;
     private String rootDir;
     private boolean generateCRUDByDefault = true;
@@ -37,6 +39,41 @@ public class App {
     private boolean generatePlaceholderText; // lorem ipsum for empty sections
     private boolean windows;
     private boolean hasImages;
+    private List<StaticPage> staticPages = new ArrayList<StaticPage>();
+    private List<String> staticMenuItems = new ArrayList<String>();
+
+    public void addPlaceholderPages (String [] names) {
+        for (String name : names) {
+            StaticPage sp = new StaticPage();
+            sp.setName(name);
+            sp.setTitle(WordUtils.capitalize(name));
+            sp.setContent("This is the " + WordUtils.capitalize(name) + " that needs to be filled in with some content. " +
+                    "This is just a placeholder to see how a bit of text looks.");
+        }
+    }
+
+    public void addStaticMenuItems (String [] names) {
+        for (String name : names) {
+            staticMenuItems.add(name);
+        }
+    }
+
+
+    public List<StaticPage> getStaticPages() {
+        return staticPages;
+    }
+
+    public void setStaticPages(List<StaticPage> staticPages) {
+        this.staticPages = staticPages;
+    }
+
+    public List<String> getStaticMenuItems() {
+        return staticMenuItems;
+    }
+
+    public void setStaticMenuItems(List<String> staticMenuItems) {
+        this.staticMenuItems = staticMenuItems;
+    }
 
     public void setHasImages (boolean hasImages) {
         this.hasImages = hasImages;

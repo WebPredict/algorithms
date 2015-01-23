@@ -1,5 +1,7 @@
 package gen;
 
+import alg.words.WordUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -53,6 +55,10 @@ public class Model extends Type {
 
     public boolean hasImages() {
         return imageFields.size() > 0;
+    }
+
+    public String   getPluralName() {
+        return WordUtils.pluralize(name);
     }
 
     public List<String> doPreprocessing (App app) {

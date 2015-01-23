@@ -349,6 +349,54 @@ public class ArrayUtils {
         return (retPermutations);
     }
 
+    /**
+     * List all combinations of k numbers from the set 1..n
+     * @param n
+     * @param k
+     * @return
+     */
+    @InterestingAlgorithm
+    public static List<List<Integer>> listCombinations (int n, int k) {
+
+        // TODO: try using a bit set
+
+//        if (num == null)
+//            return (null);
+//        else if (num.length == 0)
+//            return (new ArrayList<List<Integer>>());
+//        else if (num.length == 1) {
+//            List<List<Integer>> ret = new ArrayList<List<Integer>>();
+//            ArrayList<Integer> retArr = new ArrayList<Integer>();
+//            retArr.add(num [0]);
+//            ret.add(retArr);
+//            return (ret);
+//        }
+//
+//        int []  subArr = new int[num.length - 1];
+//        System.arraycopy(num, 1, subArr, 0, num.length - 1);
+//        List<List<Integer>>    subPermutations = listPermutations(subArr); // TODO fix to take an index to avoid this arrray copy
+//        List<List<Integer>>    retPermutations = new ArrayList<List<Integer>>();
+//
+//        for (int i = 0; i < subPermutations.size(); i++) {
+//            List<Integer> subPermutation = subPermutations.get(i);
+//            for (int j = 0; j < subPermutation.size(); j++) {
+//                ArrayList<Integer> curPerm = new ArrayList<Integer>();
+//                curPerm.addAll(subPermutation.subList(0, j));
+//                curPerm.add(num[0]);
+//                curPerm.addAll(subPermutation.subList(j, subPermutation.size()));
+//                retPermutations.add(curPerm);
+//            }
+//            ArrayList<Integer> lastPerm = new ArrayList<Integer>();
+//            lastPerm.addAll(subPermutation);
+//            lastPerm.add(num[0]);
+//            retPermutations.add(lastPerm);
+//        }
+//
+//        return (retPermutations);
+        return (null); // TODO
+    }
+
+
     @InterestingAlgorithm
     public static int []    interleave (int [] array1, int [] array2) {
         if (array1 == null)

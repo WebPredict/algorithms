@@ -5,6 +5,7 @@ import alg.arrays.Interval;
 import alg.math.MathUtils;
 import alg.math.finance.StockUtils;
 import alg.misc.MiscUtils;
+import alg.misc.StackWithMin;
 import alg.sort.SortUtils;
 import alg.strings.StringUtils;
 import alg.trees.TreeUtils;
@@ -24,6 +25,18 @@ import java.util.List;
 public class MiscUtilsTest {
 
     public static void main (String [] args) throws Exception {
+
+        StackWithMin<Integer> stackWithMin = new StackWithMin<Integer>();
+        stackWithMin.push(3);
+        int min = stackWithMin.min();
+
+        stackWithMin.push(4);
+        min = stackWithMin.min();
+        stackWithMin.push(5);
+        stackWithMin.push(1);
+        min = stackWithMin.min();
+        stackWithMin.pop();
+        min = stackWithMin.min();
 
         double value = MathUtils.evaluateArithmeticExpression("2 * (3 + ((4 - 2) + 1))");
 

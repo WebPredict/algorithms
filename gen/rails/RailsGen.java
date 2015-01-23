@@ -126,10 +126,10 @@ public class RailsGen extends Generator {
     public void generateStaticPages () throws Exception {
 
         generateHeader();
+        generateMainLayoutPage();
         generateFooter();
-        generateAboutPage();
+        generateCustomStaticPages();
         generateHomePage();
-        generateHelpPage();
         generateContactPage();
         generateNewsPage();
     }
@@ -167,21 +167,21 @@ public class RailsGen extends Generator {
     	StringUtils.addLine(buf, "<div class=\"nav-collapse\">");
     	StringUtils.addLine(buf, "<ul class=\"nav pull-right\">");
     	StringUtils.addLine(buf, "<% if signed_in? %>");
-    	//         StringUtils.addLine(buf, "<% if current_user.inquiries.any? %>");
-    	//         StringUtils.addLine(buf, "<li><%= link_to current_user.render_num_inquiries, root_path %></li>");
-    	//         StringUtils.addLine(buf, "<% else %>");
     	StringUtils.addLine(buf, "<li><%= link_to \"Dashboard\", root_path %></li>");
-    	//         StringUtils.addLine(buf, "<% end %>");
     	StringUtils.addLine(buf, "<% end %>");
     	StringUtils.addLine(buf, "<% if !signed_in? %>");
     	StringUtils.addLine(buf, "<form action=\"/listings\" class=\"navbar-search pull-right\">");
     	StringUtils.addLine(buf, "<input type=\"text\" class=\"search-query\" id=\"search\" name=\"search\" placeholder=\"Search\">");
     	StringUtils.addLine(buf, "</form>");
-    	// TODO: needs to be configurable
-    	StringUtils.addLine(buf, "<li><%= link_to \"About\", about_path %></li>");
-    	StringUtils.addLine(buf, "<% end %>");
-    	// TODO: needs to be configurable
 
+        // TODO: this is not going to work if these item_paths don't exist
+        for (String item : app.getStaticMenuItems()) {
+    	    StringUtils.addLine(buf, "<li><%= link_to \"" + WordUtils.capitalize(item) + "\", " + item + "_path %></li>");
+        }
+
+    	StringUtils.addLine(buf, "<% end %>");
+
+    	// TODO: needs to be configurable
         Model userModel = app.getUserModel();
         if (userModel != null) {
             String modelName = userModel.getName();
@@ -196,7 +196,7 @@ public class RailsGen extends Generator {
             StringUtils.addLine(buf, "<% end %>");
         }
 
-    	StringUtils.addLine(buf, "<li><%= link_to \"Help\", help_path %></li>");
+    	//StringUtils.addLine(buf, "<li><%= link_to \"Help\", help_path %></li>");
     	StringUtils.addLine(buf, "</ul>");
         HTMLUtils.closeDiv(buf);
         HTMLUtils.closeDiv(buf);
@@ -204,41 +204,23 @@ public class RailsGen extends Generator {
         HTMLUtils.closeDiv(buf);
 
     	FileUtils.write(buf, app.getWebAppDir() + "/app/views/layouts/_header.html.erb", true);
+    }
 
-    	buf = new StringBuilder();
+    public void generateMainLayoutPage () throws Exception {
+        StringBuilder buf = new StringBuilder();
 
-    	HTMLUtils.addRubyOutput(buf, "render 'layouts/header'");
+        HTMLUtils.addRubyOutput(buf, "render 'layouts/header'");
 
-        // TODO: this is the place to set out the site-wide layout, and render the sections in those side areas if any:
-        switch (app.getAppConfig().getLayout()) {
-            case ONE_COL:
-                break;
-
-            case ONE_COL_FIXED_WIDTH:
-                break;
-
-            case TWO_COL_THIN_LEFT:
-                break;
-
-            case TWO_COL_THIN_RIGHT:
-                break;
-
-            case TWO_COL_EVEN:
-                break;
-
-            case THREE_COL:
-                break;
-        }
-    	StringUtils.addLine(buf, "<div class=\"container\"> ");
-    	HTMLUtils.addRuby(buf, "flash.each do |key, value|");
-    	StringUtils.addLine(buf, "<div class=\"alert alert-<%= key %>\"><%= value %></div>  ");
-    	HTMLUtils.addRuby(buf, "end");
-    	HTMLUtils.addRubyOutput(buf, "yield");
+        StringUtils.addLine(buf, "<div class=\"container\"> ");
+        HTMLUtils.addRuby(buf, "flash.each do |key, value|");
+        StringUtils.addLine(buf, "<div class=\"alert alert-<%= key %>\"><%= value %></div>  ");
+        HTMLUtils.addRuby(buf, "end");
+        HTMLUtils.addRubyOutput(buf, "yield");
         HTMLUtils.closeDiv(buf);
         HTMLUtils.addRubyOutput(buf, "render 'layouts/footer'");
 
-    	FileUtils.replaceInFile(app.getWebAppDir() + "/app/views/layouts/application.html.erb", new String[]{"<%= yield %>"},
-    			new String [] {buf.toString()}, true, true);
+        FileUtils.replaceInFile(app.getWebAppDir() + "/app/views/layouts/application.html.erb", new String[]{"<%= yield %>"},
+                new String [] {buf.toString()}, true, true);
 
     }
 
@@ -252,38 +234,29 @@ public class RailsGen extends Generator {
         StringUtils.addLine(buf, "<nav>");
         StringUtils.addLine(buf, "<ul>");
 
-        // TODO make configurable list of footer items
-        StringUtils.addLine(buf, "<li><%= link_to \"About\", about_path %></li>");
-        StringUtils.addLine(buf, "<li><%= link_to \"Contact\", contact_path %></li>");
-        StringUtils.addLine(buf, "<li><%= link_to \"News\", news_path %></li>");
+        for (StaticPage page : app.getStaticPages()) {
+            // TODO make configurable list of footer items
+            StringUtils.addLine(buf, "<li><%= link_to \"" + page.getTitle() + "\", " + page.getName() + "_path %></li>");
+        }
         StringUtils.addLine(buf, "</ul>");
         StringUtils.addLine(buf, "</nav>");
         StringUtils.addLine(buf, "</footer>");
         FileUtils.write(buf, app.getWebAppDir() + "/app/views/layouts/_footer.html.erb", true);
     }
 
-    public void generateAboutPage () throws Exception {
-        StringBuilder buf = new StringBuilder();
-        HTMLUtils.addRuby(buf, "provide(:title, 'About')");
-        HTMLUtils.addH1(buf, "About " + WordUtils.capitalize(app.getName()));
+    public void generateCustomStaticPages () throws Exception {
 
-        // TODO make configurable
-        HTMLUtils.addParagraph(buf, "This is the about section to be filled in.");
-        HTMLUtils.addParagraph(buf, "This is the about section second paragraph to be filled in.");
+        for (StaticPage page : app.getStaticPages()) {
+            StringBuilder buf = new StringBuilder();
+            String title = page.getTitle();
+            String name = page.getName();
+            HTMLUtils.addRuby(buf, "provide(:title, '" + title + "')");
+            HTMLUtils.addH1(buf, title + " Placeholder Page");
 
-        FileUtils.write(buf, app.getWebAppDir() + "/app/views/static_pages/about.html.erb", true);
-    }
+            HTMLUtils.addParagraph(buf, page.getContent());
 
-    public void generateHelpPage () throws Exception {
-        StringBuilder buf = new StringBuilder();
-        HTMLUtils.addRuby(buf, "provide(:title, 'Help')");
-        HTMLUtils.addH1(buf, "Help for " + WordUtils.capitalize(app.getName()));
-
-        // TODO make configurable
-        HTMLUtils.addParagraph(buf, "This is the help item to be filled in.");
-        HTMLUtils.addParagraph(buf, "This is the second help item to be filled in.");
-
-        FileUtils.write(buf, app.getWebAppDir() + "/app/views/static_pages/help.html.erb", true);
+            FileUtils.write(buf, app.getWebAppDir() + "/app/views/static_pages/" + name + ".html.erb", true);
+        }
     }
 
     public void generateNewsPage () throws Exception {
@@ -325,7 +298,7 @@ public class RailsGen extends Generator {
         Model  frontSearchModel = app.getFrontPageSearchModel();
 
         if (frontSearchModel != null) {
-            String plural =  WordUtils.pluralize(frontSearchModel.getName());
+            String plural =  frontSearchModel.getPluralName();
             HTMLUtils.addRubyOutput(buf, "<%= link_to \"Search " + plural + "\", " + plural + "_path, class: \"btn btn-large btn-primary\"");
         }
         HTMLUtils.addRubyOutput(buf, "<%= link_to \"Signup!\", signup_path, class: \"btn btn-large\"");
@@ -342,7 +315,7 @@ public class RailsGen extends Generator {
     }
 
     public void generateTableFor(StringBuilder buf, Model model) {
-        String pluralModelList = WordUtils.pluralize(model.getName());
+        String pluralModelList = model.getPluralName();
 
         HTMLUtils.addRuby(buf, "if @" + pluralModelList + ".any?");
         StringUtils.addLine(buf, "<table class=\"table table-striped\">");
@@ -363,12 +336,12 @@ public class RailsGen extends Generator {
         }
         HTMLUtils.addRubyOutput(buf, "render @" + pluralModelList + "_rows");
 
-        HTMLUtils.addRubyOutput(buf, "will_paginate @" + WordUtils.pluralize(model.getName()));
+        HTMLUtils.addRubyOutput(buf, "will_paginate @" + model.getPluralName());
         HTMLUtils.addRuby(buf, "end");
     }
 
     public void generateTablePartial(StringBuilder buf, Model model) {
-        String pluralModelList = WordUtils.pluralize(model.getName());
+        String pluralModelList = model.getPluralName();
         String modelName = model.getName();
 
         ArrayList<Field> fields = model.getFields();
@@ -526,11 +499,11 @@ public class RailsGen extends Generator {
         StringBuilder buf = new StringBuilder();
 
         Model       userModel = app.getUserModel();
-        String      pluralName = WordUtils.pluralize(userModel.getName());
+        String      pluralName = userModel.getPluralName();
         List<Model> models = app.getModels();
 
         for (Model model : models) {
-            tabbed(buf, "resources :" + model.getName() + " do");
+            tabbed(buf, "resources :" + model.getPluralName() + " do");
 
             ArrayList<Rel>  rels = model.getRelationships();
 
@@ -539,7 +512,7 @@ public class RailsGen extends Generator {
                 for (int i = 0; i < rels.size(); i++) {
                     Rel rel = rels.get(i);
                     if (rel.getRelType().equals(RelType.ONE_TO_MANY)) {
-                        s += ":" + WordUtils.pluralize(rel.getModel().getName());
+                        s += ":" + rel.getModel().getPluralName();
                         if (i < rels.size() - 1)
                             s += ", ";
                     }
@@ -731,22 +704,22 @@ public class RailsGen extends Generator {
                         RelType relType = rel.getRelType();
                         Model   relModel = rel.getModel();
                         if (relType.equals(RelType.ONE_TO_MANY)) {
-                            String  toAdd =  "has_many :" + WordUtils.pluralize(relModel.getName());
+                            String  toAdd =  "has_many :" + relModel.getPluralName();
                             if (rel.isDependent())
                                 toAdd += ", dependent: :destroy";
 
                             StringUtils.addTabbedLine(buf, toAdd);
                         }
                         else if (relType.equals(RelType.MANY_TO_ONE)) {
-                            tabbed(buf, "belongs_to :" + WordUtils.pluralize(relModel.getName()));
+                            tabbed(buf, "belongs_to :" + relModel.getPluralName());
                         }
                         else if (relType.equals(RelType.ONE_TO_ONE)) {
                             tabbed(buf, "has_one :" + relModel.getName());
                         }
                         else if (relType.equals(RelType.MANY_TO_MANY)) {
-                            String  toAdd =  "has_many :" + WordUtils.pluralize(relModel.getName());
+                            String  toAdd =  "has_many :" + relModel.getPluralName();
                             if (rel.getThrough() != null) {
-                                toAdd += ", through: " + WordUtils.pluralize(rel.getThrough().getName());
+                                toAdd += ", through: " + rel.getThrough().getPluralName();
                             }
                             tabbed(buf, toAdd);
                         }
@@ -880,8 +853,8 @@ public class RailsGen extends Generator {
 
     public void generateShowView (Model model) throws Exception {
 
-        String name = model.getName();
-        String names = WordUtils.pluralize(name);
+        String              name = model.getName();
+        String              names = model.getPluralName();
         ArrayList<Field>    fields = model.getFields();
         ArrayList<Rel>      rels = model.getRelationships();
 
@@ -1016,7 +989,7 @@ public class RailsGen extends Generator {
     public void generateListView (Model model) throws Exception {
 
         String name = model.getName();
-        String names = WordUtils.pluralize(name);
+        String names = model.getPluralName();
         ArrayList<Field>    fields = model.getFields();
         ArrayList<Rel>      rels = model.getRelationships();
 
@@ -1078,7 +1051,7 @@ public class RailsGen extends Generator {
     public void generateEditView (Model model) throws Exception {
 
         String name = model.getName();
-        String names = WordUtils.pluralize(name);
+        String names = model.getPluralName();
         ArrayList<Field>    fields = model.getFields();
         ArrayList<Rel>      rels = model.getRelationships();
 
@@ -1356,7 +1329,7 @@ public class RailsGen extends Generator {
             for (Model model : models) {
                 String              name = model.getName();
                 String              capName = WordUtils.capitalize(name);
-                String              names = WordUtils.pluralize(name);
+                String              names = model.getPluralName();
                 ArrayList<Rel>      rels = model.getRelationships();
 
                 StringBuilder buf = new StringBuilder();
@@ -1388,7 +1361,7 @@ public class RailsGen extends Generator {
 
                         switch (relType) {
                             case ONE_TO_MANY:
-                                showMethod.add("@" + WordUtils.pluralize(relModelName) + " = @" + name + "." + WordUtils.pluralize(relModelName) + ".paginate(page: params[:page])");
+                                showMethod.add("@" + relModel.getPluralName() + " = @" + name + "." + relModel.getPluralName() + ".paginate(page: params[:page])");
                                 break;
 
                             case ONE_TO_ONE:
@@ -1396,8 +1369,8 @@ public class RailsGen extends Generator {
                                 break;
 
                             case MANY_TO_MANY:
-                                showMethod.add("@" + WordUtils.pluralize(relModelName) + " = @" + name +
-                                        "." + WordUtils.pluralize(relModelName) + ".paginate(page: params[:page])");  // TODO: verify this
+                                showMethod.add("@" + relModel.getPluralName() + " = @" + name +
+                                        "." + relModel.getPluralName() + ".paginate(page: params[:page])");  // TODO: verify this
                                 break;
                         }
                     }
@@ -1525,7 +1498,7 @@ public class RailsGen extends Generator {
                 StringUtils.addLine(buf, "class " + className + " < ActiveRecord::Migration");
 
                 tabbed(buf, "def create");
-                tabbed(buf, "create_table :" + WordUtils.pluralize(name) + " do |t|", 2);
+                tabbed(buf, "create_table :" + model.getPluralName() + " do |t|", 2);
 
                 if (fields != null) {
                     for (Field field : fields) {

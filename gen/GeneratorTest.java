@@ -50,6 +50,8 @@ public class GeneratorTest {
         app.setRootDir(windows ? "C:/Users/jsanchez/Downloads/apps" : "/Users/jeffreysanchez/rails_projects/generated");
         app.setName("sales");
         app.setTagLine("Sell Sell Sell");
+        app.addPlaceholderPages(new String[] {"about", "help", "news", "contact"});
+        app.addStaticMenuItems(new String[] {"about", "news", "help"});
 
         AppConfig appConfig = new AppConfig();
         appConfig.setColor1("blue");
@@ -83,5 +85,40 @@ public class GeneratorTest {
          * Layout is???
          * What's in sidebar?
          */
+    }
+
+    public static App initialApp (String name, String tagline) throws Exception {
+
+        boolean windows = false;
+        App app = new App();
+        app.setWindows(windows);
+        app.setTechnologyStack(TechnologyStack.rails);
+        app.setRootDir(windows ? "C:/Users/jsanchez/Downloads/apps" : "/Users/jeffreysanchez/rails_projects/generated");
+        app.setName(name);
+        app.setTagLine(tagline);
+        app.addPlaceholderPages(new String[] {"about", "help"});
+        app.addStaticMenuItems(new String[] {"about"});
+
+        AppConfig appConfig = app.getAppConfig();
+        appConfig.setColor1("blue");
+        appConfig.setColor2("white");
+        appConfig.setColor3("green");
+        //appConfig.setSearch(true);
+        //appConfig.setNeedsAuth(true);
+        return (app);
+    }
+
+    public static void flylineSite () throws Exception {
+        App app = initialApp("flyline", "Activity in the New England Paragliding Community");
+        Model postModel = Model.parseModel("post: name required, email required, content long_string required, site fixed_list(mt_tom|plymouth|mt_washington|welfleet)");
+
+        app.setModels(new Model[] {postModel});
+        app.getAppConfig().setColor1("blue");
+        app.getAppConfig().setColor2("white");
+        app.setJumbotronImageUrl("http://flickr.com/something/MtTom.jpg");
+
+        //app.setTopLevelModels("post"); -- should be unnecessary if there's only 1 model
+        app.setFrontPageListModel(postModel);
+        Generator.createAndGen(app, true);
     }
 }
