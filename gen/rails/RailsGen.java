@@ -6,6 +6,7 @@ import alg.web.HTMLUtils;
 import alg.words.WordUtils;
 import gen.*;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,7 +49,10 @@ public class RailsGen extends Generator {
             generateSharedPages();
             generateHelperMethods();
             generateAssets();
-            generateUpgrades();
+
+           if (app.isGenerateUpgrades())
+                generateUpgrades();
+
             generateRoutes();
             if (app.getAppConfig().isNeedsAuth())
                 generateMailers();
@@ -296,7 +300,7 @@ public class RailsGen extends Generator {
             if (topLevelModelsInTabs) {
             	HTMLUtils.addRubyOutput(buf, "tabs_tag do |tab|");
             	for (Model model : app.getTopLevelModels()) {
-            		HTMLUtils.addRubyOutput(buf, "tab." + model.getName() + "'" + 
+            		HTMLUtils.addRubyOutput(buf, "tab." + model.getName() + "' " +
             				model.getCapName() + "', " + model.getName() + "_path");
             	}
             	HTMLUtils.addRuby(buf, "end");
@@ -331,9 +335,9 @@ public class RailsGen extends Generator {
 
         if (frontSearchModel != null) {
             String plural =  frontSearchModel.getPluralName();
-            HTMLUtils.addRubyOutput(buf, "<%= link_to \"Search " + plural + "\", " + plural + "_path, class: \"btn btn-large btn-primary\"");
+            HTMLUtils.addRubyOutput(buf, "link_to \"Search " + plural + "\", " + plural + "_path, class: \"btn btn-large btn-primary\"");
         }
-        HTMLUtils.addRubyOutput(buf, "<%= link_to \"Signup!\", signup_path, class: \"btn btn-large\"");
+        HTMLUtils.addRubyOutput(buf, "link_to \"Signup!\", signup_path, class: \"btn btn-large\"");
         HTMLUtils.closeDiv(buf);
         HTMLUtils.addLineBreak(buf);
 
@@ -528,14 +532,20 @@ public class RailsGen extends Generator {
     }
 
     public void generateRoutes () throws Exception {
-        StringBuilder buf = new StringBuilder();
+        //StringBuilder buf = new StringBuilder();
 
         Model       userModel = app.getUserModel();
         String      pluralName = userModel.getPluralName();
         List<Model> models = app.getModels();
 
+        List<String> routeLines = FileUtils.getLinesCreateIfEmpty(app.getWebAppDir() + "/config/routes.rb");
+
+        int index = 2;
         for (Model model : models) {
-            tabbed(buf, "resources :" + model.getPluralName() + " do");
+            boolean didIt = insertTabbedIfNotThere(routeLines, "resources :" + model.getPluralName() + " do", index++);
+
+            if (!didIt)
+                continue;
 
             ArrayList<Rel>  rels = model.getRelationships();
 
@@ -550,33 +560,35 @@ public class RailsGen extends Generator {
                     }
                 }
                 if (!s.equals("get "))
-                    tabbed(buf, s, 2);
+                    insertTabbed(routeLines, "\t" + s, index++);
             }
-            tabbed(buf, "end");
+            insertTabbed(routeLines, "end", index++);
         }
 
-        tabbed(buf, "resources :sessions, only: [:new, :create, :destroy]");
+        insertTabbedIfNotThere(routeLines, "resources :sessions, only: [:new, :create, :destroy]", index++);
 
-        StringUtils.addLineBreak(buf);
-        tabbed(buf, "root to: 'static_pages#home'");
-        StringUtils.addLineBreak(buf);
+        //StringUtils.addLineBreak(buf);
+        insertTabbedIfNotThere(routeLines, "root to: 'static_pages#home'", index++);
+        //StringUtils.addLineBreak(buf);
 
-        tabbed(buf, "match '/help', to: 'static-pages#help'");
-        tabbed(buf, "match '/about', to: 'static-pages#about'");
-        tabbed(buf, "match '/news', to: 'static-pages#news'");
-        tabbed(buf, "match '/contact', to: 'static-pages#contact'");
-        tabbed(buf, "match '/help', to: 'static-pages#help'");
-        StringUtils.addLineBreak(buf);
+        for (StaticPage page : app.getStaticPages()) {
+            String pageName = page.getName();
+            insertTabbedIfNotThere(routeLines, "get '/" + pageName + "', to: 'static_pages#" + pageName + "'", index++);
+        }
 
-        tabbed(buf, "match '/submitcontact', to: 'static-pages#submitcontact'");
-        tabbed(buf, "match '/signup', to: '" + pluralName + "#new'");
-        tabbed(buf, "match '/send_password', to: '" + pluralName + "#send_password'");
-        tabbed(buf, "match '/submit_send_password', to: '" + pluralName + "#submit_send_password'");
-        tabbed(buf, "match '/signin', to: 'sessions#new'");
-        tabbed(buf, "match '/signout', to: 'sessions#destroy', via: :delete");
+        //StringUtils.addLineBreak(buf);
+
+        insertTabbedIfNotThere(routeLines, "match '/submitcontact', to: 'static_pages#submitcontact', via: [:get, :post]", index++);
+        insertTabbedIfNotThere(routeLines, "match '/signup', to: '" + pluralName + "#new', via: [:get, :post]", index++);
+        insertTabbedIfNotThere(routeLines, "match '/send_password', to: '" + pluralName + "#send_password', via: [:get, :post]", index++);
+        insertTabbedIfNotThere(routeLines, "match '/submit_send_password', to: '" + pluralName + "#submit_send_password', via: [:get, :post]", index++);
+        insertTabbedIfNotThere(routeLines, "match '/signin', to: 'sessions#new', via: [:get, :post]", index++);
+        insertTabbedIfNotThere(routeLines, "match '/signout', to: 'sessions#destroy', via: :delete", index++);
 
         // TODO: don't reinsert this if it's already done to routes.rb:
-        FileUtils.insertAtInFile(app.getWebAppDir() + "/config/routes.rb", 2, new String[] {buf.toString()}, true);
+        //FileUtils.insertAtInFile(app.getWebAppDir() + "/config/routes.rb", 2, new String[] {buf.toString()}, true);
+
+        FileUtils.putLines(routeLines, app.getWebAppDir() + "/config/routes.rb");
 
         /**
         *
@@ -641,10 +653,11 @@ public class RailsGen extends Generator {
 
         methodLines.add("ret = ''");
         methodLines.add("if website != nil");
-        methodLines.add("if website[0..7] == \"http://\" ");
-        methodLines.add("ret = website");
-        methodLines.add("else");
-        methodLines.add(" ret = \"http://\" + website ");
+        methodLines.add("\tif website[0..7] == \"http://\" ");
+        methodLines.add("\t\tret = website");
+        methodLines.add("\telse");
+        methodLines.add("\t\tret = \"http://\" + website ");
+        methodLines.add("\tend");
         methodLines.add("end");
 
         addMethod(buf, "render_website(website)", methodLines);
@@ -684,7 +697,10 @@ public class RailsGen extends Generator {
                 addStyle(new String[] {".hero-unit {", "\tbackground-image: url('" + app.getJumbotronImageUrl() + "');", "}"});
         }
 
-        runCommandInApp("rake assets precompile");
+        // TODO: not sure we need to do this if running with --without production:
+        //String 	railsCmd = app.isWindows() ? "C:/RailsInstaller/Ruby2.1.0/bin/rake.bat" : "rake";
+
+        //runCommandInApp(railsCmd + " assets precompile");
     }
 
     public void addStyle (String [] styleInfo) throws Exception {
@@ -731,7 +747,9 @@ public class RailsGen extends Generator {
                         }
                     }
                 }
-                tabbed(buf, attrs);
+
+                // Seems like we don't need this anymore:
+                //tabbed(buf, attrs);
 
                 if (model.isSecure()) {
                     tabbed(buf, "has_secure_password");
@@ -832,8 +850,8 @@ public class RailsGen extends Generator {
                     }
 
                     if (model.isSecure()) {
-                        tabbed(buf, "validates :password, presence: true, :if => should_validate_password?, length: { minimum: 6 }");
-                        tabbed(buf, "validates :password_confirmation, presence: true, :if => should_validate_password?");
+                        tabbed(buf, "validates :password, presence: true, :if => :should_validate_password?, length: { minimum: 6 }");
+                        tabbed(buf, "validates :password_confirmation, presence: true, :if => :should_validate_password?");
                         StringUtils.addLineBreak(buf);
 
                         tabbed(buf, "def should_validate_password?");
@@ -854,7 +872,7 @@ public class RailsGen extends Generator {
 
                 tabbed(buf, "private");
                 if (model.isSecure()) {
-                    tabbed(buf, "create_remember_token", 2);
+                    tabbed(buf, "def create_remember_token", 2);
                     tabbed(buf, "self.remember_token = SecureRandom.urlsafe_base64", 3);
                     tabbed(buf, "end", 2);
                 }
@@ -1499,6 +1517,77 @@ public class RailsGen extends Generator {
 
             }
         }
+        generateStaticPagesController();
+    }
+
+    public void generateStaticPagesController () throws Exception {
+
+        StringBuilder buf = new StringBuilder();
+        StringUtils.addLine(buf, "class StaticPagesController < ApplicationController");
+        tabbed(buf, "protect_from_forgery");
+        tabbed(buf, "include SessionsHelper");
+        tabbed(buf, "helper_method :sort_column, :sort_direction");
+
+        StringUtils.addLineBreak(buf);
+
+        String [] frontContent = new String[] {""};
+
+        Model frontListModel = app.getFrontPageListModel();
+        if (frontListModel != null) {
+            frontContent = new String []
+                    {"query = \"(disabled = 'f' or disabled is null)\"",
+                            "paramarr = []",
+                            "",
+                            "condarr = [query]",
+                            "condarr.concat(paramarr)",
+                            "@" + frontListModel.getPluralName() + " = " + frontListModel.getCapName() + ".paginate(page: params[:page])"
+                     //       "@" + frontListModel.getPluralName() + " = " + frontListModel.getCapName() + ".paginate(:page => params[:page], per_page: 10, :conditions => condarr, :order => sort_column + \" \" + sort_direction)"};
+                    };
+
+        }
+        addMethod(buf, "home", frontContent);
+
+        for (StaticPage page : app.getStaticPages()) {
+            addMethod(buf, page.getName(), new String[] {""});
+        }
+
+        // TODO: needs to be configurable
+        frontContent = new String[] {"UserMailer.contact_admin(params[:email], params[:name], params[:comment]).deliver",
+        "flash[:success] = \"Thanks for your feedback... we will review it soon.\"",
+        "redirect_to root_path"};
+        addMethod(buf, "submitcontact", frontContent);
+
+
+        tabbed(buf, "private");
+        addMethod(buf, "sort_column", new String[] {frontListModel.getCapName() + ".column_names.include?(params[:sort]) ? params[:sort] : \"created_at\""});
+        addMethod(buf, "sort_direction", new String[] {"%w[asc desc].include?(params[:direction]) ? params[:direction] : \"desc\""});
+
+        StringUtils.addLine(buf, "end");
+
+        FileUtils.write(buf, app.getWebAppDir() + "/app/controllers/static_pages_controller.rb", true);
+
+        /**
+         * class StaticPagesController < ApplicationController
+         protect_from_forgery
+
+         def home
+         if !signed_in?
+         query = "(disabled = 'f' or disabled is null)"
+         paramarr = []
+
+         condarr = [query]
+         condarr.concat(paramarr)
+
+         @listings = Listing.paginate(:page => params[:page], per_page: 10, :conditions => condarr, :order => sort_column + " " + sort_direction)
+         else
+         @listings = current_breeder.listings.paginate(:page => params[:page], per_page: 10, :order => sort_column + " " + sort_direction)
+         end
+
+         end
+
+         def articles
+         end
+         */
     }
 
     public String getRailsType (Type type) {
@@ -1547,7 +1636,7 @@ public class RailsGen extends Generator {
                 String className = "Create" + upperPluralName;
                 StringUtils.addLine(buf, "class " + className + " < ActiveRecord::Migration");
 
-                tabbed(buf, "def create");
+                tabbed(buf, "def change");
                 tabbed(buf, "create_table :" + model.getPluralName() + " do |t|", 2);
 
                 if (fields != null) {
@@ -1568,16 +1657,27 @@ public class RailsGen extends Generator {
                 tabbed(buf, "end");
                 StringUtils.addLine(buf, "end");
 
-                String fileName = String.valueOf(System.currentTimeMillis()) + "_create_" + name + ".rb";
+                String endFileName = "_create_" + WordUtils.pluralize(name) + ".rb";
+
+                File f = FileUtils.fileEndingIn(app.getWebAppDir() + "/db/migrate/", endFileName);
+
+                if (f != null) {
+                    f.delete();
+                }
+
+                String fileName = String.valueOf(System.currentTimeMillis()) + endFileName;
                 FileUtils.write(buf, app.getWebAppDir() + "/db/migrate/" + fileName, true);
             }
         }
 
-        runCommandInApp("bundle exec rake db:migrate");
+        String 	railsCmd = app.isWindows() ? "C:/RailsInstaller/Ruby2.1.0/bin/bundle.bat" : "bundle";
+
+        //runCommandInApp(railsCmd + " exec rake db:migrate");
     }
 
     private void runCommandInApp (String command) throws Exception {
-        if (!app.isWindows()) {
+        if (true) {
+        //if (!app.isWindows()) {
             String [] cmd = command.split(" ");
             String result = runCommandWithEnv(app.getWebAppDir(), cmd, null);
             
@@ -1587,7 +1687,37 @@ public class RailsGen extends Generator {
 
     private void addGem (List<String> gemfileLines, String gemName) {
         String toAdd =  "gem '" + gemName + "'";
+
+        // TODO: fix inefficiency
+        for (String line : gemfileLines) {
+            if (toAdd.equals(line))
+                return; // don't add it again
+        }
         gemfileLines.add(toAdd);
+    }
+
+    private boolean lineExists (List<String> lines, String toAdd) {
+        for (String line : lines) {
+            if (toAdd.equals(line))
+                return (true);
+        }
+        return (false);
+    }
+
+    private boolean insertTabbedIfNotThere (List<String> lines, String toAdd, int index) {
+        toAdd = "\t" + toAdd;
+        if (!lineExists(lines, toAdd)) {
+            lines.add(index, toAdd);
+            return (true);
+        }
+        else
+            return (false);
+    }
+
+    private void insertTabbed (List<String> lines, String toAdd, int index) {
+        toAdd = "\t" + toAdd;
+
+        lines.add(index, toAdd);
     }
 
     private void addGem (List<String> gemfileLines, String gemName, String version, boolean exact) {
@@ -1601,6 +1731,32 @@ public class RailsGen extends Generator {
         gemfileLines.add(toAdd);
     }
 
+    private void addGemToGroup (List<String> gemfileLines, String groupName, String gemName, String version, boolean exact) {
+        String toAdd =  "\tgem '" + gemName + "'" + (version == null ? "" : ", '" + (exact ? "" : "~> ") + version + "'");
+
+        int insertIdx = -1;
+        for (int i = 0; i < gemfileLines.size(); i++) {
+            if (gemfileLines.get(i).equals("group :" + groupName + " do")) {
+                insertIdx = i;
+                break;
+            }
+        }
+
+        if (insertIdx == -1) {
+            gemfileLines.add("group :" + groupName + " do");
+            gemfileLines.add(toAdd);
+            gemfileLines.add("end");
+            return;
+        }
+
+        // TODO: fix inefficiency
+        for (int i = insertIdx; i < gemfileLines.size(); i++) {
+            if (toAdd.equals(gemfileLines.get(i)))
+                return; // don't add it again
+        }
+        gemfileLines.add(insertIdx + 1, toAdd);
+    }
+
     public void generateGems () throws Exception {
 
         /**
@@ -1609,8 +1765,8 @@ public class RailsGen extends Generator {
         List<String> gemfileLines = FileUtils.getLinesCreateIfEmpty(app.getWebAppDir() + "/Gemfile");
 
         // Heroku stuff:
-        addGem(gemfileLines, "pg");        
-        //addGem(gemfileLines, "rails_12factor");
+        addGemToGroup(gemfileLines, "production", "pg", "0.17.1", false);
+        addGemToGroup(gemfileLines, "production", "rails_12factor", "0.0.2", false);
         
 //         FileUtils.insertAfterOrAtEnd(gemfileLines, new String[] {"group :production do"},
 //                new String[] {"gem 'pg',     '0.17.1'", "gem 'rails_12factor',      '0.0.2'"}, true, true);
@@ -1621,23 +1777,25 @@ public class RailsGen extends Generator {
 
         // if using AWS for images:
         if (app.hasImages()) {
-        	addGem(gemfileLines, "paperclip");
+        	//addGem(gemfileLines, "paperclip");
+            addGem(gemfileLines, "carrierwave");
             addGem(gemfileLines, "fog");
         }
 
-        //addGem(gemfileLines, "carrierwave")
         addGem(gemfileLines, "actionmailer");
         addGem(gemfileLines, "coderay");
         addGem(gemfileLines, "tabs_on_rails");
         addGem(gemfileLines, "twitter-bootstrap-rails");
-        addGem(gemfileLines, "bcrypt-ruby", "3.0.0", false);
-        addGem(gemfileLines, "will_paginate", "3.0.3", true);
+        addGem(gemfileLines, "bcrypt", "3.1.7", false);
+        addGem(gemfileLines, "will_paginate", "3.0.5", false);      //gem 'will_paginate', '~> 3.0.5'
         addGem(gemfileLines, "bootstrap-will_paginate", "0.0.6", true);
         addGem(gemfileLines, "faker", "1.0.1", true);
 
         FileUtils.putLines(gemfileLines, app.getWebAppDir() + "/Gemfile");
 
-        runCommandInApp("bundle install --without production");
+        String 	railsCmd = app.isWindows() ? "C:/RailsInstaller/Ruby2.1.0/bin/bundle.bat" : "bundle";
+
+        runCommandInApp(railsCmd + " install --without production");
         
         //String result = runCommand(app.getRootDir(), "bundle", "install", "-without", "production");
     	//System.out.println(result);

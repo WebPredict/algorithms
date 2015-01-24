@@ -326,6 +326,20 @@ public class FileUtils {
         write(buf.toString(), file, createSubdirsIfNeeded);
     }
 
+    public static File      fileEndingIn (String dir, String fileName) throws Exception {
+        File dirFile = new File(dir);
+        File [] files = dirFile.listFiles();
+        if (files == null)
+            return (null);
+
+        for (File file : files) {
+            if (file.getName().endsWith(fileName)) {
+                return (file);
+            }
+        }
+        return (null);
+    }
+
     /**
      *
      * @param buf

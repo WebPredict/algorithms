@@ -38,7 +38,7 @@ public class GeneratorTest {
     }
 
     public static void main (String [] args) throws Exception {
-    	boolean windows = false;
+    	boolean windows = true;
         //salesTest(windows);
         interviewSite(windows);
     }
@@ -96,8 +96,8 @@ public class GeneratorTest {
         app.setRootDir(windows ? "C:/Users/jsanchez/Downloads/apps" : "/Users/jeffreysanchez/rails_projects/generated");
         app.setName(name);
         app.setTagLine(tagline);
-        app.addPlaceholderPages(new String[] {"about", "help"});
-        app.addStaticMenuItems(new String[] {"about"});
+        //app.addPlaceholderPages(new String[] {"about", "help"});
+        //app.addStaticMenuItems(new String[] {"about"});
 
         AppConfig appConfig = app.getAppConfig();
         appConfig.setColor1("blue");
@@ -142,9 +142,10 @@ public class GeneratorTest {
 
     public static void interviewSite (boolean windows) throws Exception {
         App app = initialApp("TechReviewNow", "The Interview Q&A Repository", windows);
+        app.setGenerateUpgrades(false);
         // TODO: need to have a way to indicate when collections are readonly
         Model [] models = Model.parseModels(new String[] {
-                "user: username required, email required, password, premium boolean, avatar image, has_many tests, has_many questions", // TODO fix, has_many test.results", // means pull it in for display
+                "user: username required, email required, password, premium boolean, has_many tests, has_many questions", // TODO fix, has_many test.results", // means pull it in for display
                 "test: name required, description long_string, has_many questions, difficulty fixed_list(low|medium|high), has_many results",
                 "employer: name required, description long_string, has_many users, owns_many tests",
                 "result: has_one test, has_one user, score computed(float)", // means generate display but don't store it

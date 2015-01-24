@@ -42,6 +42,15 @@ public class App {
     private boolean hasImages;
     private List<StaticPage> staticPages = new ArrayList<StaticPage>();
     private List<String> staticMenuItems = new ArrayList<String>();
+    private boolean generateUpgrades;
+
+    public boolean isGenerateUpgrades() {
+        return generateUpgrades;
+    }
+
+    public void setGenerateUpgrades(boolean generateUpgrades) {
+        this.generateUpgrades = generateUpgrades;
+    }
 
     public void addPlaceholderPages (String [] names) {
         for (String name : names) {
@@ -50,6 +59,7 @@ public class App {
             sp.setTitle(WordUtils.capitalize(name));
             sp.setContent("This is the " + WordUtils.capitalize(name) + " that needs to be filled in with some content. " +
                     "This is just a placeholder to see how a bit of text looks.");
+            staticPages.add(sp);
         }
     }
 
