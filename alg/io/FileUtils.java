@@ -76,6 +76,37 @@ public class FileUtils {
         return (didIt);
     }
 
+    private static boolean lineExists (List<String> lines, String toAdd) {
+        for (String line : lines) {
+            if (toAdd.equals(line))
+                return (true);
+        }
+        return (false);
+    }
+
+    public static boolean insertAfterInFileIfNotExists (String filePath, String markerLine, String additionalLine, boolean onlyFirstInstance,
+                                             boolean fromTheStart) throws Exception {
+
+        List<String> fileLines = getLines(filePath);
+
+        if (lineExists(fileLines, additionalLine))
+            return (false);
+
+        boolean didIt = insertAfter(fileLines, new String[] {markerLine}, new String[] {additionalLine}, onlyFirstInstance, fromTheStart);
+
+        if (didIt)
+            putLines(fileLines, filePath);
+
+        return (didIt);
+    }
+
+    public static boolean copyTextFile (String from, String to) throws Exception {
+        List<String> fileLines = getLines(from);
+
+        putLines(fileLines, to);
+        return (true);
+    }
+
     public static boolean insertAtInFile (String filePath, int lineNum, String [] additionalLines,
                                              boolean fromTheStart) throws Exception {
 

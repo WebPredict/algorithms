@@ -171,10 +171,10 @@ public class RailsGen extends Generator {
     	StringUtils.addLine(buf, "<%= link_to raw(\"<span style='color: #9999ff'>" + app.getTitle() + "</span>\"), root_path, id: \"logo\" %>");
     	StringUtils.addLine(buf, "<div class=\"nav-collapse\">");
     	StringUtils.addLine(buf, "<ul class=\"nav pull-right\">");
-    	StringUtils.addLine(buf, "<% if signed_in? %>");
+    	StringUtils.addLine(buf, "<% if logged_in? %>");
     	StringUtils.addLine(buf, "<li><%= link_to \"Dashboard\", root_path %></li>");
     	StringUtils.addLine(buf, "<% end %>");
-    	StringUtils.addLine(buf, "<% if !signed_in? %>");
+    	StringUtils.addLine(buf, "<% if !logged_in? %>");
     	
     	String searchModelName = app.getTopLevelSearchModelName();
     	StringUtils.addLine(buf, "<form action=\"/" + searchModelName + "\" class=\"navbar-search pull-right\">");
@@ -194,7 +194,7 @@ public class RailsGen extends Generator {
             String modelName = userModel.getName();
 
             StringUtils.addLine(buf, "<li><%= link_to \"" + WordUtils.pluralize(WordUtils.capitalize(modelName)) + "\", " + WordUtils.pluralize(modelName) + "_path %></li>");
-            StringUtils.addLine(buf, "<% if signed_in? %>");
+            StringUtils.addLine(buf, "<% if logged_in? %>");
             StringUtils.addLine(buf, "<li><%= link_to \"Edit Profile\", edit_" + modelName + "_path(current_" + modelName + ") %></li>");
             StringUtils.addLine(buf, "<li class=\"divider\"></li>");
             StringUtils.addLine(buf, "<li><%= link_to \"Sign out\", signout_path, method: \"delete\" %></li>");
@@ -216,6 +216,16 @@ public class RailsGen extends Generator {
     public void generateMainLayoutPage () throws Exception {
         StringBuilder buf = new StringBuilder();
 
+        StringUtils.addLine(buf, "<!DOCTYPE html>");
+        StringUtils.addLine(buf, "<html>");
+        StringUtils.addLine(buf, "<head>");
+        tabbed(buf, "<title><%= full_title(yield(:title)) %></title>");
+        HTMLUtils.addRubyOutput(buf, "stylesheet_link_tag    \"application\", :media => \"all\"");
+        HTMLUtils.addRubyOutput(buf, "javascript_include_tag \"application\"");
+        HTMLUtils.addRubyOutput(buf, "csrf_meta_tags");
+        StringUtils.addLine(buf, "</head>");
+
+        StringUtils.addLine(buf, "<body>");
         HTMLUtils.addRubyOutput(buf, "render 'layouts/header'");
 
         StringUtils.addLine(buf, "<div class=\"container\"> ");
@@ -225,9 +235,33 @@ public class RailsGen extends Generator {
         HTMLUtils.addRubyOutput(buf, "yield");
         HTMLUtils.closeDiv(buf);
         HTMLUtils.addRubyOutput(buf, "render 'layouts/footer'");
+        StringUtils.addLine(buf, "</body>");
+        StringUtils.addLine(buf, "</html>");
 
-        FileUtils.replaceInFile(app.getWebAppDir() + "/app/views/layouts/application.html.erb", new String[]{"<%= yield %>"},
-                new String [] {buf.toString()}, true, true);
+        /**
+        <%= stylesheet_link_tag    "application", :media => "all" %>
+        <%= javascript_include_tag "application" %>
+        <%= csrf_meta_tags %>
+        <%= render 'layouts/shim' %>
+        </head>
+        <body>
+        <%= render 'layouts/header' %>
+
+        <div class="container">
+        <% flash.each do |key, value| %>
+        <div class="alert alert-<%= key %>"><%= value %></div>
+        <% end %>
+        <%= yield %>
+        </div>
+        <%= render 'layouts/footer' %>
+        </body>
+        </html>
+
+        */
+
+        FileUtils.write(HTMLUtils.formatHTML(buf.toString(), 2), app.getWebAppDir() + "/app/views/layouts/application.html.erb", false);
+//        FileUtils.replaceInFile(app.getWebAppDir() + "/app/views/layouts/application.html.erb", new String[]{"<%= yield %>"},
+//                new String [] {buf.toString()}, true, true);
 
     }
 
@@ -291,7 +325,7 @@ public class RailsGen extends Generator {
         StringBuilder buf = new StringBuilder();
 
         if (app.getUserModel() != null) {
-            HTMLUtils.addRuby(buf, "if signed_in?");
+            HTMLUtils.addRuby(buf, "if logged_in?");
             Model userModel = app.getUserModel();
             HTMLUtils.addH3(buf, userModel.getCapName() + " Dashboard for <%= current_" +userModel.getName() + ".name %>");
 
@@ -347,7 +381,7 @@ public class RailsGen extends Generator {
              generateTableFor(buf, frontPageModelList);
 
         HTMLUtils.addRuby(buf, "end");
-        FileUtils.write(buf, app.getWebAppDir() + "/app/views/static_pages/home.html.erb", true);
+        FileUtils.write(HTMLUtils.formatHTML(buf.toString(), 2), app.getWebAppDir() + "/app/views/static_pages/home.html.erb", true);
     }
 
     public void generateTableFor(StringBuilder buf, Model model) {
@@ -450,6 +484,11 @@ public class RailsGen extends Generator {
         HTMLUtils.addRubyOutput(buf, "f.label :password");
         HTMLUtils.addRubyOutput(buf, "f.password_field :password");
 
+        HTMLUtils.addRubyOutput(buf, "f.label :remember_me, class: \"checkbox inline\" do");
+        HTMLUtils.addRubyOutput(buf, "f.check_box :remember_me");
+        HTMLUtils.addSpan(buf, "Remember me on this computer");
+        HTMLUtils.addRuby(buf, "end");
+
         generateFormEnd(buf, "Sign in");
         HTMLUtils.addParagraph(buf, "New " + userModelName + "? <%= link_to \"Sign up now!\", signup_path %>");
         HTMLUtils.addParagraph(buf, "Forgot password? <%= link_to \"Reset password\",  send_password_path %>");
@@ -506,25 +545,55 @@ public class RailsGen extends Generator {
         StringUtils.addLine(buf, "module SessionsHelper");
         StringUtils.addLineBreak(buf);
 
-        addMethod(buf, "signed_in?", new String[] {"!current_" + name + ".nil?"});
 
-        addMethod(buf, "sign_out", new String[] {"self.current_" + name + " = nil", "cookies.delete(:remember_token)"});
+        /**
+         * def forget
+         update_attribute(:remember_digest, nil)
 
-        addMethod(buf, "current_" + name, new String[] {"@current_" + name + " ||= " + capName + ".find_by_remember_token(cookies[:remember_token])"});
+         def forget(user)
+         user.forget
+         cookies.delete(:user_id)
+         cookies.delete(:remember_token)
+         end
 
-        addMethod(buf, "current_" + name + "?(" + name + ")", new String[] {name + " == current_" + name});
+         # Logs out the current user.
+         def log_out
+         forget(current_user)
+         session.delete(:user_id)
+         @current_user = nil
+         end
 
-        addMethod(buf, "current_" + name + "=(" + name + ")", new String[] {"@current_" + name + " = " + name});
+         def logged_in?
+         !current_user.nil?
+         end
 
-        addMethod(buf, "redirect_back_or(default)", new String[] {"redirect_to(session[:return_to] || default)", "session.delete(:return_to)"});
+         def remember(user)
+         user.remember
+         cookies.permanent.signed[:user_id] = user.id
+         cookies.permanent[:remember_token] = user.remember_token
+         end
+         */
 
-        addMethod(buf, "sign_in(" + name + ")", new String[] {"cookies.permanent[:remember_token] = " + name + ".remember_token", "self.current_" + name + " = " + name});
+        addMethod(buf, "logged_in?", new String[] {"!current_" + name + ".nil?"});
+        addMethod(buf, "log_in(" + name + ")", new String[] {"session[:" + name + "_id] = " + name + ".id"});
+        addMethod(buf, "remember(" + name + ")", new String[] {name + ".remember", "cookies.permanent.signed[:" + name + "_id] = " + name + ".id",
+                "cookies.permanent[:remember_token] = " + name + ".remember_token"});
+        addMethod(buf, "forget(" + name + ")", new String[] {name + ".forget", "cookies.delete(:" + name + "_id)", "cookies.delete(:remember_token)"});
+        addMethod(buf, "log_out", new String[] {"forget(current_" + name + ")", "session.delete(:" + name + "_id)", "@current_" + name + " = nil"});
 
-        addMethod(buf, "redirect_back_or(default)", new String[] {"redirect_to(session[:return_to] || default)", "session.delete(:return_to)"});
+        addMethod(buf, "current_" + name, new String[] {"@current_" + name + " ||= " + capName + ".find_by(id: session[:" + name + "_id])"});
 
-        addMethod(buf, "store_location", new String[] {"session[:return_to] = request.fullpath"});
 
-        addMethod(buf, "signed_in_" + name, new String[] {"unless signed_in?", "\tstore_location", "\tredirect_to signin_path, notice: \"Please sign in.\"", "end"});
+//        addMethod(buf, "signed_in?", new String[] {"!current_" + name + ".nil?"});
+//        addMethod(buf, "sign_out", new String[] {"self.current_" + name + " = nil", "cookies.delete(:remember_token)"});
+//        addMethod(buf, "current_" + name, new String[] {"@current_" + name + " ||= " + capName + ".find_by_remember_token(cookies[:remember_token])"});
+//        addMethod(buf, "current_" + name + "?(" + name + ")", new String[] {name + " == current_" + name});
+//        addMethod(buf, "current_" + name + "=(" + name + ")", new String[] {"@current_" + name + " = " + name});
+//        addMethod(buf, "redirect_back_or(default)", new String[] {"redirect_to(session[:return_to] || default)", "session.delete(:return_to)"});
+//        addMethod(buf, "sign_in(" + name + ")", new String[] {"cookies.permanent[:remember_token] = " + name + ".remember_token", "self.current_" + name + " = " + name});
+//        addMethod(buf, "redirect_back_or(default)", new String[] {"redirect_to(session[:return_to] || default)", "session.delete(:return_to)"});
+//        addMethod(buf, "store_location", new String[] {"session[:return_to] = request.fullpath"});
+//        addMethod(buf, "signed_in_" + name, new String[] {"unless signed_in?", "\tstore_location", "\tredirect_to signin_path, notice: \"Please sign in.\"", "end"});
 
         StringUtils.addLine(buf, "end ");
 
@@ -573,7 +642,7 @@ public class RailsGen extends Generator {
 
         for (StaticPage page : app.getStaticPages()) {
             String pageName = page.getName();
-            insertTabbedIfNotThere(routeLines, "get '/" + pageName + "', to: 'static_pages#" + pageName + "'", index++);
+            insertTabbedIfNotThere(routeLines, "get '" + pageName + "'   => 'static_pages#" + pageName +"'", index++);
         }
 
         //StringUtils.addLineBreak(buf);
@@ -679,23 +748,29 @@ public class RailsGen extends Generator {
 
     public void generateAssets () throws Exception {
 
-        FileUtils.insertAfterInFile(app.getWebAppDir() + "/app/assets/stylesheets/application.css", new String[]{" *= require_self"},
-                new String[]{" *= require jquery.ui.datepicker"}, true, true);
+        FileUtils.insertAfterInFileIfNotExists(app.getWebAppDir() + "/app/assets/javascripts/application.js", "//= require jquery_ujs",
+                "//= require bootstrap", true, true);
+        FileUtils.insertAfterInFileIfNotExists(app.getWebAppDir() + "/app/assets/javascripts/application.js", "//= require jquery_ujs",
+                "//= require jquery.ui.datepicker", true, true);
 
-        if (FileUtils.fileExists(app.getWebAppDir() + "/app/assets/stylesheets/bootstrap_and_overrides.css.less")) {
-            FileUtils.insertAfterInFile(app.getWebAppDir() + "/app/assets/stylesheets/bootstrap_and_overrides.css.less", new String[] {"twitter/bootstrap/bootstrap"},
-                    new String[] {"body {\n" +
-                            "    padding-top: 60px;\n" +
-                            "}"}, true, true);
+        FileUtils.insertAfterInFileIfNotExists(app.getWebAppDir() + "/app/assets/stylesheets/application.css", " *= require_self",
+               " *= require jquery.ui.datepicker", true, true);
 
-            FileUtils.insertAfterInFile(app.getWebAppDir() + "/app/assets/stylesheets/bootstrap_and_overrides.css.less", new String[] {"twitter/bootstrap/bootstrap"},
-                    new String[] {"body {\n" +
-                            "    padding-top: 60px;\n" +
-                            "}"}, true, true);
+//        if (FileUtils.fileExists(app.getWebAppDir() + "/app/assets/stylesheets/bootstrap_and_overrides.css.less")) {
+//            FileUtils.insertAfterInFile(app.getWebAppDir() + "/app/assets/stylesheets/bootstrap_and_overrides.css.less", new String[] {"twitter/bootstrap/bootstrap"},
+//                    new String[] {"body {\n" +
+//                            "    padding-top: 60px;\n" +
+//                            "}"}, true, true);
+//
+//            FileUtils.insertAfterInFile(app.getWebAppDir() + "/app/assets/stylesheets/bootstrap_and_overrides.css.less", new String[] {"twitter/bootstrap/bootstrap"},
+//                    new String[] {"body {\n" +
+//                            "    padding-top: 60px;\n" +
+//                            "}"}, true, true);
 
-            if (app.getJumbotronImageUrl() != null)
-                addStyle(new String[] {".hero-unit {", "\tbackground-image: url('" + app.getJumbotronImageUrl() + "');", "}"});
-        }
+        if (app.getJumbotronImageUrl() != null)
+            addStyle(new String[] {".hero-unit {", "\tbackground-image: url('" + app.getJumbotronImageUrl() + "');", "}"});
+
+        FileUtils.copyTextFile("C:/Users/jsanchez/Downloads/apps/resources/custom.css.scss", app.getWebAppDir() + "/app/assets/stylesheets/custom.css.scss");
 
         // TODO: not sure we need to do this if running with --without production:
         //String 	railsCmd = app.isWindows() ? "C:/RailsInstaller/Ruby2.1.0/bin/rake.bat" : "rake";
@@ -748,10 +823,12 @@ public class RailsGen extends Generator {
                     }
                 }
 
+
                 // Seems like we don't need this anymore:
                 //tabbed(buf, attrs);
 
                 if (model.isSecure()) {
+                    tabbed(buf, "attr_accessor :remember_token");
                     tabbed(buf, "has_secure_password");
                 }
 
@@ -870,12 +947,26 @@ public class RailsGen extends Generator {
                     StringUtils.addLineBreak(buf);
                 }
 
-                tabbed(buf, "private");
+
                 if (model.isSecure()) {
-                    tabbed(buf, "def create_remember_token", 2);
-                    tabbed(buf, "self.remember_token = SecureRandom.urlsafe_base64", 3);
-                    tabbed(buf, "end", 2);
+                    addMethod(buf, model.getCapName() + ".digest(string)", new String[] {"cost = ActiveModel::SecurePassword.min_cost ? BCrypt::Engine::MIN_COST :",
+                            "                 BCrypt::Engine.cost",
+                            "                 BCrypt::Password.create(string, cost: cost)"});
+
+                    addMethod(buf, model.getCapName() + ".new_token", new String[] {"SecureRandom.urlsafe_base64"});
+                    addMethod(buf, "remember", new String[] {"self.remember_token = " + model.getCapName() + ".new_token", "update_attribute(:remember_digest, User.digest(remember_token))"});
+                    addMethod(buf, "authenticated?(remember_token)", new String[] {"return false if remember_digest.nil?",
+                            "BCrypt::Password.new(remember_digest).is_password?(remember_token)"});
+                    addMethod(buf, "forget", new String[] {"update_attribute(:remember_digest, nil)"});
                 }
+
+
+//                tabbed(buf, "private");
+//                if (model.isSecure()) {
+//                    tabbed(buf, "def create_remember_token", 2);
+//                    tabbed(buf, "self.remember_token = SecureRandom.urlsafe_base64", 3);
+//                    tabbed(buf, "end", 2);
+//                }
                 StringUtils.addLine(buf, "end");
 
                 FileUtils.write(buf, app.getWebAppDir() + "/app/models/" + capName + ".rb", true);
@@ -962,7 +1053,7 @@ public class RailsGen extends Generator {
                         tabbed(bodyContent, "<% else %>");
                         tabbed(bodyContent, "<p> No " + capName + " for this " + name + " yet.</p>");
                         tabbed(bodyContent, "<% end %>");
-                        tabbed(bodyContent, "<% if signed_in? && current_" + name + "?(@" + name + ") %>");
+                        tabbed(bodyContent, "<% if logged_in? && current_" + name + "?(@" + name + ") %>");
                         tabbed(bodyContent, "<%= link_to \"Add " + fName + "\", new_" + fName + "_path, class: \"btn btn-large btn-primary\" %>");
                         tabbed(bodyContent, "<% end %>");
                     }
@@ -1480,27 +1571,40 @@ public class RailsGen extends Generator {
                 addMethod(buf, "new", new String[] {});
                 StringUtils.addLineBreak(buf);
 
-                tabbed(buf, "def create");
-                tabbed(buf, "email = params[:session][:email]", 2);
-                tabbed(buf, "if email != nil", 2);
-                tabbed(buf, "email = email.downcase ", 3);
-                tabbed(buf, "end", 2);
-                StringUtils.addLineBreak(buf);
+//                tabbed(buf, "def create");
+//                tabbed(buf, "email = params[:session][:email]", 2);
+//                tabbed(buf, "if email != nil", 2);
+//                tabbed(buf, "email = email.downcase ", 3);
+//                tabbed(buf, "end", 2);
+//                StringUtils.addLineBreak(buf);
 
                 Model   userModel = app.getUserModel();
                 String  userModelName = userModel.getName();
 
-                tabbed(buf, userModelName + " = " + WordUtils.capitalize(userModelName) + ").find_by_email(email)", 2);
-                tabbed(buf, "if " + userModelName + " && " + userModelName + ".authenticate(params[:session][:password])", 2);
-                tabbed(buf, "sign_in user", 3);
-                tabbed(buf, "redirect_back_or root_path ", 3);
-                tabbed(buf, "else", 2);
-                tabbed(buf, "flash[:error] = \"Invalid email/password combination\" ", 3);
-                tabbed(buf, "render 'new'", 3);
-                tabbed(buf, "end", 2);
-                tabbed(buf, "end");
+                tabbed(buf, "def create ");
+                 tabbed(buf, userModelName + " = " + userModel.getCapName() + ".find_by(email: params[:session][:email].downcase)", 2);
+                 tabbed(buf, "if " + userModelName + " && " + userModelName + ".authenticate(params[:session][:password])", 2);
+                 tabbed(buf, "log_in " + userModelName, 2);
+                tabbed(buf, "params[:session][:remember_me] == '1' ? remember(" + userModelName + ") : forget(" + userModelName + ")", 2);
+                 tabbed(buf, "redirect_to " + userModelName, 2);
+                 tabbed(buf, "else", 2);
+                 tabbed(buf, "flash.now[:danger] = 'Invalid email/password combination'", 3);
+                 tabbed(buf, "render 'new'", 3);
+                 tabbed(buf, "end ", 2);
+                 tabbed(buf, "end ");
 
-                addMethod(buf, "destroy", new String[] {"sign_out", "redirect_to root_path"});
+
+//                tabbed(buf, userModelName + " = " + WordUtils.capitalize(userModelName) + ").find_by_email(email)", 2);
+//                tabbed(buf, "if " + userModelName + " && " + userModelName + ".authenticate(params[:session][:password])", 2);
+//                tabbed(buf, "sign_in user", 3);
+//                tabbed(buf, "redirect_back_or root_path ", 3);
+//                tabbed(buf, "else", 2);
+//                tabbed(buf, "flash[:error] = \"Invalid email/password combination\" ", 3);
+//                tabbed(buf, "render 'new'", 3);
+//                tabbed(buf, "end", 2);
+//                tabbed(buf, "end");
+
+                addMethod(buf, "destroy", new String[] {"log_out if logged_in?", "redirect_to root_path"});
 
                 StringUtils.addLine(buf, "end");
 
@@ -1647,6 +1751,11 @@ public class RailsGen extends Generator {
                         tabbed(buf, "t." + getRailsType(field.getTheType()) + " :" + field.getName(), 3);
                     }
                 }
+
+                if (model.isSecure()) {
+                    tabbed(buf, "t.string :remember_digest");
+                }
+
                 if (rels != null) {
                     for (Rel rel : rels) {
                         tabbed(buf, "t.integer :" + rel.getModel().getName() + "_id", 3);
@@ -1767,7 +1876,13 @@ public class RailsGen extends Generator {
         // Heroku stuff:
         addGemToGroup(gemfileLines, "production", "pg", "0.17.1", false);
         addGemToGroup(gemfileLines, "production", "rails_12factor", "0.0.2", false);
-        
+        addGemToGroup(gemfileLines, "assets", "jquery-ui-rails", null, false);
+
+        /**
+         * group :assets do
+         gem 'jquery-ui-rails'
+         end
+         */
 //         FileUtils.insertAfterOrAtEnd(gemfileLines, new String[] {"group :production do"},
 //                new String[] {"gem 'pg',     '0.17.1'", "gem 'rails_12factor',      '0.0.2'"}, true, true);
 
@@ -1785,7 +1900,8 @@ public class RailsGen extends Generator {
         addGem(gemfileLines, "actionmailer");
         addGem(gemfileLines, "coderay");
         addGem(gemfileLines, "tabs_on_rails");
-        addGem(gemfileLines, "twitter-bootstrap-rails");
+        //addGem(gemfileLines, "twitter-bootstrap-rails");
+        addGem(gemfileLines, "bootstrap-sass", "3.2.0.0", false);
         addGem(gemfileLines, "bcrypt", "3.1.7", false);
         addGem(gemfileLines, "will_paginate", "3.0.5", false);      //gem 'will_paginate', '~> 3.0.5'
         addGem(gemfileLines, "bootstrap-will_paginate", "0.0.6", true);
