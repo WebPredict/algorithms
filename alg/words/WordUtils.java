@@ -274,6 +274,22 @@ public class WordUtils {
             return (s + "s");
     }
 
+
+    public static String    depluralize (String s) {
+        if (s == null)
+            return (null);
+        else if (s.endsWith("ies")) {
+            return (s.substring(0, s.length() - 3) + "y");
+        }
+        else if (s.endsWith("ses")) {
+            return (s.substring(0, s.length() - 2));
+        }
+        else if (s.endsWith("s"))
+            return (s.substring(0, s.length() - 1));
+        else
+            return (s); // hmm
+    }
+
     @InterestingAlgorithm
     public static List<String>  leftRightTextJustification (String words, int lineLength) {
         if (words == null)

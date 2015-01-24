@@ -39,7 +39,8 @@ public class GeneratorTest {
 
     public static void main (String [] args) throws Exception {
     	boolean windows = true;
-        salesTest(windows);
+        //salesTest(windows);
+        interviewSite();
     }
 
     public static void salesTest (boolean windows) throws Exception {
@@ -87,9 +88,8 @@ public class GeneratorTest {
          */
     }
 
-    public static App initialApp (String name, String tagline) throws Exception {
+    public static App initialApp (String name, String tagline, boolean windows) throws Exception {
 
-        boolean windows = false;
         App app = new App();
         app.setWindows(windows);
         app.setTechnologyStack(TechnologyStack.rails);
@@ -109,7 +109,7 @@ public class GeneratorTest {
     }
 
     public static void flylineSite () throws Exception {
-        App app = initialApp("flyline", "Activity in the New England Paragliding Community");
+        App app = initialApp("flyline", "Activity in the New England Paragliding Community", true);
         Model postModel = Model.parseModel("post: name required, email required, content long_string required, site fixed_list(mt_tom|plymouth|mt_washington|welfleet)");
 
         app.setModels(new Model[] {postModel});
@@ -119,6 +119,47 @@ public class GeneratorTest {
 
         //app.setTopLevelModels("post"); -- should be unnecessary if there's only 1 model
         app.setFrontPageListModel(postModel);
+        Generator.createAndGen(app, true);
+    }
+
+    public static void todoSite () throws Exception {
+        App app = initialApp("todo", "Simple TODO List", true);
+        Model [] models = Model.parseModels(new String[] {
+                "user: username string, email, password, premium boolean, avatar image, has_many todo",
+                "todo: name required, details long_string, priority fixed_list(low|medium|high)"});
+        app.setSearch(true);
+        app.setNeedsAuth(true);
+
+        app.setModels(models);
+        app.getAppConfig().setColor1("blue");
+        app.getAppConfig().setColor2("white");
+        app.setJumbotronImage("TODOBG.jpg");  // TODO: support a list of stockphoto images like "office" or "high-tech" or "mountains" or something
+
+        app.setTopLevelModels("todo");
+        //app.setFrontPageListModel(models [1]);
+        Generator.createAndGen(app, true);
+    }
+
+    public static void interviewSite () throws Exception {
+        App app = initialApp("TechReviewNow", "The Interview Q&A Repository", true);
+        // TODO: need to have a way to indicate when collections are readonly
+        Model [] models = Model.parseModels(new String[] {
+                "user: username required, email required, password, premium boolean, avatar image, has_many tests, has_many questions", // TODO fix, has_many test.results", // means pull it in for display
+                "test: name required, description long_string, has_many questions, difficulty fixed_list(low|medium|high), has_many results",
+                "employer: name required, description long_string, has_many users, owns_many tests",
+                "result: has_one test, has_one user, score computed(float)", // means generate display but don't store it
+                "question: name required, description long_string, answer long_strong, code_snippet code, difficulty fixed_list(low|medium|high)"});
+
+        app.setSearch(true);
+        app.setNeedsAuth(true);
+
+        app.setModels(models);
+        app.getAppConfig().setColor1("blue");
+        app.getAppConfig().setColor2("white");
+        app.setJumbotronImageAsStockphoto("high tech");
+
+        app.setTopLevelModels("todo");
+        //app.setFrontPageListModel(models [1]);
         Generator.createAndGen(app, true);
     }
 }

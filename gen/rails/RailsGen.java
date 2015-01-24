@@ -287,6 +287,18 @@ public class RailsGen extends Generator {
             HTMLUtils.addRuby(buf, "if signed_in?");
             Model userModel = app.getUserModel();
             HTMLUtils.addH3(buf, WordUtils.capitalize(userModel.getName()) + " Dashboard for <%= current_" +userModel.getName() + ".name %>");
+
+            // TODO: generate default logged in view here
+            // if it's a user, display all user properties I guess
+            // display all top level models in the side menu, and/or the top menu in the header
+        }
+        else {
+            ArrayList<Model> topLevelModels = app.getTopLevelModels();
+
+            for (Model model : topLevelModels) {
+                // if sidebar, put one in each sidebar entry in a vertical list
+                // TODO: also do the same in the header
+            }
         }
 
         HTMLUtils.addRuby(buf, "else");
@@ -672,10 +684,15 @@ public class RailsGen extends Generator {
                 StringUtils.addLine(buf, "class " + capName + " < ActiveRecord::Base");
                 String attrs = "attr_accessible ";
 
+                ArrayList<Field> computedFields = new ArrayList<Field>();
+
                 if (fields != null) {
                     for (int i = 0; i < fields.size(); i++) {
                         Field f = fields.get(i);
                         attrs += ":" + f.getName();
+
+                        if (f.isComputed())
+                            computedFields.add(f);
 
                         if (i < fields.size() - 1) {
                             attrs += ", ";
@@ -688,6 +705,9 @@ public class RailsGen extends Generator {
                     for (Rel rel : rels) {
                         if (rel.getRelType().equals(RelType.MANY_TO_ONE)) {
                             attrs += ", :" + rel.getModel().getName() + "_id";
+                        }
+                        else if (rel.getRelType().equals(RelType.ONE_TO_MANY)) {
+                            attrs += ", :" + rel.getModel().getName() + "_ids";
                         }
                     }
                 }
@@ -805,6 +825,13 @@ public class RailsGen extends Generator {
 
                 StringUtils.addLineBreak(buf);
 
+                for (Field f : computedFields) {
+                    tabbed(buf, "def compute_" + f.getName());
+                    tabbed(buf, "# TODO: fill in custom logic to compute this field!!!", 2);
+                    tabbed(buf, "end");
+                    StringUtils.addLineBreak(buf);
+                }
+
                 tabbed(buf, "private");
                 if (model.isSecure()) {
                     tabbed(buf, "create_remember_token", 2);
@@ -910,6 +937,10 @@ public class RailsGen extends Generator {
                     generateReadOnlySection(bodyContent, "image_for(@" + nameFName + ")", fName);
                 }
                 else if (fTypeName.equals(Type.DATETIME.getName())) {
+                    generateReadOnlySection(bodyContent, "@" + nameFName, fName);
+                }
+                else if (fTypeName.equals(Type.CODE.getName())) {
+                    // TODO: either a <pre> section or some nicely formatted code area using a gem for that
                     generateReadOnlySection(bodyContent, "@" + nameFName, fName);
                 }
                 else if (fTypeName.equals(Type.CURRENCY.getName())) {
@@ -1502,6 +1533,9 @@ public class RailsGen extends Generator {
 
                 if (fields != null) {
                     for (Field field : fields) {
+                        if (field.isComputed())
+                            continue;
+
                         tabbed(buf, "t." + getRailsType(field.getTheType()) + " :" + field.getName(), 3);
                     }
                 }

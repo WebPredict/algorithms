@@ -209,7 +209,12 @@ public class Model extends Type {
             }
             else {
                 if (details [0].equals("has_many")) {
-                    Rel r = new Rel(RelType.ONE_TO_MANY, details[1]);
+                    Rel r = new Rel(RelType.ONE_TO_MANY, WordUtils.depluralize(details[1]));
+                    ret.addRel(r);
+                }
+                else if (details [0].equals("owns_many")) {
+                    Rel r = new Rel(RelType.ONE_TO_MANY, WordUtils.depluralize(details[1]));
+                    r.setDependent(true);
                     ret.addRel(r);
                 }
                 else if (details [0].equals("has_one")) {

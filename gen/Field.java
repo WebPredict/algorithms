@@ -19,6 +19,10 @@ public class Field {
     private boolean readOnly;
     private boolean adminOnly;
 
+    public boolean isComputed() {
+        return theType.isComputed();
+    }
+
     public boolean isReadOnly() {
         return readOnly;
     }

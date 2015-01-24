@@ -37,6 +37,9 @@ public class Type {
     public static final Type CODE = new Type("code");
     public static final Type VIDEO = new Type("video");
 
+    public static final Type COMPUTED = new Type("computed"); // means don't store in DB
+
+
     public boolean isPrimitive () {
         return (name.equals(Type.BOOLEAN.getName()) ||
                 name.equals(Type.EMAIL.getName()) ||
@@ -50,6 +53,11 @@ public class Type {
                 name.equals(Type.LONG_STRING.getName()) ||
                 name.equals(Type.SHORT_STRING.getName()));
     }
+
+    public boolean isComputed () {
+        return (name.equals(Type.COMPUTED.getName()));
+    }
+
     public static Type findByName (String name) {
 
         if (name.equals(LONG_STRING.name))
@@ -92,6 +100,11 @@ public class Type {
         }
         else if (name.startsWith(FIXED_LIST.name)) {
             FixedList type = new FixedList(name.substring(FIXED_LIST.getName().length()));
+            return (type);
+        }
+        else if (name.startsWith(COMPUTED.name)) {
+            Type type = new Type(COMPUTED.name);
+            type.subtype = new Type(name.substring(COMPUTED.name.length() + 1, name.length() - 2));
             return (type);
         }
         else if (name.startsWith(SET_ONE_OR_MORE.name)) {

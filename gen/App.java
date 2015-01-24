@@ -27,6 +27,7 @@ public class App {
     private String description;
     private String jumbotronText;
     private String jumbotronImageUrl;
+    private String jumbotronImage; // should be put in assets
     private HashMap<String, Model> nameToModelMap = new HashMap<String, Model>();
     private Model userModel;
     private String  tagLine;
@@ -52,12 +53,39 @@ public class App {
         }
     }
 
+    public ArrayList<Model> getTopLevelModels() {
+        return topLevelModels;
+    }
+
+    public void setTopLevelModels(ArrayList<Model> topLevelModels) {
+        this.topLevelModels = topLevelModels;
+    }
+
+    public void setJumbotronImageAsStockphoto (String name) {
+        this.jumbotronImage = Stockphoto.find(name).getPhotoName();
+    }
+
     public void addStaticMenuItems (String [] names) {
         for (String name : names) {
             staticMenuItems.add(name);
         }
     }
 
+    public void setSearch (boolean search) {
+        appConfig.setSearch(search);
+    }
+
+    public void setNeedsAuth (boolean needs) {
+        appConfig.setNeedsAuth(needs);
+    }
+
+    public String getJumbotronImage() {
+        return jumbotronImage;
+    }
+
+    public void setJumbotronImage(String jumbotronImage) {
+        this.jumbotronImage = jumbotronImage;
+    }
 
     public List<StaticPage> getStaticPages() {
         return staticPages;
