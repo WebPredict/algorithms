@@ -35,6 +35,7 @@ public class RailsGen extends Generator {
         else {
             if (!FileUtils.dirExists(app.getWebAppDir()))
                 generateAppStructure();
+            generateDeploymentScript();
             generateGems();
             generateModels();
             generateControllers();
@@ -170,7 +171,9 @@ public class RailsGen extends Generator {
     	StringUtils.addLine(buf, "<li><%= link_to \"Dashboard\", root_path %></li>");
     	StringUtils.addLine(buf, "<% end %>");
     	StringUtils.addLine(buf, "<% if !signed_in? %>");
-    	StringUtils.addLine(buf, "<form action=\"/listings\" class=\"navbar-search pull-right\">");
+    	
+    	String searchModelName = app.getTopLevelSearchModelName();
+    	StringUtils.addLine(buf, "<form action=\"/" + searchModelName + "\" class=\"navbar-search pull-right\">");
     	StringUtils.addLine(buf, "<input type=\"text\" class=\"search-query\" id=\"search\" name=\"search\" placeholder=\"Search\">");
     	StringUtils.addLine(buf, "</form>");
 
@@ -286,8 +289,25 @@ public class RailsGen extends Generator {
         if (app.getUserModel() != null) {
             HTMLUtils.addRuby(buf, "if signed_in?");
             Model userModel = app.getUserModel();
-            HTMLUtils.addH3(buf, WordUtils.capitalize(userModel.getName()) + " Dashboard for <%= current_" +userModel.getName() + ".name %>");
+            HTMLUtils.addH3(buf, userModel.getCapName() + " Dashboard for <%= current_" +userModel.getName() + ".name %>");
 
+            boolean topLevelModelsInTabs = true; // TODO
+            
+            if (topLevelModelsInTabs) {
+            	HTMLUtils.addRubyOutput(buf, "tabs_tag do |tab|");
+            	for (Model model : app.getTopLevelModels()) {
+            		HTMLUtils.addRubyOutput(buf, "tab." + model.getName() + "'" + 
+            				model.getCapName() + "', " + model.getName() + "_path");
+            	}
+            	HTMLUtils.addRuby(buf, "end");
+            }
+            /**
+             * <%= tabs_tag do |tab| %>
+  <%= tab.home      'Homepage', root_path %>
+  <%= tab.dashboard 'Dashboard', dashboard_path %>
+  <%= tab.account   'Account', account_path %>
+<% end %>
+             */
             // TODO: generate default logged in view here
             // if it's a user, display all user properties I guess
             // display all top level models in the side menu, and/or the top menu in the header
@@ -476,7 +496,7 @@ public class RailsGen extends Generator {
 
         Model userModel = app.getUserModel();
         String  name = userModel.getName();
-        String  capName = WordUtils.capitalize(name);
+        String  capName = userModel.getCapName();
 
         StringBuilder buf = new StringBuilder();
         StringUtils.addLine(buf, "module SessionsHelper");
@@ -664,7 +684,7 @@ public class RailsGen extends Generator {
                 addStyle(new String[] {".hero-unit {", "\tbackground-image: url('" + app.getJumbotronImageUrl() + "');", "}"});
         }
 
-        runCommand("rake assets precompile");
+        runCommandInApp("rake assets precompile");
     }
 
     public void addStyle (String [] styleInfo) throws Exception {
@@ -676,7 +696,7 @@ public class RailsGen extends Generator {
         if (models != null) {
             for (Model model : models) {
                 String name = model.getName();
-                String              capName = WordUtils.capitalize(name);
+                String              capName = model.getCapName();
                 ArrayList<Field>    fields = model.getFields();
                 ArrayList<Rel>      rels = model.getRelationships();
 
@@ -940,8 +960,7 @@ public class RailsGen extends Generator {
                     generateReadOnlySection(bodyContent, "@" + nameFName, fName);
                 }
                 else if (fTypeName.equals(Type.CODE.getName())) {
-                    // TODO: either a <pre> section or some nicely formatted code area using a gem for that
-                    generateReadOnlySection(bodyContent, "@" + nameFName, fName);
+                	generateReadOnlySection(bodyContent, "CodeRay.scan(@" + nameFName + ", :ruby).div(:line_numbers => :table)", fName);               	
                 }
                 else if (fTypeName.equals(Type.CURRENCY.getName())) {
                     generateReadOnlySection(bodyContent, "number_to_currency(@" + nameFName + ", :unit => \"$\")", fName);
@@ -1554,13 +1573,15 @@ public class RailsGen extends Generator {
             }
         }
 
-        runCommand("bundle exec rake db:migrate");
+        runCommandInApp("bundle exec rake db:migrate");
     }
 
-    private void runCommand (String command) throws Exception {
+    private void runCommandInApp (String command) throws Exception {
         if (!app.isWindows()) {
             String [] cmd = command.split(" ");
             String result = runCommandWithEnv(app.getWebAppDir(), cmd, null);
+            
+            System.out.println ("Result of running command: '" + command + "' was: " + result);
         }
     }
 
@@ -1571,6 +1592,12 @@ public class RailsGen extends Generator {
 
     private void addGem (List<String> gemfileLines, String gemName, String version, boolean exact) {
         String toAdd =  "gem '" + gemName + "'" + (version == null ? "" : ", '" + (exact ? "" : "~> ") + version + "'");
+        
+        // TODO: fix inefficiency
+        for (String line : gemfileLines) {
+        	if (toAdd.equals(line)) 
+        		return; // don't add it again
+        }
         gemfileLines.add(toAdd);
     }
 
@@ -1581,32 +1608,39 @@ public class RailsGen extends Generator {
          */
         List<String> gemfileLines = FileUtils.getLinesCreateIfEmpty(app.getWebAppDir() + "/Gemfile");
 
-
         // Heroku stuff:
-         FileUtils.insertAfterOrAtEnd(gemfileLines, new String[] {"group :production do"},
-                new String[] {"gem 'pg',     '0.17.1'", "gem 'rails12_factor',      '0.0.2'"}, true, true);
+        addGem(gemfileLines, "pg");        
+        //addGem(gemfileLines, "rails_12factor");
+        
+//         FileUtils.insertAfterOrAtEnd(gemfileLines, new String[] {"group :production do"},
+//                new String[] {"gem 'pg',     '0.17.1'", "gem 'rails_12factor',      '0.0.2'"}, true, true);
 
 
 //        boolean didIt = FileUtils.insertAfter(gemfileLines, new String[] {"group :assets do"},
 //                new String[] {"  gem 'sass-rails', '~> 3.2.3'"}, true, true);
 
         // if using AWS for images:
-        if (app.hasImages())
+        if (app.hasImages()) {
+        	addGem(gemfileLines, "paperclip");
             addGem(gemfileLines, "fog");
+        }
 
         //addGem(gemfileLines, "carrierwave")
         addGem(gemfileLines, "actionmailer");
+        addGem(gemfileLines, "coderay");
         addGem(gemfileLines, "tabs_on_rails");
-        addGem(gemfileLines, "paperclip");
         addGem(gemfileLines, "twitter-bootstrap-rails");
         addGem(gemfileLines, "bcrypt-ruby", "3.0.0", false);
-        addGem(gemfileLines, "will-paginate", "3.0.3", true);
-        addGem(gemfileLines, "bootstrap-will-paginate", "0.0.6", true);
+        addGem(gemfileLines, "will_paginate", "3.0.3", true);
+        addGem(gemfileLines, "bootstrap-will_paginate", "0.0.6", true);
         addGem(gemfileLines, "faker", "1.0.1", true);
 
         FileUtils.putLines(gemfileLines, app.getWebAppDir() + "/Gemfile");
 
-        runCommand("bundle install -without production");
+        runCommandInApp("bundle install --without production");
+        
+        //String result = runCommand(app.getRootDir(), "bundle", "install", "-without", "production");
+    	//System.out.println(result);
     }
 
     public void generateAppStructure () throws Exception {
@@ -1621,7 +1655,19 @@ public class RailsGen extends Generator {
     }
 
 
-    public void generateDeploymentScript () {
+    public void generateDeploymentScript () throws Exception {
+    	
+    	StringBuilder builder = new StringBuilder();
+    	StringUtils.addLine(builder, "#!/bin/sh");
+    	StringUtils.addLine(builder, "bundle install --without production");
+    	StringUtils.addLine(builder, "bundle assets precompile");
+    	StringUtils.addLine(builder, "bundle exec rake db:migrate");
+    	//StringUtils.addLine(builder, "git add .");
+    	//StringUtils.addLine(builder, "git commit -a -m \"the app code\"");
+    	//StringUtils.addLine(builder, "git push heroku master");
+
+    	FileUtils.write(builder, app.getWebAppDir() + "/setup.sh", true);
+
         /**
          * bundle install --without production   done
          * bundle exec rake db:migrate               done

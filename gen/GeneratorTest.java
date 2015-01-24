@@ -38,9 +38,9 @@ public class GeneratorTest {
     }
 
     public static void main (String [] args) throws Exception {
-    	boolean windows = true;
+    	boolean windows = false;
         //salesTest(windows);
-        interviewSite();
+        interviewSite(windows);
     }
 
     public static void salesTest (boolean windows) throws Exception {
@@ -140,8 +140,8 @@ public class GeneratorTest {
         Generator.createAndGen(app, true);
     }
 
-    public static void interviewSite () throws Exception {
-        App app = initialApp("TechReviewNow", "The Interview Q&A Repository", true);
+    public static void interviewSite (boolean windows) throws Exception {
+        App app = initialApp("TechReviewNow", "The Interview Q&A Repository", windows);
         // TODO: need to have a way to indicate when collections are readonly
         Model [] models = Model.parseModels(new String[] {
                 "user: username required, email required, password, premium boolean, avatar image, has_many tests, has_many questions", // TODO fix, has_many test.results", // means pull it in for display
@@ -157,9 +157,11 @@ public class GeneratorTest {
         app.getAppConfig().setColor1("blue");
         app.getAppConfig().setColor2("white");
         app.setJumbotronImageAsStockphoto("high tech");
+        app.addPlaceholderPages(new String[] {"about", "help", "news", "contact"});
+        app.addStaticMenuItems(new String[] {"about", "news", "help"});
 
-        app.setTopLevelModels("todo");
-        //app.setFrontPageListModel(models [1]);
+        app.setTopLevelModels("test", "question");
+        app.setFrontPageListModel(models [1]);
         Generator.createAndGen(app, true);
     }
 }

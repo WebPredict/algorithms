@@ -1,5 +1,7 @@
 package gen;
 
+import alg.words.WordUtils;
+
 /**
  * Created with IntelliJ IDEA.
  * User: jsanchez
@@ -134,6 +136,10 @@ public class Type {
         return name;
     }
 
+    public String getCapName () {
+    	return (WordUtils.capitalize(name));
+    }
+    
     public void setName(String name) {
         this.name = name;
     }

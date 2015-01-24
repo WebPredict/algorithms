@@ -44,11 +44,18 @@ public abstract class Generator {
         InputStream inputStream = p.getInputStream();
         BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
 
+        BufferedReader bre = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+
         String line;
         while ((line = br.readLine()) != null)
             System.out.println(line);
+        
+        while ((line = bre.readLine()) != null)
+            System.out.println(line);
 
         br.close();
+        bre.close();
+        
         return (String.valueOf(p.exitValue()));
 
     }

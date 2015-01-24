@@ -335,6 +335,10 @@ public class App {
         return technologyStack;
     }
 
+    public String getTopLevelSearchModelName() {
+    	return ("search"); // TODO
+    }
+    
     public void setTechnologyStack(TechnologyStack technologyStack) {
         this.technologyStack = technologyStack;
     }
