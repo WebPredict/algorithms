@@ -159,27 +159,85 @@ public class RailsGen extends Generator {
 
     public void generateHeader () throws Exception {
 
+        /**
+         * <nav class="navbar navbar-inverse navbar-fixed-top">
+         <div class="container">
+         <div class="navbar-header">
+         <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+         <span class="sr-only">Toggle navigation</span>
+         <span class="icon-bar"></span>
+         <span class="icon-bar"></span>
+         <span class="icon-bar"></span>
+         </button>
+         <a class="navbar-brand" id="logo" href="#">TechReviewNow</a>
+         </div>
+         <div id="navbar" class="navbar-collapse collapse">
+         <form class="navbar-form navbar-right">
+         <div class="form-group">
+         <input type="text" placeholder="Search" class="form-control">
+         </div>
+         <button type="submit" class="btn btn-success">Search</button>
+         </form>
+         <ul class="nav navbar-nav navbar-right">
+         <li><%= link_to "Home",   '#' %></li>
+         <li><%= link_to "Help",   help_path %></li>
+         <li><%= link_to "Log in", signin_path %></li>
+         </ul>
+         </div><!--/.navbar-collapse -->
+         </div>
+         </nav>
+         */
     	StringBuilder buf = new StringBuilder();
-    	StringUtils.addLine(buf, "<div class=\"navbar navbar-inverse navbar-fixed-top\">");
-    	StringUtils.addLine(buf, "<div class=\"navbar-inner\">");
-    	StringUtils.addLine(buf, "<div class=\"container\">");
-    	StringUtils.addLine(buf, "<a class=\"btn btn-navbar\" data-toggle=\"collapse\" data-target=\".nav-collapse\">");
+        StringUtils.addLine(buf, "<nav class=\"navbar navbar-inverse navbar-fixed-top\">");
+        HTMLUtils.addDiv(buf, "container");
+        HTMLUtils.addDiv(buf, "navbar-header");
+
+        StringUtils.addLine(buf, "<button type=\"button\" class=\"navbar-toggle collapsed\" data-toggle=\"collapse\" data-target=\"#navbar\" aria-expanded=\"false\" aria-controls=\"navbar\">");
+        StringUtils.addLine(buf, "<span class=\"sr-only\">Toggle navigation</span>");
+        StringUtils.addLine(buf, "<span class=\"icon-bar\"></span>");
     	StringUtils.addLine(buf, "<span class=\"icon-bar\"></span>");
     	StringUtils.addLine(buf, "<span class=\"icon-bar\"></span>");
-    	StringUtils.addLine(buf, "<span class=\"icon-bar\"></span>");
-    	StringUtils.addLine(buf, "</a>");
-    	StringUtils.addLine(buf, "<%= link_to raw(\"<span style='color: #9999ff'>" + app.getTitle() + "</span>\"), root_path, id: \"logo\" %>");
-    	StringUtils.addLine(buf, "<div class=\"nav-collapse\">");
-    	StringUtils.addLine(buf, "<ul class=\"nav pull-right\">");
+    	StringUtils.addLine(buf, "</button>");
+
+    	StringUtils.addLine(buf, "<%= link_to \"" + app.getTitle() + "\", root_path, class: \"navbar-brand\", id: \"logo\" %>");
+        HTMLUtils.closeDiv(buf);
+
+        /**
+         *
+         * <div id="navbar" class="navbar-collapse collapse">
+         <form class="navbar-form navbar-right">
+         <div class="form-group">
+         <input type="text" placeholder="Search" class="form-control">
+         </div>
+         <button type="submit" class="btn btn-success">Search</button>
+         </form>
+         <ul class="nav navbar-nav navbar-right">
+         <li><%= link_to "Home",   '#' %></li>
+         <li><%= link_to "Help",   help_path %></li>
+         <li><%= link_to "Log in", signin_path %></li>
+         </ul>
+         </div><!--/.navbar-collapse -->
+         </div>
+         </nav>
+         */
+
+        StringUtils.addLine(buf, "<div id=\"navbar\" class=\"navbar-collapse collapse\">");
+        String searchModelName = app.getTopLevelSearchModelName();
+        if (searchModelName != null) {
+            StringUtils.addLine(buf, "<form action=\"/" + searchModelName + "\" class=\"navbar-form navbar-right\">");
+            HTMLUtils.addDiv(buf, "form-group");
+            StringUtils.addLine(buf, "<input type=\"text\" class=\"form-control\" id=\"search\" name=\"search\" placeholder=\"Search\">");
+            HTMLUtils.closeDiv(buf);
+            StringUtils.addLine(buf, "<button type=\"submit\" class=\"btn btn-success\">Search</button>");
+            StringUtils.addLine(buf, "</form>");
+        }
+
+        StringUtils.addLine(buf, "<ul class=\"nav navbar-nav navbar-right\">");
     	StringUtils.addLine(buf, "<% if logged_in? %>");
     	StringUtils.addLine(buf, "<li><%= link_to \"Dashboard\", root_path %></li>");
     	StringUtils.addLine(buf, "<% end %>");
     	StringUtils.addLine(buf, "<% if !logged_in? %>");
     	
-    	String searchModelName = app.getTopLevelSearchModelName();
-    	StringUtils.addLine(buf, "<form action=\"/" + searchModelName + "\" class=\"navbar-search pull-right\">");
-    	StringUtils.addLine(buf, "<input type=\"text\" class=\"search-query\" id=\"search\" name=\"search\" placeholder=\"Search\">");
-    	StringUtils.addLine(buf, "</form>");
 
         // TODO: this is not going to work if these item_paths don't exist
         for (String item : app.getStaticMenuItems()) {
@@ -207,8 +265,7 @@ public class RailsGen extends Generator {
     	StringUtils.addLine(buf, "</ul>");
         HTMLUtils.closeDiv(buf);
         HTMLUtils.closeDiv(buf);
-        HTMLUtils.closeDiv(buf);
-        HTMLUtils.closeDiv(buf);
+        StringUtils.addLine(buf, "</nav>");
 
     	FileUtils.write(buf, app.getWebAppDir() + "/app/views/layouts/_header.html.erb", true);
     }
@@ -272,6 +329,7 @@ public class RailsGen extends Generator {
 
         String siteName = app.getName();
         StringUtils.addLine(buf, "<a href=\"http://" + siteName + ".com\">@ 2015 " + siteName + ".com. All Rights Reserved.</a>");
+        StringUtils.addLine(buf, "</small>");
         StringUtils.addLine(buf, "<nav>");
         StringUtils.addLine(buf, "<ul>");
 
@@ -360,18 +418,20 @@ public class RailsGen extends Generator {
         }
 
         HTMLUtils.addRuby(buf, "else");
-        StringUtils.addLine(buf, "<div class=\"center hero-unit\">");
-        HTMLUtils.addH1(buf, "Welcome to " + app.getTitle(), "color: #9999ff");
+        HTMLUtils.addDiv(buf, "jumbotron");
+        HTMLUtils.addDiv(buf, "container");
+        HTMLUtils.addH1(buf, "Welcome to " + app.getTitle());
 
-        HTMLUtils.addH2(buf, app.getTagLine(), "color: #9999ff");
+        HTMLUtils.addParagraph(buf, app.getTagLine());
 
         Model  frontSearchModel = app.getFrontPageSearchModel();
 
         if (frontSearchModel != null) {
             String plural =  frontSearchModel.getPluralName();
-            HTMLUtils.addRubyOutput(buf, "link_to \"Search " + plural + "\", " + plural + "_path, class: \"btn btn-large btn-primary\"");
+            HTMLUtils.addRubyOutput(buf, "link_to \"Search " + plural + "\", " + plural + "_path, class: \"btn btn-lg btn-primary\"");
         }
-        HTMLUtils.addRubyOutput(buf, "link_to \"Signup!\", signup_path, class: \"btn btn-large\"");
+        HTMLUtils.addRubyOutput(buf, "link_to \"Signup!\", signup_path, class: \"btn btn-primary btn-lg\"");
+        HTMLUtils.closeDiv(buf);
         HTMLUtils.closeDiv(buf);
         HTMLUtils.addLineBreak(buf);
 
@@ -476,35 +536,124 @@ public class RailsGen extends Generator {
         StringBuilder buf = new StringBuilder();
         HTMLUtils.addRuby(buf, "provide(:title, \"Sign in\")");
         HTMLUtils.addH1(buf, "Sign In");
+
+        /**
+         * <%= form_for(:session, url: sessions_path, :html => {:class => "form-horizontal" } ) do |f| %>
+         <div class="form-group">
+         <%= f.label(:email, class: "col-sm-2 control-label") %>
+         <div class="col-sm-8">
+         <%= f.text_field(:email, class: "form-control") %>
+         </div>
+         </div>
+         <div class="form-group">
+         <%= f.label(:password, :password, class: "col-sm-2 control-label") %>
+         <div class="col-sm-8">
+         <%= f.password_field(:password, class: "form-control") %>
+         </div>
+         </div>
+         <div class="form-group">
+         <div class="col-sm-offset-2 col-sm-8">
+         <%= f.label :remember_me, class: "checkbox inline" do %>
+         <%= f.check_box :remember_me %>
+         <span>Remember me on this computer</span>
+         <% end %>
+         </div>
+         </div>
+         <div class="form-group">
+         <div class="col-sm-offset-2 col-sm-8">
+         <%= f.submit "Sign in", class: "btn btn-large btn-primary"  %>
+         </div>
+         </div>
+         <% end %>
+         </div>
+         </div>
+
+         */
         generateFormForStart(buf, "session");
 
-        HTMLUtils.addRubyOutput(buf, "f.label :email");
-        HTMLUtils.addRubyOutput(buf, "f.text_field :email");
+        generateFormField(buf, "email");
+        generateFormField(buf, "password", "password");
 
-        HTMLUtils.addRubyOutput(buf, "f.label :password");
-        HTMLUtils.addRubyOutput(buf, "f.password_field :password");
-
-        HTMLUtils.addRubyOutput(buf, "f.label :remember_me, class: \"checkbox inline\" do");
-        HTMLUtils.addRubyOutput(buf, "f.check_box :remember_me");
-        HTMLUtils.addSpan(buf, "Remember me on this computer");
-        HTMLUtils.addRuby(buf, "end");
+        generateCheckboxField(buf, "remember_me", "Remember me on this computer");
 
         generateFormEnd(buf, "Sign in");
-        HTMLUtils.addParagraph(buf, "New " + userModelName + "? <%= link_to \"Sign up now!\", signup_path %>");
-        HTMLUtils.addParagraph(buf, "Forgot password? <%= link_to \"Reset password\",  send_password_path %>");
+        HTMLUtils.addLineBreak(buf);
+        HTMLUtils.addDiv(buf, "row");
+        HTMLUtils.addDiv(buf, "col-sm-offset-3 col-sm-3");
+        StringUtils.addLine(buf, "New " + userModelName + "? <%= link_to \"Sign up now!\", signup_path %>");
+        HTMLUtils.closeDiv(buf);
+        HTMLUtils.addDiv(buf, "col-sm-3");
+        StringUtils.addLine(buf, "Forgot password? <%= link_to \"Reset password\",  send_password_path %>");
+        HTMLUtils.closeDiv(buf);
 
         FileUtils.write(buf, app.getWebAppDir() + "/app/views/sessions/new.html.erb", true);
     }
 
     private void generateFormForStart (StringBuilder buf, String modelName) {
-        HTMLUtils.addRow(buf, "span6", "offset3");
-        HTMLUtils.addRubyOutput(buf, "form_for(:" + modelName + ", url: " + WordUtils.pluralize(modelName) + "_path) do |f|");
+        //HTMLUtils.addRow(buf, "span6", "offset3");
+        //        * <%= form_for(:session, url: sessions_path, :html => {:class => "form-horizontal" } ) do |f| %>
+
+        HTMLUtils.addRubyOutput(buf, "form_for(:" + modelName + ", url: " + WordUtils.pluralize(modelName) + "_path, :html => {:class => \"form-horizontal\" }) do |f|");
     }
 
     private void generateFormEnd (StringBuilder buf, String buttonText) {
-        HTMLUtils.addRubyOutput(buf, "f.submit \"" + buttonText + "\", class: \"btn btn-large btn-primary\" ");
+        /**
+         * <div class="form-group">
+         <div class="col-sm-offset-2 col-sm-8">
+         */
+        HTMLUtils.addDiv(buf, "form-group");
+        HTMLUtils.addDiv(buf, "col-sm-offset-2 col-sm-8");
+        HTMLUtils.addRubyOutput(buf, "f.submit \"" + buttonText + "\", class: \"btn btn-lg btn-primary\" ");
+        HTMLUtils.closeDiv(buf);
+        HTMLUtils.closeDiv(buf);
         HTMLUtils.addRuby(buf, "end");
-        HTMLUtils.closeRow(buf);
+       // HTMLUtils.closeRow(buf);
+    }
+
+    private void generateFormField (StringBuilder buf, String name) {
+        generateFormField(buf, name, "text");
+    }
+
+    private void generateCheckboxField (StringBuilder buf, String name, String text) {
+        HTMLUtils.addDiv(buf, "form-group");
+        HTMLUtils.addDiv(buf, "col-sm-offset-2 col-sm-8");
+        HTMLUtils.addRubyOutput(buf, "f.label :" + name + ", class: \"checkbox inline\" do");
+        HTMLUtils.addRubyOutput(buf, "f.check_box :" + name);
+        HTMLUtils.addSpan(buf, text);
+        HTMLUtils.addRuby(buf, "end");
+        HTMLUtils.closeDiv(buf);
+        HTMLUtils.closeDiv(buf);
+    }
+
+    private void generateTextArea (StringBuilder buf, String name, int rows) {
+        HTMLUtils.addDiv(buf, "form-group");
+        HTMLUtils.addRubyOutput(buf, "f.label(:" + name + ", class: \"col-sm-2 control-label\") ");
+        HTMLUtils.addDiv(buf, "col-sm-8");
+        HTMLUtils.addRubyOutput(buf, "f.text_area(:" + name + ", :rows => \"" + rows + "\", class: \"form-control\") ");
+        HTMLUtils.closeDiv(buf);
+        HTMLUtils.closeDiv(buf);
+    }
+
+    private void generateFormField (StringBuilder buf, String name, String fieldType) {
+        HTMLUtils.addDiv(buf, "form-group");
+        HTMLUtils.addRubyOutput(buf, "f.label(:" + name + ", class: \"col-sm-2 control-label\") ");
+        HTMLUtils.addDiv(buf, "col-sm-8");
+        HTMLUtils.addRubyOutput(buf, "f." + fieldType + "_field(:" + name + ", class: \"form-control\") ");
+        HTMLUtils.closeDiv(buf);
+        HTMLUtils.closeDiv(buf);
+    }
+
+    private void generateFileUploadField (StringBuilder buf, String name) {
+        HTMLUtils.addDiv(buf, "form-group");
+        rubyout(buf, "f.label(:" + name + ", \"Your " + WordUtils.capitalize(name) + " File\", class: \"col-sm-2 control-label\") ");
+        HTMLUtils.addDiv(buf, "col-sm-8");
+        rubyout(buf, "file_for(@" + name + ")");         // TODO support for file_for
+        HTMLUtils.addDiv(buf, "fileUpload btn");
+        aline(buf, "<span>Change File</span>");
+        rubyout(buf, "f.file_field :" + name + " :class => \"form-control upload\"");
+        HTMLUtils.closeDiv(buf);
+        HTMLUtils.closeDiv(buf);
+        HTMLUtils.closeDiv(buf);
     }
 
     public void generateContactPage () throws Exception {
@@ -750,11 +899,15 @@ public class RailsGen extends Generator {
 
         FileUtils.insertAfterInFileIfNotExists(app.getWebAppDir() + "/app/assets/javascripts/application.js", "//= require jquery_ujs",
                 "//= require bootstrap", true, true);
-        FileUtils.insertAfterInFileIfNotExists(app.getWebAppDir() + "/app/assets/javascripts/application.js", "//= require jquery_ujs",
-                "//= require jquery.ui.datepicker", true, true);
 
-        FileUtils.insertAfterInFileIfNotExists(app.getWebAppDir() + "/app/assets/stylesheets/application.css", " *= require_self",
-               " *= require jquery.ui.datepicker", true, true);
+        // Where is datepicker now?
+//        FileUtils.insertAfterInFileIfNotExists(app.getWebAppDir() + "/app/assets/javascripts/application.js", "//= require jquery_ujs",
+//                "//= require jquery.ui.datepicker", true, true);
+//
+//        FileUtils.insertAfterInFileIfNotExists(app.getWebAppDir() + "/app/assets/stylesheets/application.css", " *= require_self",
+//               " *= require jquery.ui.datepicker", true, true);
+
+
 
 //        if (FileUtils.fileExists(app.getWebAppDir() + "/app/assets/stylesheets/bootstrap_and_overrides.css.less")) {
 //            FileUtils.insertAfterInFile(app.getWebAppDir() + "/app/assets/stylesheets/bootstrap_and_overrides.css.less", new String[] {"twitter/bootstrap/bootstrap"},
@@ -770,7 +923,7 @@ public class RailsGen extends Generator {
         if (app.getJumbotronImageUrl() != null)
             addStyle(new String[] {".hero-unit {", "\tbackground-image: url('" + app.getJumbotronImageUrl() + "');", "}"});
 
-        FileUtils.copyTextFile("C:/Users/jsanchez/Downloads/apps/resources/custom.css.scss", app.getWebAppDir() + "/app/assets/stylesheets/custom.css.scss");
+        FileUtils.copyTextFile("C:/Users/jsanchez/Downloads/apps/resources/simple2.css.scss", app.getWebAppDir() + "/app/assets/stylesheets/custom.css.scss");
 
         // TODO: not sure we need to do this if running with --without production:
         //String 	railsCmd = app.isWindows() ? "C:/RailsInstaller/Ruby2.1.0/bin/rake.bat" : "rake";
@@ -1054,7 +1207,7 @@ public class RailsGen extends Generator {
                         tabbed(bodyContent, "<p> No " + capName + " for this " + name + " yet.</p>");
                         tabbed(bodyContent, "<% end %>");
                         tabbed(bodyContent, "<% if logged_in? && current_" + name + "?(@" + name + ") %>");
-                        tabbed(bodyContent, "<%= link_to \"Add " + fName + "\", new_" + fName + "_path, class: \"btn btn-large btn-primary\" %>");
+                        tabbed(bodyContent, "<%= link_to \"Add " + fName + "\", new_" + fName + "_path, class: \"btn btn-lg btn-primary\" %>");
                         tabbed(bodyContent, "<% end %>");
                     }
 
@@ -1217,14 +1370,19 @@ public class RailsGen extends Generator {
         StringBuilder   buf = new StringBuilder();
         boolean         useTabs = useTabs(model);
         StringBuilder   bodyContent = new StringBuilder();
+        //HTMLUtils.addRuby(buf, "provide(:title, \"Sign in\")");
+        HTMLUtils.addH1(buf, "New " + model.getCapName());
 
+        /**
+
+         */
         if (fields != null) {
 
-             HTMLUtils.addRubyOutput(bodyContent, "form_for @" + name + ", :html => {:multipart => true} do |f|");
+             HTMLUtils.addRubyOutput(bodyContent, "form_for @" + name + ", :html => {:multipart => true, :class => \"form-horizontal\" } do |f|");
              HTMLUtils.addRubyOutput(bodyContent, "render 'shared/error_messages', object: f.object");
 
              for (Field f : fields) {
-                 if (f.isReadOnly())
+                 if (f.isReadOnly() || f.isAdminOnly() || f.isComputed())
                      continue;
 
                  String fName = f.getName();
@@ -1233,21 +1391,18 @@ public class RailsGen extends Generator {
                  String capitalized = WordUtils.capitalizeAndSpace(fName);
 
                  if (fType.equals(Type.BOOLEAN)) {
-                    StringUtils.addLine(bodyContent, "<label class=\"checkbox line\">");
-                    StringUtils.addLine(bodyContent, "<%= f.check_box :" + fName + "%>" + capitalized + "?");
-                    StringUtils.addLine(bodyContent, "</label></br>"); // TODO change so we don't have to use line breaks
+                     generateCheckboxField(bodyContent, fName, capitalized + "?");
                  }
                  else if (fType.equals(Type.SHORT_STRING)) {
-                     HTMLUtils.addRubyOutput(bodyContent, "f.label :" + fName);
-                     HTMLUtils.addRubyOutput(bodyContent, "f.text_field :" + fName);
+//                     HTMLUtils.addRubyOutput(bodyContent, "f.label :" + fName);
+//                     HTMLUtils.addRubyOutput(bodyContent, "f.text_field :" + fName);
+                     generateFormField(bodyContent, fName);
                  }
                  else if (fType.equals(Type.LONG_STRING)) {
-                     HTMLUtils.addRubyOutput(bodyContent, "f.label :" + fName);
-                     HTMLUtils.addRubyOutput(bodyContent, "f.text_area :" + fName + ", :rows => \"5\"");
+                     generateTextArea(bodyContent, fName, 5);
                  }
                  else if (fType.equals(Type.STRING)) {
-                     HTMLUtils.addRubyOutput(bodyContent, "f.label :" + fName);
-                     HTMLUtils.addRubyOutput(bodyContent, "f.text_field :" + fName);
+                     generateTextArea(bodyContent, fName, 2);
                  }
                  else if (fType.equals(Type.IMAGE)) {
                      rubyout(bodyContent, "f.label :" + fName + ", \"Your " + WordUtils.capitalize(fName) + " Image\"");
@@ -1258,19 +1413,20 @@ public class RailsGen extends Generator {
                      HTMLUtils.closeDiv(bodyContent);
                  }
                  else if (fType.equals(Type.PHONE)) {
-                     HTMLUtils.addRubyOutput(bodyContent, "f.label :" + fName);
-                     HTMLUtils.addRubyOutput(bodyContent, "f.phone_field :" + fName);
+                     generateFormField(bodyContent, fName, "phone");
+
                  }
                  else if (fType.equals(Type.CURRENCY)) {
-                     HTMLUtils.addRubyOutput(bodyContent, "f.label :" + fName);
-                     HTMLUtils.addRubyOutput(bodyContent, "f.text_field :" + fName); // TODO: currency symbol?
+                     generateFormField(bodyContent, fName);   // TODO: currency symbol?
                  }
                  else if (fType instanceof FixedList) {
 
                      FixedList fl = (FixedList)fType;
                      Object []  values = fl.getValues();
 
-                     HTMLUtils.addRubyOutput(bodyContent, "f.label :" + fName);
+                     HTMLUtils.addDiv(bodyContent, "form-group");
+                     HTMLUtils.addRubyOutput(bodyContent, "f.label(:" + fName + ", class: \"col-sm-2 control-label\") ");
+                     HTMLUtils.addDiv(bodyContent, "col-sm-8");
 
                      StringUtils.addLine(bodyContent, "<select name=\"" + name + "[" + fName + "]\" id=\"" + name + "_" + fName + "\" class=\"input-medium\">");
                      StringUtils.addLine(bodyContent, "<%= options_for_select ([");
@@ -1280,8 +1436,10 @@ public class RailsGen extends Generator {
                              StringUtils.addLine(bodyContent, "\"" + values [i].toString() + "\"" + (i < values.length - 1 ? ", " : ""));
                          }
                      }
-                     StringUtils.addLine(bodyContent, "], selected: @" + name + "." + fName + ") %>");
+                     StringUtils.addLine(bodyContent, "]) %>"); //  TODO: fix this , selected: @" + name + "." + fName + ") %>");
                      HTMLUtils.close(bodyContent, "select");
+                     HTMLUtils.closeDiv(bodyContent);
+                     HTMLUtils.closeDiv(bodyContent);
                  }
                  else if (fType instanceof Collection) {
 
@@ -1311,12 +1469,7 @@ public class RailsGen extends Generator {
                      }
                  }
                  else if (fType.equals(Type.FILE)) {
-                     rubyout(bodyContent, "f.label :" + fName + ", \"Your " + WordUtils.capitalize(fName) + " File\"");
-                     rubyout(bodyContent, "file_for(@" + fName + ")");         // TODO support for file_for
-                     HTMLUtils.addDiv(bodyContent, "fileUpload btn");
-                     aline(bodyContent, "<span>Change File</span>");
-                     rubyout(bodyContent, "f.file_field :" + fName + " :class => \"upload\"");
-                     HTMLUtils.closeDiv(bodyContent);
+                     generateFileUploadField(bodyContent, fName);
                  }
 
                  else if (fType.equals(Type.SET_PICK_ONE)) {
@@ -1331,17 +1484,16 @@ public class RailsGen extends Generator {
                       */
                  }
                  else if (fType.equals(Type.PASSWORD)) {
-                     HTMLUtils.addRubyOutput(bodyContent, "f.label :" + fName);
-                     HTMLUtils.addRubyOutput(bodyContent, "f.password_field :" + fName);
+                     generateFormField(bodyContent, fName, "password");
                  }
                  else {
-                    HTMLUtils.addRubyOutput(bodyContent, "f.label :" + fName);
-                    HTMLUtils.addRubyOutput(bodyContent, "f.text_field :" + fName);
+                     generateFormField(bodyContent, fName);
                  }
 
                  aline(bodyContent, "");
              }
-            ruby(bodyContent, "end");
+            //ruby(bodyContent, "end");
+            generateFormEnd(bodyContent, "Submit");
         }
 
 
@@ -1496,9 +1648,10 @@ public class RailsGen extends Generator {
                 StringUtils.addLine(buf, "class " + className + " < ApplicationController");
                 tabbed(buf, "before_filter :signed_in_" + name + ", only: [:edit, :update, :destroy]");
                 tabbed(buf, "before_filter :correct_" + name + ", only: [:edit, :update]");
+                tabbed(buf, "helper_method :sort_column, :sort_direction");
 
                 ArrayList<String> createLines = new ArrayList<String>();
-                createLines.add("@" + name + " = " + capName + ".new(params[:" + name + "])");
+                createLines.add("@" + name + " = " + capName + ".new(params[" + name + "_params])");
                 createLines.add("if @" + name + ".save");
                 createLines.add("\tredirect_to root_path");
                 createLines.add("else");
@@ -1537,9 +1690,9 @@ public class RailsGen extends Generator {
                 addMethod(buf, "show", showMethod);
 
                 ArrayList<String> indexMethod = new ArrayList<String>();
-                indexMethod.add("query = \"(disabled = 'f' or disabled is null)\"");
-                indexMethod.add("condarr = [query]");
-                indexMethod.add("@" + names + " = " + capName + ".paginate(:page => params[:page], :conditions => condarr, :order => sort_column + \" \" + sort_direction)");
+                //indexMethod.add("query = \"(disabled = 'f' or disabled is null)\"");
+                //indexMethod.add("condarr = [query]");
+                indexMethod.add("@" + names + " = " + capName + ".where(\"disabled = 'f' or disabled is null\").order(sort_column + \" \" + sort_direction).paginate(:page => params[:page])");
                 
                 addMethod(buf, "index", indexMethod);
 
@@ -1549,6 +1702,22 @@ public class RailsGen extends Generator {
 
                 StringUtils.addLineBreak(buf);
                 tabbed(buf, "private");
+
+                /**
+                 * def user_params
+                 params.require(:user).permit(:name, :email, :password,
+                 :password_confirmation)
+                 end
+                 */
+                String fieldList = "";
+                for (int i = 0; i < model.getFields().size(); i++) {
+                    Field f = model.getFields().get(i);
+
+                    fieldList += ":" + f.getName();
+                    if (i < model.getFields().size() - 1)
+                        fieldList += ", ";
+                }
+                addMethod(buf, name + "_params", new String[] {"params.require(:" + name + ").permit(" + fieldList + ")"});
                 tabbed(buf, "def correct_" + name, 2);
                 tabbed(buf, "@" + name + " = " + capName + ".find(params[:id])", 3);
                 tabbed(buf, "end", 2);
@@ -1745,7 +1914,7 @@ public class RailsGen extends Generator {
 
                 if (fields != null) {
                     for (Field field : fields) {
-                        if (field.isComputed())
+                        if (field.isComputed() || field.getName().equals("created_at") || field.getName().equals("updated_at"))
                             continue;
 
                         tabbed(buf, "t." + getRailsType(field.getTheType()) + " :" + field.getName(), 3);
@@ -1753,7 +1922,8 @@ public class RailsGen extends Generator {
                 }
 
                 if (model.isSecure()) {
-                    tabbed(buf, "t.string :remember_digest");
+                    tabbed(buf, "t.string :remember_digest", 3);
+                    tabbed(buf, "t.string :password_digest", 3);
                 }
 
                 if (rels != null) {
@@ -1761,7 +1931,7 @@ public class RailsGen extends Generator {
                         tabbed(buf, "t.integer :" + rel.getModel().getName() + "_id", 3);
                     }
                 }
-                tabbed(buf, "t.timestamps", 3);
+                tabbed(buf, "t.timestamps null: false", 3);
                 tabbed(buf, "end", 2);
                 tabbed(buf, "end");
                 StringUtils.addLine(buf, "end");
