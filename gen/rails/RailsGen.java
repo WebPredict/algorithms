@@ -407,7 +407,7 @@ public class RailsGen extends Generator {
             	HTMLUtils.addRubyOutput(buf, "tabs_tag do |tab|");
             	for (Model model : app.getTopLevelModels()) {
             		HTMLUtils.addRubyOutput(buf, "tab." + model.getName() + "' " +
-            				model.getCapName() + "', " + model.getName() + "_path");
+            				model.getCapName() + "', " + model.getPluralName() + "_path");
             	}
             	HTMLUtils.addRuby(buf, "end");
             }
@@ -452,13 +452,17 @@ public class RailsGen extends Generator {
          Model  frontPageModelList = app.getFrontPageListModel();
 
          if (frontPageModelList != null)
-             generateTableFor(buf, frontPageModelList);
+             generateTableFor(buf, frontPageModelList, "static_pages");
 
         HTMLUtils.addRuby(buf, "end");
         FileUtils.write(HTMLUtils.formatHTML(buf.toString(), 2), app.getWebAppDir() + "/app/views/static_pages/home.html.erb", true);
     }
 
     public void generateTableFor(StringBuilder buf, Model model) {
+        generateTableFor(buf, model, null);
+    }
+
+    public void generateTableFor(StringBuilder buf, Model model, String collectionOverride) {
         String pluralModelList = model.getPluralName();
 
         /**
@@ -480,8 +484,8 @@ public class RailsGen extends Generator {
          </container-fluid>
          */
 
-        //HTMLUtils.addRubyOutput(buf, "will_paginate");
-        HTMLUtils.addRuby(buf, "if @" + pluralModelList + ".any?");
+        HTMLUtils.addRubyOutput(buf, "will_paginate");
+        HTMLUtils.addRuby(buf, "if @" + (collectionOverride == null ? pluralModelList : collectionOverride) + ".any?");
         StringUtils.addLine(buf, "<table class=\"table table-striped\">");
 
         ArrayList<Field> fields = model.getFields();
@@ -491,19 +495,24 @@ public class RailsGen extends Generator {
             String line = "<tr>";
 
             for (Field f : fields) {
+                if (f.isAdminOnly())
+                    continue;
+                else if (f.getName().indexOf("password") != -1)
+                    continue;
+
                 line += "<th><%= sortable \"" + f.getName() + "\", \"" + WordUtils.capitalizeAndSpace(f.getName()) + "\" %></th>";
             }
             line += "<th>Actions</th></tr>";
             StringUtils.addLine(buf, line);
         }
-        //HTMLUtils.addRuby(buf, "@" + model.getPluralName() + ".each do |" + model.getName() + "|");
-        //HTMLUtils.addRubyOutput(buf, "render " + model.getName());
-        //HTMLUtils.addRuby(buf, "end");
+        HTMLUtils.addRuby(buf, "@" + (collectionOverride == null ? pluralModelList : collectionOverride) + ".each do |" + model.getName() + "|");
+        HTMLUtils.addRubyOutput(buf, "render " + model.getName());
+        HTMLUtils.addRuby(buf, "end");
 
-        HTMLUtils.addRubyOutput(buf, "will_paginate @" + model.getPluralName());
+        //HTMLUtils.addRubyOutput(buf, "will_paginate @" + model.getPluralName());
         StringUtils.addLine(buf, "</table>");
         HTMLUtils.addRuby(buf, "end");
-        //HTMLUtils.addRubyOutput(buf, "will_paginate");
+        HTMLUtils.addRubyOutput(buf, "will_paginate");
     }
 
     public void generateTablePartial(StringBuilder buf, Model model) {
@@ -518,6 +527,11 @@ public class RailsGen extends Generator {
             for (Field f : fields) {
                 String fieldName = f.getName();
                 Type    fType = f.getTheType();
+
+                if (f.isAdminOnly())
+                    continue;
+                else if (f.getName().indexOf("password") != -1)
+                    continue;
 
                 if (fType.equals(Type.BOOLEAN))
                     line += "<td><%= yesno(" + modelName + "." + fieldName + ") %></td>";
@@ -535,7 +549,7 @@ public class RailsGen extends Generator {
                 else if (fType.equals(Type.URL))
                     line += "<td><%= " + modelName + "." + fieldName + " %></td>";
                 else if (fieldName.equals("created_at"))
-                    line += "<td><%= time_ago_in_words(" + modelName + "." + fieldName + ") %></td>";
+                    line += "<td><%= time_ago_in_words(" + modelName + "." + fieldName + ")%> ago</td>";
                 else if (fieldName.equals("name"))
                     line += "<td><%= link_to " + modelName + "." + fieldName + ", " + modelName + " %></td>";
                 else
@@ -546,8 +560,9 @@ public class RailsGen extends Generator {
 
             // Actions:
             StringUtils.addLine(buf, "<td>");
-            //HTMLUtils.addRuby(buf, "if current_user?(" + modelName + ".user) || (current_user != nil && current_user.admin?)");
-            HTMLUtils.addRuby(buf, "if true");
+            //HTMLUtils.addRuby(buf, "if current_" + app.getUserModel().getName() + "?(" + modelName + ".user)"); // || (current_user != nil && current_user.admin?)");
+            HTMLUtils.addRuby(buf, "if current_" + app.getUserModel().getName() + " != nil"); // || (current_user != nil && current_user.admin?)");
+            //HTMLUtils.addRuby(buf, "if true");
             HTMLUtils.addRubyOutput(buf, "link_to \"edit\", edit_" + modelName + "_path(" + modelName + "), :class => 'btn btn-mini'");
             HTMLUtils.addRuby(buf, "if " + modelName + ".disabled");
             HTMLUtils.addRubyOutput(buf, "link_to \"enable\", enable_" + modelName + "_path(" + modelName + "), :class => 'btn btn-mini'");
@@ -556,7 +571,7 @@ public class RailsGen extends Generator {
             HTMLUtils.addRuby(buf, "end");
             HTMLUtils.addRubyOutput(buf, "link_to \"delete\", " + modelName + ", :class => 'btn btn-mini btn-danger', method: :delete, " +
              "confirm: \"You sure you want to delete this " + modelName + "?\"," +
-             "title: " + modelName + "." + model.getUserIndentifierFieldName());  // TODO don't hardcode
+             "name: " + modelName + "." + model.getUserIndentifierFieldName());  // TODO don't hardcode
             HTMLUtils.addRuby(buf, "end");
 
             StringUtils.addLine(buf, "</td>");
@@ -574,38 +589,6 @@ public class RailsGen extends Generator {
         HTMLUtils.addRuby(buf, "provide(:title, \"Sign in\")");
         HTMLUtils.addH1(buf, "Sign In");
 
-        /**
-         * <%= form_for(:session, url: sessions_path, :html => {:class => "form-horizontal" } ) do |f| %>
-         <div class="form-group">
-         <%= f.label(:email, class: "col-sm-2 control-label") %>
-         <div class="col-sm-8">
-         <%= f.text_field(:email, class: "form-control") %>
-         </div>
-         </div>
-         <div class="form-group">
-         <%= f.label(:password, :password, class: "col-sm-2 control-label") %>
-         <div class="col-sm-8">
-         <%= f.password_field(:password, class: "form-control") %>
-         </div>
-         </div>
-         <div class="form-group">
-         <div class="col-sm-offset-2 col-sm-8">
-         <%= f.label :remember_me, class: "checkbox inline" do %>
-         <%= f.check_box :remember_me %>
-         <span>Remember me on this computer</span>
-         <% end %>
-         </div>
-         </div>
-         <div class="form-group">
-         <div class="col-sm-offset-2 col-sm-8">
-         <%= f.submit "Sign in", class: "btn btn-large btn-primary"  %>
-         </div>
-         </div>
-         <% end %>
-         </div>
-         </div>
-
-         */
         generateFormForStart(buf, "session");
 
         generateFormField(buf, "email");
@@ -621,6 +604,7 @@ public class RailsGen extends Generator {
         HTMLUtils.closeDiv(buf);
         HTMLUtils.addDiv(buf, "col-sm-3");
         StringUtils.addLine(buf, "Forgot password? <%= link_to \"Reset password\",  send_password_path %>");
+        HTMLUtils.closeDiv(buf);
         HTMLUtils.closeDiv(buf);
 
         FileUtils.write(buf, app.getWebAppDir() + "/app/views/sessions/new.html.erb", true);
@@ -769,16 +753,27 @@ public class RailsGen extends Generator {
 
         addMethod(buf, "current_" + name, new String[] {"@current_" + name + " ||= " + capName + ".find_by(id: session[:" + name + "_id])"});
 
+        /**
+         * def redirect_back_or(default)
+         redirect_to(session[:forwarding_url] || default)
+         session.delete(:forwarding_url)
+         end
+
+         # Stores the URL trying to be accessed.
+         def store_location
+         session[:forwarding_url] = request.url if request.get?
+         end
+         */
 
 //        addMethod(buf, "signed_in?", new String[] {"!current_" + name + ".nil?"});
 //        addMethod(buf, "sign_out", new String[] {"self.current_" + name + " = nil", "cookies.delete(:remember_token)"});
 //        addMethod(buf, "current_" + name, new String[] {"@current_" + name + " ||= " + capName + ".find_by_remember_token(cookies[:remember_token])"});
-//        addMethod(buf, "current_" + name + "?(" + name + ")", new String[] {name + " == current_" + name});
+        addMethod(buf, "current_" + name + "?(" + name + ")", new String[] {name + " == current_" + name});
 //        addMethod(buf, "current_" + name + "=(" + name + ")", new String[] {"@current_" + name + " = " + name});
-//        addMethod(buf, "redirect_back_or(default)", new String[] {"redirect_to(session[:return_to] || default)", "session.delete(:return_to)"});
+        addMethod(buf, "redirect_back_or(default)", new String[] {"redirect_to(session[:forwarding_url] || default)", "session.delete(:forwarding_url)"});
 //        addMethod(buf, "sign_in(" + name + ")", new String[] {"cookies.permanent[:remember_token] = " + name + ".remember_token", "self.current_" + name + " = " + name});
 //        addMethod(buf, "redirect_back_or(default)", new String[] {"redirect_to(session[:return_to] || default)", "session.delete(:return_to)"});
-//        addMethod(buf, "store_location", new String[] {"session[:return_to] = request.fullpath"});
+        addMethod(buf, "store_location", new String[] {"session[:forwarding_url] = request.url if request.get?"});
 //        addMethod(buf, "signed_in_" + name, new String[] {"unless signed_in?", "\tstore_location", "\tredirect_to signin_path, notice: \"Please sign in.\"", "end"});
 
         StringUtils.addLine(buf, "end ");
@@ -1208,10 +1203,22 @@ public class RailsGen extends Generator {
         
         // TODO: need to not hardcode this
         StringUtils.addLine(buf, "<% provide(:title, @" + name + "." + model.getUserIndentifierFieldName() + ") %>");
+
+        HTMLUtils.addDiv(buf, "page-header");
+        HTMLUtils.addH1(buf, model.getCapName() + ": <%= @" + name + "." + model.getUserIndentifierFieldName() + " %>");
+        HTMLUtils.closeDiv(buf);
+        /**
+         * <div class="page-header">
+         <h1>Example page header <small>Subtext for header</small></h1>
+         </div>
+         */
+
+
         StringBuilder       bodyContent = new StringBuilder();
 
         boolean useTabs = useTabs(model);
 
+        StringUtils.addLine(bodyContent, "<dl class=\"dl-horizontal\">");
         if (fields != null) {
             for (Field f : fields) {
 
@@ -1284,7 +1291,7 @@ public class RailsGen extends Generator {
                 StringUtils.addLineBreak(bodyContent);
             }
         }
-
+        StringUtils.addLine(bodyContent, "</dl>");
         Layout layout = app.getAppConfig().getLayout();
 
         if (layout == null)
@@ -1330,9 +1337,9 @@ public class RailsGen extends Generator {
     }
 
     private void generateReadOnlySection (StringBuilder bodyContent, String fieldDetails, String fieldName) {
-        StringUtils.addLine(bodyContent, "<section><h4>" + WordUtils.capitalizeAndSpace(fieldName) + "</h4>");
+        StringUtils.addLine(bodyContent, "<dt>" + WordUtils.capitalizeAndSpace(fieldName) + "</dt><dd>");
         HTMLUtils.addRubyOutput(bodyContent, fieldDetails);
-        StringUtils.addLine(bodyContent, "</section>");
+        StringUtils.addLine(bodyContent, "</dd>");
     }
 
     public void generateListView (Model model) throws Exception {
@@ -1347,6 +1354,11 @@ public class RailsGen extends Generator {
         ModelLayout modelLayout = app.getAppConfig().getComplexModelLayout();
 
         StringBuilder bodyContent = new StringBuilder();
+
+        HTMLUtils.addDiv(bodyContent, "page-header");
+        HTMLUtils.addH1(bodyContent, WordUtils.pluralize(model.getCapName()));
+        HTMLUtils.closeDiv(bodyContent);
+
         generateTableFor(bodyContent, model);
 
         switch (app.getAppConfig().getLayout()) {
@@ -1683,7 +1695,7 @@ public class RailsGen extends Generator {
                 StringBuilder buf = new StringBuilder();
                 String  className = WordUtils.capitalizeAndJoin(names, "controller");
                 StringUtils.addLine(buf, "class " + className + " < ApplicationController");
-                tabbed(buf, "before_filter :signed_in_" + name + ", only: [:edit, :update, :destroy]");
+                tabbed(buf, "before_filter :logged_in_" + name + ", only: [:edit, :update, :destroy]");
                 tabbed(buf, "before_filter :correct_" + name + ", only: [:edit, :update]");
                 tabbed(buf, "helper_method :sort_column, :sort_direction");
 
@@ -1733,23 +1745,23 @@ public class RailsGen extends Generator {
                 ArrayList<String> indexMethod = new ArrayList<String>();
                 //indexMethod.add("query = \"(disabled = 'f' or disabled is null)\"");
                 //indexMethod.add("condarr = [query]");
-                indexMethod.add("@" + names + " = " + capName + ".where(\"disabled = 'f' or disabled is null\").order(sort_column + \" \" + sort_direction).paginate(:page => params[:page])");
-                
+                //indexMethod.add("@" + names + " = " + capName + ".where(\"disabled = 'f' or disabled is null\").order(sort_column + \" \" + sort_direction).paginate(:page => params[:page])");
+                // TODO: debug what's up with this where clause not working
+                indexMethod.add("@" + names + " = " + capName + ".order(sort_column + \" \" + sort_direction).paginate(:page => params[:page])");
                 addMethod(buf, "index", indexMethod);
 
                 addMethod(buf, "destroy", new String[] {capName + ".find(params[:id]).destroy",
                         "flash[:success] = \"" + capName + " removed from system.\"",
                         "redirect_to " + names + "_path"});
 
+                /**
+                 * User.find(params[:id]).destroy
+                 flash[:success] = "User deleted"
+                 redirect_to users_url
+                 */
                 StringUtils.addLineBreak(buf);
                 tabbed(buf, "private");
 
-                /**
-                 * def user_params
-                 params.require(:user).permit(:name, :email, :password,
-                 :password_confirmation)
-                 end
-                 */
                 String fieldList = "";
                 for (int i = 0; i < model.getFields().size(); i++) {
                     Field f = model.getFields().get(i);
@@ -1759,12 +1771,27 @@ public class RailsGen extends Generator {
                         fieldList += ", ";
                 }
                 addMethod(buf, name + "_params", new String[] {"params.require(:" + name + ").permit(" + fieldList + ")"});
-                tabbed(buf, "def correct_" + name, 2);
-                tabbed(buf, "@" + name + " = " + capName + ".find(params[:id])", 3);
-                tabbed(buf, "end", 2);
 
+                addMethod(buf, "correct_" + name, new String[] {"@" + name + " = " + capName + ".find(params[:id])",
+                        "redirect_to(root_url) unless @" + name + " == current_" + name});
+                //redirect_to(root_url) unless current_user?(@user)
+
+//                tabbed(buf, "def correct_" + name, 2);
+//                tabbed(buf, "@" + name + " = " + capName + ".find(params[:id])", 3);
+//                tabbed(buf, "end", 2);
+
+                /**
+                 * def logged_in_user
+                 unless logged_in?
+                 flash[:danger] = "Please log in."
+                 redirect_to login_url
+                 end
+                 end
+                 */
+
+                addMethod(buf, "logged_in_" + name, new String[] {"unless logged_in?", "store_location", "flash[:danger] = \"Please log in.\"", "redirect_to signin_url", "end"});
                 addMethodTabbed(buf, "sort_column", new String[]{
-                        capName + ".column_names.include?(params[:sort]) ? params[:sort] : \"title\" "});
+                        capName + ".column_names.include?(params[:sort]) ? params[:sort] : \"" + model.getUserIndentifierFieldName() + "\" "});
 
                 addMethodTabbed(buf, "sort_direction", new String[]{"%w[asc desc].include?(params[:direction]) ? params[:direction] : \"asc\" "});
 
@@ -1781,13 +1808,6 @@ public class RailsGen extends Generator {
                 addMethod(buf, "new", new String[] {});
                 StringUtils.addLineBreak(buf);
 
-//                tabbed(buf, "def create");
-//                tabbed(buf, "email = params[:session][:email]", 2);
-//                tabbed(buf, "if email != nil", 2);
-//                tabbed(buf, "email = email.downcase ", 3);
-//                tabbed(buf, "end", 2);
-//                StringUtils.addLineBreak(buf);
-
                 Model   userModel = app.getUserModel();
                 String  userModelName = userModel.getName();
 
@@ -1802,17 +1822,6 @@ public class RailsGen extends Generator {
                  tabbed(buf, "render 'new'", 3);
                  tabbed(buf, "end ", 2);
                  tabbed(buf, "end ");
-
-
-//                tabbed(buf, userModelName + " = " + WordUtils.capitalize(userModelName) + ").find_by_email(email)", 2);
-//                tabbed(buf, "if " + userModelName + " && " + userModelName + ".authenticate(params[:session][:password])", 2);
-//                tabbed(buf, "sign_in user", 3);
-//                tabbed(buf, "redirect_back_or root_path ", 3);
-//                tabbed(buf, "else", 2);
-//                tabbed(buf, "flash[:error] = \"Invalid email/password combination\" ", 3);
-//                tabbed(buf, "render 'new'", 3);
-//                tabbed(buf, "end", 2);
-//                tabbed(buf, "end");
 
                 addMethod(buf, "destroy", new String[] {"log_out if logged_in?", "redirect_to root_path"});
 
@@ -1854,7 +1863,7 @@ public class RailsGen extends Generator {
                             "",
                             "condarr = [query]",
                             "condarr.concat(paramarr)",
-                            "@" + frontListModel.getPluralName() + " = " + frontListModel.getCapName() + ".paginate(page: params[:page])"
+                            "@static_pages = " + frontListModel.getCapName() + ".paginate(page: params[:page])"
                      //       "@" + frontListModel.getPluralName() + " = " + frontListModel.getCapName() + ".paginate(:page => params[:page], per_page: 10, :conditions => condarr, :order => sort_column + \" \" + sort_direction)"};
                     };
 

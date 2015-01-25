@@ -63,6 +63,11 @@ public class App {
         }
     }
 
+    public App () {
+        newsBlurbs.add(new Blurb("News Item 1", "This is the first of many news items."));
+        newsBlurbs.add(new Blurb("News Item 2", "This is the second of many news items."));
+    }
+
     public ArrayList<Model> getTopLevelModels() {
         return topLevelModels;
     }
