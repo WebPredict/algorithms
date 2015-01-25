@@ -73,7 +73,8 @@ public class Validation {
             return (new Validation(ValidationType.NUMERIC));
         }
         else
-            throw new RuntimeException("What validation type is this?" + trimmed);
+            return (null);
+            //throw new RuntimeException("What validation type is this?" + trimmed);
     }
 
     public String toString () {

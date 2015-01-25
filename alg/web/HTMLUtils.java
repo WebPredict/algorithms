@@ -16,6 +16,10 @@ public class HTMLUtils {
           buf.append("<p>" + content + "</p>\n");
     }
 
+    public static void    addParagraph (StringBuilder buf, String content, String className) {
+        buf.append("<p class=\"" + className + "\">" + content + "</p>\n");
+    }
+
     public static void      addRuby (StringBuilder buf, String content) {
         buf.append("<% " + content + " %>\n");
     }

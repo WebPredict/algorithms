@@ -22,6 +22,15 @@ public class Model extends Type {
     private boolean email;
     private boolean URL;
     private boolean dependent;
+    private String  userIndentifierFieldName = "name";
+
+    public String getUserIndentifierFieldName() {
+        return userIndentifierFieldName;
+    }
+
+    public void setUserIndentifierFieldName(String userIndentifierFieldName) {
+        this.userIndentifierFieldName = userIndentifierFieldName;
+    }
 
     public boolean isDependent() {
         return dependent;
@@ -70,6 +79,12 @@ public class Model extends Type {
         for (int i = 0; i < fields.size(); i++) {
             Field f = fields.get(i);
             String fieldName = f.getName();
+            if (fieldName.equals("username"))
+                userIndentifierFieldName = fieldName;
+            else if (fieldName.equals("name"))
+                userIndentifierFieldName = fieldName;
+            // TODO: improve this
+
             if (fieldName.equals("password")) {
                 secure = true;
             }
@@ -91,7 +106,7 @@ public class Model extends Type {
             }
         }
         if (secure && !sawPWConf) {
-             fields.add(new Field("password_confirmation", Type.SHORT_STRING));
+             fields.add(new Field("password_confirmation", Type.PASSWORD));
         }
         if (!sawDisabled) {
             fields.add(new Field("disabled", Type.BOOLEAN, false, true));
@@ -194,18 +209,7 @@ public class Model extends Type {
             String []   details = next.split(" ");
             Field       f = null;
             if (details.length == 1) {
-                if (details [0].equals("email"))
-                    f = new Field(details [0], Type.EMAIL);
-                else if (details [0].equals("phone"))
-                    f = new Field(details [0], Type.PHONE);
-                else if (details [0].equals("password"))
-                    f = new Field(details [0], Type.PASSWORD);
-                else if (details [0].equals("url"))
-                    f = new Field(details [0], Type.URL);
-                else if (details [0].equals("address"))
-                    f = new Field(details [0], Type.ADDRESS);
-                else
-                    f = new Field(details [0], Type.STRING);
+                f = new Field(details [0], getType(details[0]));
             }
             else {
                 if (details [0].equals("has_many")) {
@@ -222,7 +226,13 @@ public class Model extends Type {
                     ret.addRel(r);
                 }
                 else {
-                    f = new Field(details [0], details [1]);
+                    Validation v = Validation.parseValidation(details[1]);
+                    if (v == null)
+                        f = new Field(details [0], details [1]);
+                    else {
+                        f = new Field(details [0], getType(details[0]));
+                        f.addValidation(v);
+                    }
                 }
             }
 
@@ -237,6 +247,21 @@ public class Model extends Type {
 
         }
         return (ret);
+    }
+
+    private static Type getType (String typeName) {
+        if (typeName.equals("email"))
+            return (Type.EMAIL);
+        else if (typeName.equals("phone"))
+            return (Type.PHONE);
+        else if (typeName.equals("password"))
+            return (Type.PASSWORD);
+        else if (typeName.equals("url"))
+            return (Type.URL);
+        else if (typeName.equals("address"))
+            return (Type.ADDRESS);
+        else
+            return (Type.SHORT_STRING);
     }
 
     public String toString () {

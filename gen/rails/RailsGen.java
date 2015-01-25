@@ -71,7 +71,7 @@ public class RailsGen extends Generator {
         Model userModel = app.getUserModel();
         String  userModelName = userModel.getName();
 
-        HTMLUtils.addParagraph(buf, "Thank you for registering <%= @" + userModelName + ".name %> with " + app.getTitle());
+        HTMLUtils.addParagraph(buf, "Thank you for registering <%= @" + userModelName + "." + userModel.getUserIndentifierFieldName() +" %> with " + app.getTitle());
         HTMLUtils.addLineBreak(buf);
         HTMLUtils.addParagraph(buf, "You can view or change your account details <%= link_to \"here\", edit_" + userModelName + "_url(@" + userModelName + ") %>.");
         HTMLUtils.addParagraph(buf, "You can get started <%= link_to \"here\", edit_" + userModelName + "_url(@" + userModelName + ") %>.");
@@ -140,10 +140,23 @@ public class RailsGen extends Generator {
     }
 
     public void generateSharedPages () throws Exception {
+        /**
+         * <% if @user.errors.any? %>
+         <div id="error_explanation">
+         <div class="alert alert-danger">
+         The form contains <%= pluralize(@user.errors.count, "error") %>.
+         </div>
+         <ul                                                      <% @user.errors.full_messages.each do |msg| %>
+         <li><%= msg %></li>
+         <% end %>
+         </ul>
+         </div>
+         <% end %>
+         */
         StringBuilder buf = new StringBuilder();
         HTMLUtils.addRuby(buf, "if object.errors.any?");
         HTMLUtils.addDivId(buf, "error_explanation");
-        HTMLUtils.addDiv(buf, "alert alert-error");
+        HTMLUtils.addDiv(buf, "alert alert-danger");
         StringUtils.addLine(buf, "Please correct the following <%= pluralize(object.errors.count, \"error\") %>.");
         HTMLUtils.closeDiv(buf);
         StringUtils.addLine(buf, "<ul>");
@@ -292,6 +305,7 @@ public class RailsGen extends Generator {
         HTMLUtils.addRubyOutput(buf, "yield");
         HTMLUtils.closeDiv(buf);
         HTMLUtils.addRubyOutput(buf, "render 'layouts/footer'");
+        HTMLUtils.addRubyOutput(buf, "debug(params) if Rails.env.development?");
         StringUtils.addLine(buf, "</body>");
         StringUtils.addLine(buf, "</html>");
 
@@ -352,7 +366,7 @@ public class RailsGen extends Generator {
             HTMLUtils.addRuby(buf, "provide(:title, '" + title + "')");
             HTMLUtils.addH1(buf, title + " Placeholder Page");
 
-            HTMLUtils.addParagraph(buf, page.getContent());
+            HTMLUtils.addParagraph(buf, page.getContent(), "lead text-center");
 
             FileUtils.write(buf, app.getWebAppDir() + "/app/views/static_pages/" + name + ".html.erb", true);
         }
@@ -385,7 +399,7 @@ public class RailsGen extends Generator {
         if (app.getUserModel() != null) {
             HTMLUtils.addRuby(buf, "if logged_in?");
             Model userModel = app.getUserModel();
-            HTMLUtils.addH3(buf, userModel.getCapName() + " Dashboard for <%= current_" +userModel.getName() + ".name %>");
+            HTMLUtils.addH3(buf, userModel.getCapName() + " Dashboard for <%= current_" +userModel.getName() + "." + userModel.getUserIndentifierFieldName() +" %>");
 
             boolean topLevelModelsInTabs = true; // TODO
             
@@ -422,7 +436,7 @@ public class RailsGen extends Generator {
         HTMLUtils.addDiv(buf, "container");
         HTMLUtils.addH1(buf, "Welcome to " + app.getTitle());
 
-        HTMLUtils.addParagraph(buf, app.getTagLine());
+        HTMLUtils.addParagraph(buf, app.getTagLine(), "lead text-center");
 
         Model  frontSearchModel = app.getFrontPageSearchModel();
 
@@ -447,10 +461,28 @@ public class RailsGen extends Generator {
     public void generateTableFor(StringBuilder buf, Model model) {
         String pluralModelList = model.getPluralName();
 
+        /**
+         * <container-fluid>
+         <row-fluid>
+         <span10>
+         <%= will_paginate %>
+         <% if @questions.any? %>
+         <table class="table table-striped">
+         <tr><th><%= sortable "name", "Name" %></th><th><%= sortable "description", "Description" %></th><th><%= sortable "answer", "Answer" %></th><th><%= sortable "code_snippet", "Code snippet" %></th><th><%= sortable "difficulty", "Difficulty" %></th><th><%= sortable "disabled", "Disabled" %></th><th><%= sortable "created_by", "Created by" %></th><th><%= sortable "created_at", "Created at" %></th><th><%= sortable "updated_by", "Updated by" %></th><th><%= sortable "updated_at", "Updated at" %></th><th>Actions</th></tr>
+         <% @questions.each do |question| %>
+         <%= render question %>
+         <% end %>
+         </table>
+         <% end %>
+         <%= will_paginate %>
+         </span10>
+         </row-fluid>
+         </container-fluid>
+         */
+
+        //HTMLUtils.addRubyOutput(buf, "will_paginate");
         HTMLUtils.addRuby(buf, "if @" + pluralModelList + ".any?");
         StringUtils.addLine(buf, "<table class=\"table table-striped\">");
-
-        StringUtils.addLine(buf, "</table>");
 
         ArrayList<Field> fields = model.getFields();
 
@@ -464,10 +496,14 @@ public class RailsGen extends Generator {
             line += "<th>Actions</th></tr>";
             StringUtils.addLine(buf, line);
         }
-        HTMLUtils.addRubyOutput(buf, "render @" + pluralModelList + "_rows");
+        //HTMLUtils.addRuby(buf, "@" + model.getPluralName() + ".each do |" + model.getName() + "|");
+        //HTMLUtils.addRubyOutput(buf, "render " + model.getName());
+        //HTMLUtils.addRuby(buf, "end");
 
         HTMLUtils.addRubyOutput(buf, "will_paginate @" + model.getPluralName());
+        StringUtils.addLine(buf, "</table>");
         HTMLUtils.addRuby(buf, "end");
+        //HTMLUtils.addRubyOutput(buf, "will_paginate");
     }
 
     public void generateTablePartial(StringBuilder buf, Model model) {
@@ -510,16 +546,17 @@ public class RailsGen extends Generator {
 
             // Actions:
             StringUtils.addLine(buf, "<td>");
-            HTMLUtils.addRuby(buf, "if current_user?(" + modelName + ".user) || (current_user != nil && current_user.admin?)");
+            //HTMLUtils.addRuby(buf, "if current_user?(" + modelName + ".user) || (current_user != nil && current_user.admin?)");
+            HTMLUtils.addRuby(buf, "if true");
             HTMLUtils.addRubyOutput(buf, "link_to \"edit\", edit_" + modelName + "_path(" + modelName + "), :class => 'btn btn-mini'");
             HTMLUtils.addRuby(buf, "if " + modelName + ".disabled");
             HTMLUtils.addRubyOutput(buf, "link_to \"enable\", enable_" + modelName + "_path(" + modelName + "), :class => 'btn btn-mini'");
-            HTMLUtils.addRuby(buf, "else");
-            HTMLUtils.addRubyOutput(buf, "link_to \"disable\", disable_" + modelName + "_path(" + modelName + "), :class => 'btn btn-mini'");
+           // HTMLUtils.addRuby(buf, "else");
+            //HTMLUtils.addRubyOutput(buf, "link_to \"disable\", disable_" + modelName + "_path(" + modelName + "), :class => 'btn btn-mini'");
             HTMLUtils.addRuby(buf, "end");
             HTMLUtils.addRubyOutput(buf, "link_to \"delete\", " + modelName + ", :class => 'btn btn-mini btn-danger', method: :delete, " +
              "confirm: \"You sure you want to delete this " + modelName + "?\"," +
-             "title: " + modelName + ".title");
+             "title: " + modelName + "." + model.getUserIndentifierFieldName());  // TODO don't hardcode
             HTMLUtils.addRuby(buf, "end");
 
             StringUtils.addLine(buf, "</td>");
@@ -1026,12 +1063,12 @@ public class RailsGen extends Generator {
                 StringUtils.addLineBreak(buf);
 
                 if (model.hasEmail ()) {
-                    tabbed(buf, "before_save { |" + name + "| " + name + ".email = email.downcase }");
+                    tabbed(buf, "before_save { self.email = email.downcase }");
                 }
-                if (model.isSecure()) {
-                    tabbed(buf, "before_save :create_remember_token");
-                    StringUtils.addLineBreak(buf);
-                }
+                //if (model.isSecure()) {
+                    //tabbed(buf, "before_save :create_remember_token");
+                  //  StringUtils.addLineBreak(buf);
+                //}
 
                 if (fields != null) {
                     if (model.hasEmail()) {
@@ -1170,7 +1207,7 @@ public class RailsGen extends Generator {
         StringBuilder       buf = new StringBuilder();
         
         // TODO: need to not hardcode this
-        StringUtils.addLine(buf, "<% provide(:title, @" + name + ".name) %>");
+        StringUtils.addLine(buf, "<% provide(:title, @" + name + "." + model.getUserIndentifierFieldName() + ") %>");
         StringBuilder       bodyContent = new StringBuilder();
 
         boolean useTabs = useTabs(model);
@@ -1352,7 +1389,7 @@ public class RailsGen extends Generator {
 
         buf = new StringBuilder();
         generateTablePartial(buf, model);
-        writeViewFile(buf, names, "_" + name + "_rows");
+        writeViewFile(buf, names, "_" + name);
     }
 
     private void writeViewFile(StringBuilder buf, String subdir, String fileName) throws Exception {
@@ -1651,8 +1688,12 @@ public class RailsGen extends Generator {
                 tabbed(buf, "helper_method :sort_column, :sort_direction");
 
                 ArrayList<String> createLines = new ArrayList<String>();
-                createLines.add("@" + name + " = " + capName + ".new(params[" + name + "_params])");
+                createLines.add("@" + name + " = " + capName + ".new(" + name + "_params)");
                 createLines.add("if @" + name + ".save");
+                if (model.isSecure())
+                    createLines.add("flash[:success] = \"Welcome to " + app.getTitle() + "!\"");
+                else
+                    createLines.add("flash[:success] = \"Created new + " + model.getCapName() + ".\"");
                 createLines.add("\tredirect_to root_path");
                 createLines.add("else");
                 createLines.add("\trender 'new'");
@@ -1868,9 +1909,13 @@ public class RailsGen extends Generator {
             return ("string");
         else  if (type.equals(Type.BOOLEAN))
             return ("boolean");
-        else  if (type.equals(Type.SHORT_STRING))
-            return ("string");
         else  if (type.equals(Type.EMAIL))
+            return ("string");
+        else  if (type.equals(Type.PASSWORD))
+            return ("string");
+        else  if (type.equals(Type.CODE))
+            return ("string");
+        else  if (type.equals(Type.SHORT_STRING))
             return ("string");
         else  if (type.equals(Type.PHONE))
             return ("string");
