@@ -157,7 +157,7 @@ public class GeneratorTest {
         app.setModels(models);
         app.getAppConfig().setColor1("blue");
         app.getAppConfig().setColor2("white");
-        app.setJumbotronImageAsStockphoto("high tech");
+        app.setJumbotronImageAsStockphoto("office");
         app.addPlaceholderPages(new String[] {"about", "help", "news", "contact"});
         app.addStaticMenuItems(new String[] {"about", "news", "help"});
 

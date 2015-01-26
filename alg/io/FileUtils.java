@@ -100,6 +100,22 @@ public class FileUtils {
         return (didIt);
     }
 
+    public static boolean insertInFileIfNotExists (String filePath, String [] additionalLines) throws Exception {
+
+        List<String> fileLines = getLines(filePath);
+
+        if (lineExists(fileLines, additionalLines [0]))
+            return (false);
+
+        for (String additionalLine : additionalLines) {
+            fileLines.add(additionalLine);
+        }
+
+        putLines(fileLines, filePath);
+
+        return (true);
+    }
+
     public static boolean copyTextFile (String from, String to) throws Exception {
         List<String> fileLines = getLines(from);
 

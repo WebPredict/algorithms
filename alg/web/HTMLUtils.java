@@ -58,12 +58,15 @@ public class HTMLUtils {
 
     public static void      addSubmitButton (StringBuilder buf, String fieldName, String fieldLabel) {
 
-        buf.append("<input class=\"btn btn-large btn-primary\" name=\"commit\" type=\"submit\" value=\"" + fieldLabel + "\" />\n");
+        buf.append("<input class=\"btn btn-lg btn-primary\" name=\"commit\" type=\"submit\" value=\"" + fieldLabel + "\" />\n");
     }
 
     public static void      addForm (StringBuilder buf, String action) {
-
         buf.append("<form action=\"/" + action + "\" method=\"post\">\n");
+    }
+
+    public static void      addForm (StringBuilder buf, String action, String className) {
+        buf.append("<form action=\"/" + action + "\" method=\"post\" class=\"" + className + "\">\n");
     }
 
     // These are bootstrap specific:
@@ -98,18 +101,23 @@ public class HTMLUtils {
     }
 
     public static void      addFormElement (StringBuilder buf, String fieldName, String fieldType, String fieldLabel) {
-        buf.append("<label for=\"" + fieldName + "\">");
+        HTMLUtils.addDiv(buf, "form-group");
+        //HTMLUtils.addRubyOutput(buf, "f.label(:" + name + ", class: \"col-sm-2 control-label\") ");
+        //HTMLUtils.addRubyOutput(buf, "f." + fieldType + "_field(:" + name + ", class: \"form-control\") ");
+
+        buf.append("<label class=\"col-sm-2 control-label\" for=\"" + fieldName + "\">");
         if (fieldLabel != null)
             buf.append(fieldLabel);
         else
             buf.append(WordUtils.capitalizeAndSpace(fieldName));
          buf.append("</label>\n");
 
+        HTMLUtils.addDiv(buf, "col-sm-8");
         if (fieldType.equals("string")) {
-            buf.append("<input type=\"text\" size=\"30\" id=\"" + fieldName + "\" name=\"" + fieldName + "\" />\n");
+            buf.append("<input class=\"form-control\" type=\"text\" size=\"30\" id=\"" + fieldName + "\" name=\"" + fieldName + "\" />\n");
         }
         else if (fieldType.equals("long_string")) {
-            buf.append("<textarea cols=\"40\" rows=\"5\" id=\"" + fieldName + "\" name=\"" + fieldName + "\" /> </textarea>\n");
+            buf.append("<textarea class=\"form-control\" rows=\"5\" id=\"" + fieldName + "\" name=\"" + fieldName + "\" /> </textarea>\n");
         }
         else if (fieldType.equals("boolean")) {
             // TODO
@@ -117,6 +125,8 @@ public class HTMLUtils {
         else if (fieldType.equals("integer")) {
             // TODO
         }
+        HTMLUtils.closeDiv(buf);
+        HTMLUtils.closeDiv(buf);
     }
 
     public static void      addFormElementDropdown (StringBuilder buf, String fieldName, String [] fieldValues, String fieldLabel) {

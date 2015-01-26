@@ -380,8 +380,9 @@ public class RailsGen extends Generator {
         ArrayList<Blurb> blurbs = app.getNewsBlurbs();
 
         for (int i = 0; i < blurbs.size(); i++) {
-            HTMLUtils.addH2(buf, blurbs.get(i).getTitle());
+            HTMLUtils.addParagraph(buf, blurbs.get(i).getTitle(), "lead");
             HTMLUtils.addParagraph(buf, blurbs.get(i).getContent());
+            HTMLUtils.addLineBreak(buf);
         }
 
         FileUtils.write(buf, app.getWebAppDir() + "/app/views/static_pages/news.html.erb", true);
@@ -611,9 +612,6 @@ public class RailsGen extends Generator {
     }
 
     private void generateFormForStart (StringBuilder buf, String modelName) {
-        //HTMLUtils.addRow(buf, "span6", "offset3");
-        //        * <%= form_for(:session, url: sessions_path, :html => {:class => "form-horizontal" } ) do |f| %>
-
         HTMLUtils.addRubyOutput(buf, "form_for(:" + modelName + ", url: " + WordUtils.pluralize(modelName) + "_path, :html => {:class => \"form-horizontal\" }) do |f|");
     }
 
@@ -628,7 +626,6 @@ public class RailsGen extends Generator {
         HTMLUtils.closeDiv(buf);
         HTMLUtils.closeDiv(buf);
         HTMLUtils.addRuby(buf, "end");
-       // HTMLUtils.closeRow(buf);
     }
 
     private void generateFormField (StringBuilder buf, String name) {
@@ -677,14 +674,32 @@ public class RailsGen extends Generator {
         HTMLUtils.closeDiv(buf);
     }
 
+    private void generateRadioButtonsField (StringBuilder buf, String name) {
+        HTMLUtils.addDiv(buf, "form-group");
+        HTMLUtils.addRubyOutput(buf, "f.label(:" + name + ", class: \"col-sm-2 control-label\") ");
+        HTMLUtils.addDiv(buf, "col-sm-8");
+        // TODO finish
+        HTMLUtils.addRubyOutput(buf, "f.radio_button(:" + name + ", class: \"form-control\") ");
+        HTMLUtils.closeDiv(buf);
+        HTMLUtils.closeDiv(buf);
+        /**
+         * <div class="form-group">
+         <div class="controls-row"
+         <label class="radio inline">Weaned <%= f.radio_button :weened, true %> Unweaned <%= f.radio_button :weened, false %></label>
+         </div>
+
+         </div>
+
+         */
+    }
+
     public void generateContactPage () throws Exception {
 
         StringBuilder buf = new StringBuilder();
         HTMLUtils.addRuby(buf, "provide(:title, 'Contact')");
         HTMLUtils.addH1(buf, "Contact Us");
 
-        HTMLUtils.addRow(buf, "span6", "offset3");
-        HTMLUtils.addForm(buf, "submitcontact");
+        HTMLUtils.addForm(buf, "submitcontact", "form-horizontal");
 
         StringUtils.addLine(buf, "<%= hidden_field_tag :authenticity_token, form_authenticity_token %>");
 
@@ -692,9 +707,14 @@ public class RailsGen extends Generator {
         HTMLUtils.addFormElement(buf, "name", "string", "Your Name");
         HTMLUtils.addFormElement(buf, "comment", "long_string", "Your Message");
 
+        HTMLUtils.addDiv(buf, "form-group");
+        HTMLUtils.addDiv(buf, "col-sm-offset-2 col-sm-8");
         HTMLUtils.addSubmitButton(buf, "commit", "Send Message");
+
+        HTMLUtils.closeDiv(buf);
+        HTMLUtils.closeDiv(buf);
+
         StringUtils.addLine(buf, "</form>");
-        HTMLUtils.closeRow(buf);
 
         FileUtils.write(buf, app.getWebAppDir() + "/app/views/static_pages/contact.html.erb", true);
     }
@@ -715,35 +735,6 @@ public class RailsGen extends Generator {
         StringUtils.addLine(buf, "module SessionsHelper");
         StringUtils.addLineBreak(buf);
 
-
-        /**
-         * def forget
-         update_attribute(:remember_digest, nil)
-
-         def forget(user)
-         user.forget
-         cookies.delete(:user_id)
-         cookies.delete(:remember_token)
-         end
-
-         # Logs out the current user.
-         def log_out
-         forget(current_user)
-         session.delete(:user_id)
-         @current_user = nil
-         end
-
-         def logged_in?
-         !current_user.nil?
-         end
-
-         def remember(user)
-         user.remember
-         cookies.permanent.signed[:user_id] = user.id
-         cookies.permanent[:remember_token] = user.remember_token
-         end
-         */
-
         addMethod(buf, "logged_in?", new String[] {"!current_" + name + ".nil?"});
         addMethod(buf, "log_in(" + name + ")", new String[] {"session[:" + name + "_id] = " + name + ".id"});
         addMethod(buf, "remember(" + name + ")", new String[] {name + ".remember", "cookies.permanent.signed[:" + name + "_id] = " + name + ".id",
@@ -753,21 +744,6 @@ public class RailsGen extends Generator {
 
         addMethod(buf, "current_" + name, new String[] {"@current_" + name + " ||= " + capName + ".find_by(id: session[:" + name + "_id])"});
 
-        /**
-         * def redirect_back_or(default)
-         redirect_to(session[:forwarding_url] || default)
-         session.delete(:forwarding_url)
-         end
-
-         # Stores the URL trying to be accessed.
-         def store_location
-         session[:forwarding_url] = request.url if request.get?
-         end
-         */
-
-//        addMethod(buf, "signed_in?", new String[] {"!current_" + name + ".nil?"});
-//        addMethod(buf, "sign_out", new String[] {"self.current_" + name + " = nil", "cookies.delete(:remember_token)"});
-//        addMethod(buf, "current_" + name, new String[] {"@current_" + name + " ||= " + capName + ".find_by_remember_token(cookies[:remember_token])"});
         addMethod(buf, "current_" + name + "?(" + name + ")", new String[] {name + " == current_" + name});
 //        addMethod(buf, "current_" + name + "=(" + name + ")", new String[] {"@current_" + name + " = " + name});
         addMethod(buf, "redirect_back_or(default)", new String[] {"redirect_to(session[:forwarding_url] || default)", "session.delete(:forwarding_url)"});
@@ -782,8 +758,6 @@ public class RailsGen extends Generator {
     }
 
     public void generateRoutes () throws Exception {
-        //StringBuilder buf = new StringBuilder();
-
         Model       userModel = app.getUserModel();
         String      pluralName = userModel.getPluralName();
         List<Model> models = app.getModels();
@@ -826,17 +800,12 @@ public class RailsGen extends Generator {
             insertTabbedIfNotThere(routeLines, "get '" + pageName + "'   => 'static_pages#" + pageName +"'", index++);
         }
 
-        //StringUtils.addLineBreak(buf);
-
         insertTabbedIfNotThere(routeLines, "match '/submitcontact', to: 'static_pages#submitcontact', via: [:get, :post]", index++);
         insertTabbedIfNotThere(routeLines, "match '/signup', to: '" + pluralName + "#new', via: [:get, :post]", index++);
         insertTabbedIfNotThere(routeLines, "match '/send_password', to: '" + pluralName + "#send_password', via: [:get, :post]", index++);
         insertTabbedIfNotThere(routeLines, "match '/submit_send_password', to: '" + pluralName + "#submit_send_password', via: [:get, :post]", index++);
         insertTabbedIfNotThere(routeLines, "match '/signin', to: 'sessions#new', via: [:get, :post]", index++);
         insertTabbedIfNotThere(routeLines, "match '/signout', to: 'sessions#destroy', via: :delete", index++);
-
-        // TODO: don't reinsert this if it's already done to routes.rb:
-        //FileUtils.insertAtInFile(app.getWebAppDir() + "/config/routes.rb", 2, new String[] {buf.toString()}, true);
 
         FileUtils.putLines(routeLines, app.getWebAppDir() + "/config/routes.rb");
 
@@ -952,10 +921,10 @@ public class RailsGen extends Generator {
 //                            "    padding-top: 60px;\n" +
 //                            "}"}, true, true);
 
-        if (app.getJumbotronImageUrl() != null)
-            addStyle(new String[] {".hero-unit {", "\tbackground-image: url('" + app.getJumbotronImageUrl() + "');", "}"});
-
         FileUtils.copyTextFile("C:/Users/jsanchez/Downloads/apps/resources/simple2.css.scss", app.getWebAppDir() + "/app/assets/stylesheets/custom.css.scss");
+        if (app.getJumbotronImageUrl() != null)
+            addStyle(new String[] {".jumbotron {", "\tbackground-image: url('" + app.getJumbotronImageUrl() + "');", "}"});
+
 
         // TODO: not sure we need to do this if running with --without production:
         //String 	railsCmd = app.isWindows() ? "C:/RailsInstaller/Ruby2.1.0/bin/rake.bat" : "rake";
@@ -964,7 +933,8 @@ public class RailsGen extends Generator {
     }
 
     public void addStyle (String [] styleInfo) throws Exception {
-        FileUtils.append(app.getWebAppDir() + "/app/assets/stylesheets/bootstrap_and_overrides.css.less", styleInfo);
+        //FileUtils.append(app.getWebAppDir() + "/app/assets/stylesheets/bootstrap_and_overrides.css.less", styleInfo);
+        FileUtils.insertInFileIfNotExists(app.getWebAppDir() + "/app/assets/stylesheets/custom.css.scss", styleInfo);
     }
 
     public void generateModels () throws Exception {
@@ -1008,10 +978,6 @@ public class RailsGen extends Generator {
                     }
                 }
 
-
-                // Seems like we don't need this anymore:
-                //tabbed(buf, attrs);
-
                 if (model.isSecure()) {
                     tabbed(buf, "attr_accessor :remember_token");
                     tabbed(buf, "has_secure_password");
@@ -1051,7 +1017,11 @@ public class RailsGen extends Generator {
 
                     for (Field imageField : imageFields) {
                         // TODO: this needs to change for a model with a set of images as opposed to just one:
-                        tabbed(buf, "mount_uploader :" + imageField.getName() + ", " + capName + "imageUploader");
+                        tabbed(buf, "mount_uploader :" + imageField.getName() + ", " + WordUtils.capitalize(imageField.getName()) + "Uploader");
+
+                        String imgGenCmd = "rails.bat generate uploader " + imageField.getName();
+                        // Need to do this too:
+                        // rails generate uploader Picture
                     }
                 }
 
@@ -1145,13 +1115,6 @@ public class RailsGen extends Generator {
                     addMethod(buf, "forget", new String[] {"update_attribute(:remember_digest, nil)"});
                 }
 
-
-//                tabbed(buf, "private");
-//                if (model.isSecure()) {
-//                    tabbed(buf, "def create_remember_token", 2);
-//                    tabbed(buf, "self.remember_token = SecureRandom.urlsafe_base64", 3);
-//                    tabbed(buf, "end", 2);
-//                }
                 StringUtils.addLine(buf, "end");
 
                 FileUtils.write(buf, app.getWebAppDir() + "/app/models/" + capName + ".rb", true);
@@ -1173,7 +1136,8 @@ public class RailsGen extends Generator {
             for (Model model : models) {
                 generateShowView(model);
                 generateListView(model);
-                generateEditView(model);
+                generateEditView(model, true);
+                generateEditView(model, false);
             }
         }
     }
@@ -1409,7 +1373,7 @@ public class RailsGen extends Generator {
         FileUtils.write(HTMLUtils.formatHTML(buf.toString(), 2), app.getWebAppDir() + "/app/views/" + subdir + "/" + fileName + ".html.erb", true);
     }
 
-    public void generateEditView (Model model) throws Exception {
+    public void generateEditView (Model model, boolean isNew) throws Exception {
 
         String name = model.getName();
         String names = model.getPluralName();
@@ -1419,12 +1383,8 @@ public class RailsGen extends Generator {
         StringBuilder   buf = new StringBuilder();
         boolean         useTabs = useTabs(model);
         StringBuilder   bodyContent = new StringBuilder();
-        //HTMLUtils.addRuby(buf, "provide(:title, \"Sign in\")");
-        HTMLUtils.addH1(buf, "New " + model.getCapName());
+        HTMLUtils.addH1(buf, (isNew ? "New " : "Edit ") + model.getCapName());
 
-        /**
-
-         */
         if (fields != null) {
 
              HTMLUtils.addRubyOutput(bodyContent, "form_for @" + name + ", :html => {:multipart => true, :class => \"form-horizontal\" } do |f|");
@@ -1433,6 +1393,12 @@ public class RailsGen extends Generator {
              for (Field f : fields) {
                  if (f.isReadOnly() || f.isAdminOnly() || f.isComputed())
                      continue;
+
+                 // Special case: minimize the new user form:
+                 if (isNew && model.isSecure()) {
+                     if (!(f.getName().equals("email") || f.getName().equals("name") || f.getName().equals("username") || f.getName().indexOf("password") != -1))
+                         continue;
+                 }
 
                  String fName = f.getName();
 
@@ -1443,8 +1409,6 @@ public class RailsGen extends Generator {
                      generateCheckboxField(bodyContent, fName, capitalized + "?");
                  }
                  else if (fType.equals(Type.SHORT_STRING)) {
-//                     HTMLUtils.addRubyOutput(bodyContent, "f.label :" + fName);
-//                     HTMLUtils.addRubyOutput(bodyContent, "f.text_field :" + fName);
                      generateFormField(bodyContent, fName);
                  }
                  else if (fType.equals(Type.LONG_STRING)) {
@@ -1522,15 +1486,7 @@ public class RailsGen extends Generator {
                  }
 
                  else if (fType.equals(Type.SET_PICK_ONE)) {
-                     /**
-                      * <div class="form-group">
-                      <div class="controls-row"
-                      <label class="radio inline">Weaned <%= f.radio_button :weened, true %> Unweaned <%= f.radio_button :weened, false %></label>
-                      </div>
-
-                      </div>
-
-                      */
+                     generateRadioButtonsField(bodyContent, fName);
                  }
                  else if (fType.equals(Type.PASSWORD)) {
                      generateFormField(bodyContent, fName, "password");
@@ -1541,8 +1497,8 @@ public class RailsGen extends Generator {
 
                  aline(bodyContent, "");
              }
-            //ruby(bodyContent, "end");
-            generateFormEnd(bodyContent, "Submit");
+
+            generateFormEnd(bodyContent, isNew ? "Submit" : "Update");
         }
 
 
@@ -1583,10 +1539,7 @@ public class RailsGen extends Generator {
             break;
         }
 
-        // TODO: how should new differ from edit here?
-        writeViewFile(buf, names, "new");
-
-        writeViewFile(buf, names, "edit");
+        writeViewFile(buf, names, isNew ? "new" : "edit");
     }
 
     public static void  aline (StringBuilder builder, String content) {
@@ -1754,11 +1707,6 @@ public class RailsGen extends Generator {
                         "flash[:success] = \"" + capName + " removed from system.\"",
                         "redirect_to " + names + "_path"});
 
-                /**
-                 * User.find(params[:id]).destroy
-                 flash[:success] = "User deleted"
-                 redirect_to users_url
-                 */
                 StringUtils.addLineBreak(buf);
                 tabbed(buf, "private");
 
@@ -1774,20 +1722,6 @@ public class RailsGen extends Generator {
 
                 addMethod(buf, "correct_" + name, new String[] {"@" + name + " = " + capName + ".find(params[:id])",
                         "redirect_to(root_url) unless @" + name + " == current_" + name});
-                //redirect_to(root_url) unless current_user?(@user)
-
-//                tabbed(buf, "def correct_" + name, 2);
-//                tabbed(buf, "@" + name + " = " + capName + ".find(params[:id])", 3);
-//                tabbed(buf, "end", 2);
-
-                /**
-                 * def logged_in_user
-                 unless logged_in?
-                 flash[:danger] = "Please log in."
-                 redirect_to login_url
-                 end
-                 end
-                 */
 
                 addMethod(buf, "logged_in_" + name, new String[] {"unless logged_in?", "store_location", "flash[:danger] = \"Please log in.\"", "redirect_to signin_url", "end"});
                 addMethodTabbed(buf, "sort_column", new String[]{
@@ -1888,29 +1822,6 @@ public class RailsGen extends Generator {
         StringUtils.addLine(buf, "end");
 
         FileUtils.write(buf, app.getWebAppDir() + "/app/controllers/static_pages_controller.rb", true);
-
-        /**
-         * class StaticPagesController < ApplicationController
-         protect_from_forgery
-
-         def home
-         if !signed_in?
-         query = "(disabled = 'f' or disabled is null)"
-         paramarr = []
-
-         condarr = [query]
-         condarr.concat(paramarr)
-
-         @listings = Listing.paginate(:page => params[:page], per_page: 10, :conditions => condarr, :order => sort_column + " " + sort_direction)
-         else
-         @listings = current_breeder.listings.paginate(:page => params[:page], per_page: 10, :order => sort_column + " " + sort_direction)
-         end
-
-         end
-
-         def articles
-         end
-         */
     }
 
     public String getRailsType (Type type) {
@@ -2009,13 +1920,11 @@ public class RailsGen extends Generator {
     }
 
     private void runCommandInApp (String command) throws Exception {
-        if (true) {
-        //if (!app.isWindows()) {
-            String [] cmd = command.split(" ");
-            String result = runCommandWithEnv(app.getWebAppDir(), cmd, null);
-            
-            System.out.println ("Result of running command: '" + command + "' was: " + result);
-        }
+
+        String [] cmd = command.split(" ");
+        String result = runCommandWithEnv(app.getWebAppDir(), cmd, null);
+
+        System.out.println ("Result of running command: '" + command + "' was: " + result);
     }
 
     private void addGem (List<String> gemfileLines, String gemName) {
@@ -2118,6 +2027,7 @@ public class RailsGen extends Generator {
         if (app.hasImages()) {
         	//addGem(gemfileLines, "paperclip");
             addGem(gemfileLines, "carrierwave");
+            addGem(gemfileLines, "mini-magick");
             addGem(gemfileLines, "fog");
         }
 

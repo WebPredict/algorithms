@@ -77,7 +77,7 @@ public class App {
     }
 
     public void setJumbotronImageAsStockphoto (String name) {
-        this.jumbotronImage = Stockphoto.find(name).getPhotoName();
+        this.jumbotronImageUrl = Stockphoto.find(name).getPhotoName();
     }
 
     public void addStaticMenuItems (String [] names) {
