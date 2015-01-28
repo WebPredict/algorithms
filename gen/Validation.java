@@ -54,24 +54,24 @@ public class Validation {
         else if (trimmed.startsWith("required")) {
             return (new Validation(ValidationType.NOT_NULL));
         }
-        else if (trimmed.startsWith("email")) {
-            return (new Validation(ValidationType.EMAIL));
-        }
-        else if (trimmed.startsWith("phone")) {
-            return (new Validation(ValidationType.PHONE));
-        }
-        else if (trimmed.startsWith("date")) {
-            return (new Validation(ValidationType.DATE));
-        }
-        else if (trimmed.startsWith("time")) {
-            return (new Validation(ValidationType.TIME));
-        }
+//        else if (trimmed.startsWith("email")) {
+//            return (new Validation(ValidationType.EMAIL));
+//        }
+//        else if (trimmed.startsWith("phone")) {
+//            return (new Validation(ValidationType.PHONE));
+//        }
+//        else if (trimmed.startsWith("date")) {
+//            return (new Validation(ValidationType.DATE));
+//        }
+//        else if (trimmed.startsWith("time")) {
+//            return (new Validation(ValidationType.TIME));
+//        }
         else if (trimmed.startsWith("alpha")) {
             return (new Validation(ValidationType.ALPHABETIC));
         }
-        else if (trimmed.startsWith("numeric")) {
-            return (new Validation(ValidationType.NUMERIC));
-        }
+//        else if (trimmed.startsWith("numeric")) {
+//            return (new Validation(ValidationType.NUMERIC));
+//        }
         else
             return (null);
             //throw new RuntimeException("What validation type is this?" + trimmed);

@@ -56,6 +56,10 @@ public class Field {
 
     public Field () { }
 
+    public Field (String name) {
+        this(name, Type.SHORT_STRING.getName());
+    }
+
     public Field (String name, String type) {
         this.name = name;
         this.theType = Type.findByName(type);
@@ -64,6 +68,18 @@ public class Field {
     public Field (String name, Type theType) {
         this.name = name;
         this.theType = theType;
+
+        if (theType.equals(Type.EMAIL))
+            addValidation(new Validation(ValidationType.EMAIL));
+        else if (theType.equals(Type.PHONE))
+            addValidation(new Validation(ValidationType.PHONE));
+        else if (theType.equals(Type.DATE))
+            addValidation(new Validation(ValidationType.DATE));
+        else if (theType.equals(Type.TIME))
+            addValidation(new Validation(ValidationType.TIME));
+        else if (theType.equals(Type.INT) || theType.equals(Type.FLOAT))
+            addValidation(new Validation(ValidationType.NUMERIC));
+
     }
 
     public Field (String name, Type theType, boolean readOnly, boolean adminOnly) {

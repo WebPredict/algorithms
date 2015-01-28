@@ -39,6 +39,10 @@ public class RailsGen extends Generator {
             generateDeploymentScript();
             generateGems();
             generateModels();
+
+            if (app.isGenerateUpgrades())
+                generateUpgrades();
+
             generateControllers();
             generateViews();
 
@@ -49,9 +53,6 @@ public class RailsGen extends Generator {
             generateSharedPages();
             generateHelperMethods();
             generateAssets();
-
-           if (app.isGenerateUpgrades())
-                generateUpgrades();
 
             generateRoutes();
             if (app.getAppConfig().isNeedsAuth())
@@ -540,10 +541,11 @@ public class RailsGen extends Generator {
                     line += "<td><%= number_to_currency(" + modelName + "." + fieldName + ", :unit => \"$\") %></td>";
                 else if (fType.equals(Type.IMAGE)) {
                     StringBuilder imgBuilder = new StringBuilder("<td>");
-                    HTMLUtils.addRuby(imgBuilder, "if " + modelName + ".image_url.nil?"); // TODO remove hardcoding
+                    HTMLUtils.addRuby(imgBuilder, "if " + modelName + ".url.nil?"); // TODO remove hardcoding
                     HTMLUtils.addRubyOutput(imgBuilder, "image_tag(\"ImagePlaceholderSmall.png\")");
                     HTMLUtils.addRuby(imgBuilder, "else");
-                    HTMLUtils.addRubyOutput(imgBuilder, "image_tag(listing.image_url, :size => \"50x50\", :style => \"width: 50px; height: 50px\")");
+                    //<%= image_tag micropost.picture.url if micropost.picture? %>
+                    HTMLUtils.addRubyOutput(imgBuilder, "image_tag(" + modelName + "." + fieldName + ".url, :size => \"50x50\", :style => \"width: 50px; height: 50px\")");
                     HTMLUtils.addRuby(imgBuilder, "end");
                     imgBuilder.append("</td>");
                 }
@@ -852,19 +854,19 @@ public class RailsGen extends Generator {
         StringUtils.addLineBreak(buf);
 
         tabbed(buf, "def image_for_options(imageholder, options)");
-        tabbed(buf, "if imageholder.nil? or imageholder.image_url.nil?", 2);
+        tabbed(buf, "if imageholder.nil? or imageholder.url.nil?", 2);
         tabbed(buf, "image_tag(\"ImagePlaceholderSmall.png\", options)", 3);
         tabbed(buf, "else", 2);
-        tabbed(buf, "image_tag(imageholder.image_url, options)", 3);
+        tabbed(buf, "image_tag(imageholder.url, options)", 3);
         tabbed(buf, "end", 2);
         tabbed(buf, "end");
 
         StringUtils.addLineBreak(buf);
         tabbed(buf, "def image_for(imageholder)");
-        tabbed(buf, "if imageholder.nil? or imageholder.image_url.nil?", 2);
+        tabbed(buf, "if imageholder.nil? or imageholder.url.nil?", 2);
         tabbed(buf, "image_tag(\"ImagePlaceholderSmall.png\")", 3);
         tabbed(buf, "else", 2);
-        tabbed(buf, "image_tag(imageholder.image_url)", 3);
+        tabbed(buf, "image_tag(imageholder.url)", 3);
         tabbed(buf, "end", 2);
         tabbed(buf, "end");
 
@@ -883,11 +885,11 @@ public class RailsGen extends Generator {
 
         methodLines.clear();
         methodLines.add("addr = ''");
-        methodLines.addAll(generateIf("address != nil", "addr = address"));
+        methodLines.addAll(generateIf("address.addressLine1 != nil", "addr = address.addressLine1"));
 
-        methodLines.addAll(generateIf("city != nil", "addr != '' ? addr += ' ' + city : city"));
-        methodLines.addAll(generateIf("state != nil", "addr != '' ? addr += ', ' + state : state"));
-        methodLines.addAll(generateIf("postal != nil", "addr != '' ? addr += ', ' + postal : postal"));
+        methodLines.addAll(generateIf("address.city != nil", "addr != '' ? addr += ' ' + address.city : address.city"));
+        methodLines.addAll(generateIf("address.state != nil", "addr != '' ? addr += ', ' + address.state : address.state"));
+        methodLines.addAll(generateIf("address.postal != nil", "addr != '' ? addr += ', ' + address.postal : address.postal"));
 
         addMethod(buf, "render_address(address)", methodLines);
 
@@ -1011,7 +1013,9 @@ public class RailsGen extends Generator {
 
                         String imgGenCmd = getRailsCommand() + " generate uploader " + imageField.getName();
                         // generate uploader
-                        runCommandInApp(imgGenCmd);
+
+                        // TODO: is this working?
+                        //runCommandInApp(imgGenCmd);
                     }
                 }
 
@@ -1217,10 +1221,10 @@ public class RailsGen extends Generator {
                     generateReadOnlySection(bodyContent, "render_address(@" + nameFName + ")", fName);
                 }
                 else if (fTypeName.equals(Type.URL.getName())) {
-                    String content = " <% if @" + nameFName + "!= nil %>\n" +
-                            "        <a href=\"<%= render_website(@" + nameFName + ") %>\" target=\"_blank\"><%= @" + nameFName +" %></a>\n" +
-                            "        <% end %>\n";
+                    StringUtils.addLine(bodyContent, "<% if @" + nameFName + "!= nil %>");
+                    String content  = "        <a href=\"<%= render_website(@" + nameFName + ") %>\" target=\"_blank\"><%= @" + nameFName +" %></a>";
                     generateReadOnlySection(bodyContent, content, fName);
+                    StringUtils.addLine(bodyContent, "<% end %>");
                 }
                 else if (fTypeName.equals(Type.BOOLEAN.getName())) {
                     generateReadOnlySection(bodyContent, "yesno(@" + nameFName + ")", fName);
@@ -1975,6 +1979,8 @@ public class RailsGen extends Generator {
             return ("string");
         else  if (type.equals(Type.DATE))
             return ("date");
+        else  if (type.equals(Type.IMAGE))
+            return ("string");
         else  if (type.equals(Type.TIME))
             return ("time");
         else  if (type.equals(Type.DATETIME))
@@ -1983,6 +1989,8 @@ public class RailsGen extends Generator {
             return ("text");
         else  if (type.equals(Type.INT))
             return ("integer");
+        else  if (type.equals(Type.RANGE))
+            return ("string");
         else  if (type.equals(Type.FLOAT))
             return ("float");
         else if (type.equals(Type.SET_ONE_OR_MORE))
@@ -2045,7 +2053,7 @@ public class RailsGen extends Generator {
                     f.delete();
                 }
 
-                String fileName = String.valueOf(System.currentTimeMillis()) + endFileName;
+                String fileName = String.valueOf(System.nanoTime()) + endFileName;
                 FileUtils.write(buf, app.getWebAppDir() + "/db/migrate/" + fileName, true);
             }
         }
@@ -2164,7 +2172,7 @@ public class RailsGen extends Generator {
         if (app.hasImages()) {
         	//addGem(gemfileLines, "paperclip");
             addGem(gemfileLines, "carrierwave");
-            addGem(gemfileLines, "mini-magick");
+            //addGem(gemfileLines, "mini-magick"); TODO can't find this gem
             addGem(gemfileLines, "fog");
         }
 
@@ -2206,14 +2214,23 @@ public class RailsGen extends Generator {
     	
     	StringBuilder builder = new StringBuilder();
     	StringUtils.addLine(builder, "#!/bin/sh");
-    	StringUtils.addLine(builder, "bundle install --without production");
-    	StringUtils.addLine(builder, "bundle assets precompile");
-    	StringUtils.addLine(builder, "bundle exec rake db:migrate");
+        String bundle = app.isWindows() ? "bundle.bat" : "bundle";
+
+    	StringUtils.addLine(builder, bundle + " install --without production");
+    	StringUtils.addLine(builder, bundle + " assets precompile");
+    	StringUtils.addLine(builder, bundle + " exec rake db:migrate");
     	//StringUtils.addLine(builder, "git add .");
     	//StringUtils.addLine(builder, "git commit -a -m \"the app code\"");
     	//StringUtils.addLine(builder, "git push heroku master");
 
     	FileUtils.write(builder, app.getWebAppDir() + "/setup.sh", true);
+
+        builder = new StringBuilder();
+        StringUtils.addLine(builder, "#!/bin/sh");
+        StringUtils.addLine(builder,  bundle + " exec rake db:drop");
+        StringUtils.addLine(builder,  bundle + " exec rake db:migrate");
+
+        FileUtils.write(builder, app.getWebAppDir() + "/db.sh", true);
 
         /**
          * bundle install --without production   done

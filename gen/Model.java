@@ -5,6 +5,7 @@ import alg.words.WordUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * Created with IntelliJ IDEA.
@@ -220,9 +221,14 @@ public class Model extends Type {
             String []   details = next.split(" ");
             Field       f = null;
             if (details.length == 1) {
-                f = new Field(details [0], getType(details[0]));
+                Type theType = getType(details[0]);
+                //if (theType.getName().equals(details [0]))
+                //    theType = Type.SHORT_STRING;
+                if (theType == null)
+                    theType = Type.SHORT_STRING; // default
+                f = new Field(details [0], theType);
             }
-            else {
+            else if (details.length > 1) {
                 if (details [0].equals("has_many")) {
                     Rel r = new Rel(RelType.ONE_TO_MANY, WordUtils.depluralize(details[1]));
                     ret.addRel(r);
@@ -239,9 +245,9 @@ public class Model extends Type {
                 else {
                     Validation v = Validation.parseValidation(details[1]);
                     if (v == null)
-                        f = new Field(details [0], details [1]);
+                        f = new Field(details [0], getType(details[1]));   // assume it's a type name
                     else {
-                        f = new Field(details [0], getType(details[0]));
+                        f = new Field(details [0]);
                         f.addValidation(v);
                     }
                 }
@@ -260,19 +266,22 @@ public class Model extends Type {
         return (ret);
     }
 
+    // TODO this needs to be filled out
     private static Type getType (String typeName) {
-        if (typeName.equals("email"))
-            return (Type.EMAIL);
-        else if (typeName.equals("phone"))
-            return (Type.PHONE);
-        else if (typeName.equals("password"))
-            return (Type.PASSWORD);
-        else if (typeName.equals("url"))
-            return (Type.URL);
-        else if (typeName.equals("address"))
-            return (Type.ADDRESS);
-        else
-            return (Type.SHORT_STRING);
+        return (Type.findByName(typeName));
+
+//        if (typeName.equals("email"))
+//            return (Type.EMAIL);
+//        else if (typeName.equals("phone"))
+//            return (Type.PHONE);
+//        else if (typeName.equals("password"))
+//            return (Type.PASSWORD);
+//        else if (typeName.equals("url"))
+//            return (Type.URL);
+//        else if (typeName.equals("address"))
+//            return (Type.ADDRESS);
+//        else
+//            return (Type.SHORT_STRING);
     }
 
     public String toString () {

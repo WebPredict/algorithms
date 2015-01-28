@@ -38,6 +38,7 @@ public class Type {
     public static final Type FIXED_LIST = new Type("fixed_list");
     public static final Type CODE = new Type("code");
     public static final Type VIDEO = new Type("video");
+    public static final Type DURATION = new Type("duration"); // TODO how to handle units?
 
     public static final Type COMPUTED = new Type("computed"); // means don't store in DB
 
@@ -88,6 +89,8 @@ public class Type {
             return (PHONE);
         else if (name.equals(TIME.name))
             return (TIME);
+        else if (name.equals(DURATION.name))
+            return (DURATION);
         else if (name.equals(ADDRESS.name))
             return (ADDRESS);
         else if (name.equals(IMAGE.name))
@@ -102,6 +105,10 @@ public class Type {
         }
         else if (name.startsWith(FIXED_LIST.name)) {
             FixedList type = new FixedList(name.substring(FIXED_LIST.getName().length()));
+            return (type);
+        }
+        else if (name.startsWith(RANGE.name)) {
+            Range type = new Range(name.substring(RANGE.getName().length()));
             return (type);
         }
         else if (name.startsWith(COMPUTED.name)) {
@@ -122,7 +129,9 @@ public class Type {
         else if (name.equals(VIDEO.name))
             return (VIDEO);
         else
-            return (new Type(name));
+            return (null);
+//        else
+//            return (new Type(name));
     }
 
     public Type() {
