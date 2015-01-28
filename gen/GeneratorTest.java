@@ -42,6 +42,11 @@ public class GeneratorTest {
         //salesTest(windows);
         //interviewSite(windows);
 
+        /**
+         * TODO: bug tracker site
+         * jobs site
+         * RMR site!
+         */
         exampleWithAllTypes(windows);
     }
 
@@ -170,44 +175,14 @@ public class GeneratorTest {
 
     public static void exampleWithAllTypes (boolean windows) throws Exception {
 
-
-        /**
-         *  public static final Type LONG_STRING = new Type("long_string");
-         public static final Type STRING = new Type("string");
-         public static final Type SHORT_STRING = new Type("short_string");
-         public static final Type BOOLEAN = new Type("boolean");
-         public static final Type INT = new Type("int");
-         public static final Type FLOAT = new Type("float");
-         public static final Type DATE = new Type("date");
-         public static final Type TIME = new Type("time");
-         public static final Type DATETIME = new Type("datetime");
-         public static final Type CURRENCY = new Type("currency");
-         public static final Type EMAIL = new Type("email");
-         public static final Type PHONE = new Type("phone");
-         public static final Type ADDRESS = new Type("address");
-         public static final Type IMAGE = new Type("image");
-         public static final Type FILE = new Type("file");
-         public static final Type URL = new Type("url");
-         public static final Type SET_ONE_OR_MORE = new Type("set");
-         public static final Type SET_PICK_ONE = new Type("setpickone");
-         public static final Type PASSWORD = new Type("password");
-         public static final Type RANGE = new Type("range");
-         public static final Type LIST = new Type("list");
-         public static final Type FIXED_LIST = new Type("fixed_list");
-         public static final Type CODE = new Type("code");
-         public static final Type VIDEO = new Type("video");
-
-         public static final Type COMPUTED = new Type("co
-         */
-
         App app = initialApp("TestSiteAllTypes", "A Test Site With All Complex Types In Use", windows);
-        app.setGenerateUpgrades(true);
+        app.setGenerateUpgrades(false);
         // TODO: need to have a way to indicate when collections are readonly
         Model [] models = Model.parseModels(new String[] {
                 "user: dob date, work_hours range(time), username required, email required, password, tagline string, employed duration, premium boolean, " +
                         "has_many items, has_one home, owns_many blogs, avatar image, phone, address, website url, gender fixed_list(male|female), likes set(string)",
                 "item: name required, description long_string, value currency, file file",
-                "home: name required, address, age int, acreage float, home_phone phone",
+                "home: name required, address, age int, acreage float, home_phone phone, volume computed",
                 "blog: name required, video video, code_area code, theme list"});
 
         app.setSearch(true);

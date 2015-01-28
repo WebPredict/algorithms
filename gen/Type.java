@@ -42,6 +42,8 @@ public class Type {
 
     public static final Type COMPUTED = new Type("computed"); // means don't store in DB
 
+    public static final Type LOCATION = new Type("location"); // TODO support... should show on map with name?
+
 
     public boolean isPrimitive () {
         return (name.equals(Type.BOOLEAN.getName()) ||
@@ -100,7 +102,10 @@ public class Type {
         else if (name.equals(URL.name))
             return (URL);
         else if (name.startsWith(LIST.name)) {
-            Collection type = new Collection(LIST.name, findByName(LIST.name.substring(LIST.getName().length())), true);
+            Collection type = new Collection(LIST.name, findByName(name.substring(LIST.getName().length())), true);
+            if (type.getSubtype() == null)
+                type.setSubtype(Type.SHORT_STRING);
+
             return (type);
         }
         else if (name.startsWith(FIXED_LIST.name)) {
@@ -113,21 +118,26 @@ public class Type {
         }
         else if (name.startsWith(COMPUTED.name)) {
             Type type = new Type(COMPUTED.name);
-            type.subtype = new Type(name.substring(COMPUTED.name.length() + 1, name.length() - 2));
+            String rest = name.substring(COMPUTED.name.length());
+            if (rest != null && rest.length() > 0) {
+                type.subtype = new Type(name.substring(COMPUTED.name.length() + 1, name.length() - 1));
+            }
             return (type);
         }
         else if (name.startsWith(SET_ONE_OR_MORE.name)) {
-            Collection type = new Collection(SET_ONE_OR_MORE.name, findByName(SET_ONE_OR_MORE.name.substring(SET_ONE_OR_MORE.getName().length())), false);
+            Collection type = new Collection(SET_ONE_OR_MORE.name, findByName(name.substring(SET_ONE_OR_MORE.getName().length() + 1, name.length() - 1)), false);
             return (type);
         }
         else if (name.startsWith(SET_PICK_ONE.name)) {
-            Collection type = new Collection(SET_PICK_ONE.name, findByName(SET_PICK_ONE.name.substring(SET_PICK_ONE.getName().length())), false);
+            Collection type = new Collection(SET_PICK_ONE.name, findByName(name.substring(SET_PICK_ONE.getName().length() + 1, name.length() - 1)), false);
             return (type);
         }
         else if (name.equals(CODE.name))
             return (CODE);
         else if (name.equals(VIDEO.name))
             return (VIDEO);
+        else if (name.equals(LOCATION.name))
+            return (LOCATION);
         else
             return (null);
 //        else
@@ -159,5 +169,9 @@ public class Type {
 
     public Type     getSubtype () {
         return (subtype);
+    }
+
+    public void     setSubtype (Type subtype) {
+        this.subtype = subtype;
     }
 }

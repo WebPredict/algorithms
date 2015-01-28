@@ -670,7 +670,7 @@ public class RailsGen extends Generator {
         rubyout(buf, "file_for(@" + name + ")");         // TODO support for file_for
         HTMLUtils.addDiv(buf, "fileUpload btn");
         aline(buf, "<span>Change File</span>");
-        rubyout(buf, "f.file_field :" + name + " :class => \"form-control upload\"");
+        rubyout(buf, "f.file_field :" + name + ", :class => \"form-control upload\"");
         HTMLUtils.closeDiv(buf);
         HTMLUtils.closeDiv(buf);
         HTMLUtils.closeDiv(buf);
@@ -914,7 +914,16 @@ public class RailsGen extends Generator {
         if (app.getJumbotronImageUrl() != null)
             addStyle(new String[] {".jumbotron {", "\tbackground-image: url('" + app.getJumbotronImageUrl() + "');", "}"});
 
+        if (app.getColorScheme() != null) {
+            ColorScheme scheme = app.getColorScheme();
+            //$jumbotron-color: #007700;
+            //$jumbotron-heading-color: #007700;
 
+            // TODO: full navbar, buttons, tables, forms, header, footer
+            overrideStyles(new String [] {"jumbotron-color", "jumbotron-heading-color", "body-bg", "text-color", "link-color", "brand-primary", "brand-info", "navbar-inverse"},
+                new String [] {scheme.getColor1(), scheme.getColor1(), scheme.getColor2(), scheme.getColor3(), scheme.getColor3(), scheme.getColor4(), scheme.getColor4(), scheme.getColor5()});
+
+        }
         // TODO: not sure we need to do this if running with --without production:
         //String 	railsCmd = app.isWindows() ? "C:/RailsInstaller/Ruby2.1.0/bin/rake.bat" : "rake";
 
@@ -924,6 +933,15 @@ public class RailsGen extends Generator {
     public void addStyle (String [] styleInfo) throws Exception {
         //FileUtils.append(app.getWebAppDir() + "/app/assets/stylesheets/bootstrap_and_overrides.css.less", styleInfo);
         FileUtils.insertInFileIfNotExists(app.getWebAppDir() + "/app/assets/stylesheets/custom.css.scss", styleInfo);
+    }
+
+    public void overrideStyles (String [] styleNames, String [] overrides) throws Exception {
+        //FileUtils.append(app.getWebAppDir() + "/app/assets/stylesheets/bootstrap_and_overrides.css.less", styleInfo);
+        String [] lines = new String[styleNames.length];
+        for (int i = 0; i < lines.length; i++) {
+            lines [i] = "$" + styleNames[i] + ": #" + overrides [i] + ";";
+        }
+        FileUtils.prependInFileIfNotExists(app.getWebAppDir() + "/app/assets/stylesheets/custom.css.scss", lines);
     }
 
     public void generateModels () throws Exception {
@@ -1218,7 +1236,7 @@ public class RailsGen extends Generator {
                 }
                 else if (fTypeName.equals(Type.ADDRESS.getName())) {
 
-                    generateReadOnlySection(bodyContent, "render_address(@" + nameFName + ")", fName);
+                    generateReadOnlySection(bodyContent, "render_address(@" + nameFName + ") if @" + nameFName + "?", fName);
                 }
                 else if (fTypeName.equals(Type.URL.getName())) {
                     StringUtils.addLine(bodyContent, "<% if @" + nameFName + "!= nil %>");
@@ -1482,7 +1500,7 @@ public class RailsGen extends Generator {
                      rubyout(bodyContent, "image_for(@" + fName + ")");
                      HTMLUtils.addDiv(bodyContent, "fileUpload btn");
                      aline(bodyContent, "<span>Change Image</span>");
-                     rubyout(bodyContent, "f.file_field :" + fName + " :class => \"upload\"");
+                     rubyout(bodyContent, "f.file_field :" + fName + ", :class => \"upload\"");
                      HTMLUtils.closeDiv(bodyContent);
                  }
                  else if (fType.equals(Type.PHONE)) {
@@ -1528,17 +1546,22 @@ public class RailsGen extends Generator {
                          aline(bodyContent, "<%= options_from_collection_for_select(" + WordUtils.capitalize(subType.getName()) + ".all, :name, :name, @" + name + "." + fName + ") %>");
                      }
                      else if (colName.equals(Type.SET_ONE_OR_MORE.getName())) {
-                         aline(bodyContent, "<fieldset>");
-                         aline(bodyContent, "<legend>" + WordUtils.capitalizeAndSpace(subTypeName) + "</legend>");
-                         rubyout(bodyContent, "<%= hidden_field_tag \"" + name + "[" + subTypeName + "_ids][]\", nil %>");
-                         ruby(bodyContent, WordUtils.capitalize(subTypeName) + ".all.each do |" + subTypeName + "|");
-                         aline(bodyContent, "<label class=\"checkbox inline\">");
-                         rubyout(bodyContent, "check_box_tag \"" + name + "[" + subType.getName() + "_ids][]\", " +
-                                 subTypeName + ".id, @" + name + "." + subTypeName + "_ids.include?(" + subTypeName + ".id), id: dom_id(" + subTypeName + ")");
-                         rubyout(bodyContent, subType.getName() + ".name");
-                         aline(bodyContent, "</label>");
-                         ruby(bodyContent, "end");
-                         aline(bodyContent, "</fieldset>");
+                         if (subType.isPrimitive()) {
+                             // TODO figure out how this should work
+                         }
+                         else {
+                             aline(bodyContent, "<fieldset>");
+                             aline(bodyContent, "<legend>" + WordUtils.capitalizeAndSpace(subTypeName) + "</legend>");
+                             rubyout(bodyContent, "hidden_field_tag \"" + name + "[" + subTypeName + "_ids][]\", nil");
+                             ruby(bodyContent, WordUtils.capitalize(subTypeName) + ".all.each do |" + subTypeName + "|");
+                             aline(bodyContent, "<label class=\"checkbox inline\">");
+                             rubyout(bodyContent, "check_box_tag \"" + name + "[" + subType.getName() + "_ids][]\", " +
+                                     subTypeName + ".id, @" + name + "." + subTypeName + "_ids.include?(" + subTypeName + ".id), id: dom_id(" + subTypeName + ")");
+                             rubyout(bodyContent, subType.getName() + ".name");
+                             aline(bodyContent, "</label>");
+                             ruby(bodyContent, "end");
+                             aline(bodyContent, "</fieldset>");
+                         }
                      }
                  }
                  else if (fType.equals(Type.FILE)) {

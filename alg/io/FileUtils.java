@@ -116,6 +116,23 @@ public class FileUtils {
         return (true);
     }
 
+    public static boolean prependInFileIfNotExists (String filePath, String [] additionalLines) throws Exception {
+
+        List<String> fileLines = getLines(filePath);
+
+        if (lineExists(fileLines, additionalLines [0]))
+            return (false);
+
+        int index = 0;
+        for (String additionalLine : additionalLines) {
+            fileLines.add(index++, additionalLine);
+        }
+
+        putLines(fileLines, filePath);
+
+        return (true);
+    }
+
     public static boolean copyTextFile (String from, String to) throws Exception {
         List<String> fileLines = getLines(from);
 
