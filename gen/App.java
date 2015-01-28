@@ -44,6 +44,16 @@ public class App {
     private List<String> staticMenuItems = new ArrayList<String>();
     private boolean generateUpgrades;
 
+    private ColorScheme colorScheme;
+
+    public ColorScheme getColorScheme() {
+        return colorScheme;
+    }
+
+    public void setColorScheme(ColorScheme colorScheme) {
+        this.colorScheme = colorScheme;
+    }
+
     public boolean isGenerateUpgrades() {
         return generateUpgrades;
     }

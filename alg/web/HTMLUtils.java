@@ -57,8 +57,11 @@ public class HTMLUtils {
     }
 
     public static void      addSubmitButton (StringBuilder buf, String fieldName, String fieldLabel) {
+        addButton(buf, fieldName, fieldLabel, "submit");
+    }
 
-        buf.append("<input class=\"btn btn-lg btn-primary\" name=\"commit\" type=\"submit\" value=\"" + fieldLabel + "\" />\n");
+    public static void      addButton (StringBuilder buf, String fieldName, String fieldLabel, String buttonType) {
+        buf.append("<input class=\"btn btn-lg btn-primary\" name=\"commit\" type=\"" + buttonType + "\" value=\"" + fieldLabel + "\" />\n");
     }
 
     public static void      addForm (StringBuilder buf, String action) {
@@ -102,8 +105,6 @@ public class HTMLUtils {
 
     public static void      addFormElement (StringBuilder buf, String fieldName, String fieldType, String fieldLabel) {
         HTMLUtils.addDiv(buf, "form-group");
-        //HTMLUtils.addRubyOutput(buf, "f.label(:" + name + ", class: \"col-sm-2 control-label\") ");
-        //HTMLUtils.addRubyOutput(buf, "f." + fieldType + "_field(:" + name + ", class: \"form-control\") ");
 
         buf.append("<label class=\"col-sm-2 control-label\" for=\"" + fieldName + "\">");
         if (fieldLabel != null)

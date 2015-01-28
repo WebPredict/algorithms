@@ -133,8 +133,15 @@ public class Model extends Type {
                     Model found = app.getNameToModelMap().get(rel.getModelName());
                     if (found == null)
                         errors.add("Could not resolve model by name: " + rel.getModelName());
-                    else
+                    else {
                         rel.setModel(found);
+                        if (rel.getRelType().equals(RelType.ONE_TO_MANY)) {
+                            found.addRel(this, RelType.MANY_TO_ONE);
+                        }
+                        else if (rel.getRelType().equals(RelType.ONE_TO_ONE)) {
+                            found.addRel(this, RelType.ONE_TO_ONE);
+                        }
+                    }
                 }
             }
         }
@@ -176,6 +183,10 @@ public class Model extends Type {
     }
 
     public void addRel (Model m, RelType relType) {
+        for (Rel rel : relationships) {
+            if (rel.getModel() != null && rel.getModel().getName().equals(m.getName()))
+                return; // already there
+        }
         relationships.add(new Rel(relType, m));
     }
 

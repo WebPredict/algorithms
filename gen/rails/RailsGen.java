@@ -903,23 +903,10 @@ public class RailsGen extends Generator {
 
         // Where is datepicker now?
 //        FileUtils.insertAfterInFileIfNotExists(app.getWebAppDir() + "/app/assets/javascripts/application.js", "//= require jquery_ujs",
-//                "//= require jquery.ui.datepicker", true, true);
+//                "//= require jquery-ui", true, true);
 //
 //        FileUtils.insertAfterInFileIfNotExists(app.getWebAppDir() + "/app/assets/stylesheets/application.css", " *= require_self",
-//               " *= require jquery.ui.datepicker", true, true);
-
-
-
-//        if (FileUtils.fileExists(app.getWebAppDir() + "/app/assets/stylesheets/bootstrap_and_overrides.css.less")) {
-//            FileUtils.insertAfterInFile(app.getWebAppDir() + "/app/assets/stylesheets/bootstrap_and_overrides.css.less", new String[] {"twitter/bootstrap/bootstrap"},
-//                    new String[] {"body {\n" +
-//                            "    padding-top: 60px;\n" +
-//                            "}"}, true, true);
-//
-//            FileUtils.insertAfterInFile(app.getWebAppDir() + "/app/assets/stylesheets/bootstrap_and_overrides.css.less", new String[] {"twitter/bootstrap/bootstrap"},
-//                    new String[] {"body {\n" +
-//                            "    padding-top: 60px;\n" +
-//                            "}"}, true, true);
+//               " *= require jquery-ui", true, true);
 
         FileUtils.copyTextFile("C:/Users/jsanchez/Downloads/apps/resources/simple2.css.scss", app.getWebAppDir() + "/app/assets/stylesheets/custom.css.scss");
         if (app.getJumbotronImageUrl() != null)
@@ -960,6 +947,9 @@ public class RailsGen extends Generator {
                         if (f.isComputed())
                             computedFields.add(f);
 
+                        if (f.getTheType().equals(Type.SET_ONE_OR_MORE)) {
+                            tabbed(buf, "serialize :" + f.getName() + ", Array");
+                        }
                         if (i < fields.size() - 1) {
                             attrs += ", ";
                         }
@@ -997,7 +987,7 @@ public class RailsGen extends Generator {
                             StringUtils.addTabbedLine(buf, toAdd);
                         }
                         else if (relType.equals(RelType.MANY_TO_ONE)) {
-                            tabbed(buf, "belongs_to :" + relModel.getPluralName());
+                            tabbed(buf, "belongs_to :" + relModel.getName());
                         }
                         else if (relType.equals(RelType.ONE_TO_ONE)) {
                             tabbed(buf, "has_one :" + relModel.getName());
@@ -1019,9 +1009,9 @@ public class RailsGen extends Generator {
                         // TODO: this needs to change for a model with a set of images as opposed to just one:
                         tabbed(buf, "mount_uploader :" + imageField.getName() + ", " + WordUtils.capitalize(imageField.getName()) + "Uploader");
 
-                        String imgGenCmd = "rails.bat generate uploader " + imageField.getName();
-                        // Need to do this too:
-                        // rails generate uploader Picture
+                        String imgGenCmd = getRailsCommand() + " generate uploader " + imageField.getName();
+                        // generate uploader
+                        runCommandInApp(imgGenCmd);
                     }
                 }
 
@@ -1076,7 +1066,8 @@ public class RailsGen extends Generator {
                         // Need to do the _ids
                         for (Rel rel : rels) {
                             if (rel.getRelType().equals(RelType.MANY_TO_ONE)) {
-                                tabbed(buf, "validates :" + rel.getModel().getName() + "_id, presence: true");
+                                if (rel.isDependent())
+                                    tabbed(buf, "validates :" + rel.getModel().getName() + "_id, presence: true");
                             }
                         }
                     }
@@ -1161,8 +1152,6 @@ public class RailsGen extends Generator {
         String              name = model.getName();
         String              names = model.getPluralName();
         ArrayList<Field>    fields = model.getFields();
-        ArrayList<Rel>      rels = model.getRelationships();
-
         StringBuilder       buf = new StringBuilder();
         
         // TODO: need to not hardcode this
@@ -1180,8 +1169,6 @@ public class RailsGen extends Generator {
 
         StringBuilder       bodyContent = new StringBuilder();
 
-        boolean useTabs = useTabs(model);
-
         StringUtils.addLine(bodyContent, "<dl class=\"dl-horizontal\">");
         if (fields != null) {
             for (Field f : fields) {
@@ -1197,28 +1184,18 @@ public class RailsGen extends Generator {
                     if (fName.equals("updated_by") || fName.equals("created_by") || fName.equals("updated_at") || fName.equals("created_at"))
                         continue;
                 }
-                // TODO: different layout for all these different types
-                // TODO: sets, lists, range generation
-                // TODO: collections as tables generation (partial renderer calls?)
+                // TODO: range generation
 
                 String nameFName = name + "." + fName;
                 String capName = WordUtils.capitalize(fName);
                 if (fTypeName.equals(Type.SET_ONE_OR_MORE) || fTypeName.equals(Type.LIST)) {
                     if (fType.getSubtype().isPrimitive()) {
-                        // TODO: display collection of strings, dates, ints, etc.
+                        // TODO: if it's a list, display vertically, if it's a set, just put it in a line
+                        generateReadOnlySection(bodyContent, "@" + nameFName, fName);
                     }
                     else {
-                        StringUtils.addLine(bodyContent, "<% if @" + name + "." + capName + ".any? %>");
-
-                        tabbed(bodyContent, "<%= render @" + capName + " %>");
-                        tabbed(bodyContent, "<% else %>");
-                        tabbed(bodyContent, "<p> No " + capName + " for this " + name + " yet.</p>");
-                        tabbed(bodyContent, "<% end %>");
-                        tabbed(bodyContent, "<% if logged_in? && current_" + name + "?(@" + name + ") %>");
-                        tabbed(bodyContent, "<%= link_to \"Add " + fName + "\", new_" + fName + "_path, class: \"btn btn-lg btn-primary\" %>");
-                        tabbed(bodyContent, "<% end %>");
+                        generateSublistView(bodyContent, name, fName, model.isSecure());
                     }
-
                 }
                 else if (fName.equals("name")) {
                     HTMLUtils.addH3(bodyContent, "<%= @" + nameFName + " %>");
@@ -1256,6 +1233,42 @@ public class RailsGen extends Generator {
             }
         }
         StringUtils.addLine(bodyContent, "</dl>");
+
+        boolean             useTabs = useTabs(model);
+        ArrayList<Rel>      rels = model.getRelationships();
+        if (rels != null) {
+            /**
+             * For each rel:
+             *
+             * if it's one-to-one, display link_to name and the show path
+             * if it's one-to-many or many-to-many, display read only table with link_to on name columns
+             */
+
+            for (Rel rel : rels) {
+                RelType rt = rel.getRelType();
+                String fName = rel.getModel().getName();
+                String nameFName = name + "." + fName;
+                switch (rt) {
+                    case ONE_TO_ONE:
+                        //generateReadOnlyLinkSection(bodyContent, "link_to @" + nameFName, fName + ", show_" + fName + "_path");
+                        break;
+
+                    case ONE_TO_MANY:
+                        generateSublistView(bodyContent, name, fName, model.isSecure());
+                        break;
+
+                    case MANY_TO_MANY:
+                        generateSublistView(bodyContent, name, fName, model.isSecure());
+                        break;
+
+                    case MANY_TO_ONE:
+                       // generateReadOnlyLinkSection(bodyContent, "link_to @" + nameFName, fName + ", show_" + fName + "_path");
+                        break;
+                }
+            }
+
+        }
+
         Layout layout = app.getAppConfig().getLayout();
 
         if (layout == null)
@@ -1304,6 +1317,48 @@ public class RailsGen extends Generator {
         StringUtils.addLine(bodyContent, "<dt>" + WordUtils.capitalizeAndSpace(fieldName) + "</dt><dd>");
         HTMLUtils.addRubyOutput(bodyContent, fieldDetails);
         StringUtils.addLine(bodyContent, "</dd>");
+    }
+
+    private void generateReadOnlyLinkSectionInForm (StringBuilder bodyContent, String fieldDisplayName, String fieldName, String linkPath) {
+        HTMLUtils.addDiv(bodyContent, "form-group");
+        StringUtils.addLine(bodyContent, "<label class=\"control-label col-sm-2\">" + fieldDisplayName + "</label>");
+        HTMLUtils.addDiv(bodyContent, "col-sm-8");
+        HTMLUtils.addRuby(bodyContent, "if @" + fieldName + " != nil");
+        StringUtils.addLine(bodyContent, "<%= link_to @" + fieldName + ".name, " + linkPath + "(@" + fieldName + ") %>");
+        HTMLUtils.addRuby(bodyContent, "else");
+        StringUtils.addLine(bodyContent, "None");
+        HTMLUtils.addRuby(bodyContent, "end");
+        // TODO: this button needs to allow use to select another item - either list selection, lookup field, popup from a table select?
+        HTMLUtils.addButton(bodyContent, "change", "Change", "button");
+        HTMLUtils.closeDiv(bodyContent);
+        HTMLUtils.closeDiv(bodyContent);
+    }
+
+    private void generateReadOnlyLinkSection (StringBuilder bodyContent, String fieldDisplayName, String fieldName, String linkPath) {
+        StringUtils.addLine(bodyContent, "<dl><dt>" + fieldDisplayName + "</dt><dd>");
+        HTMLUtils.addRuby(bodyContent, "if @" + fieldName + " != nil");
+        //"Breeder Profile", breeder_path(@listing.breeder),
+        StringUtils.addLine(bodyContent, "<%= link_to @" + fieldDisplayName + ", " + linkPath + "(@" + fieldName + ") %>");
+        HTMLUtils.addRuby(bodyContent, "else");
+        StringUtils.addLine(bodyContent, "None");
+        HTMLUtils.addRuby(bodyContent, "end");
+        StringUtils.addLine(bodyContent, "</dd></dl>");
+        //StringUtils.addLine(bodyContent, "</dd>");
+    }
+
+    private void generateSublistView (StringBuilder builder, String modelName, String collectionName, boolean addAddBtn) throws Exception {
+        String pluralColName = WordUtils.pluralize(collectionName);
+        StringUtils.addLine(builder, "<% if @" + modelName + "." + pluralColName + ".any? %>");
+
+        tabbed(builder, "<%= render @" + pluralColName + " %>");
+        tabbed(builder, "<% else %>");
+        tabbed(builder, "<p> No " + pluralColName + " for this " + modelName + " yet.</p>");
+        tabbed(builder, "<% end %>");
+        if (addAddBtn) {
+            tabbed(builder, "<% if logged_in? && current_" + modelName + "?(@" + modelName + ") %>");
+            tabbed(builder, "<%= link_to \"Add " + collectionName + "\", new_" + collectionName + "_path, class: \"btn btn-lg btn-primary\" %>");
+            tabbed(builder, "<% end %>");
+        }
     }
 
     public void generateListView (Model model) throws Exception {
@@ -1378,12 +1433,13 @@ public class RailsGen extends Generator {
         String name = model.getName();
         String names = model.getPluralName();
         ArrayList<Field>    fields = model.getFields();
-        ArrayList<Rel>      rels = model.getRelationships();
 
         StringBuilder   buf = new StringBuilder();
         boolean         useTabs = useTabs(model);
         StringBuilder   bodyContent = new StringBuilder();
         HTMLUtils.addH1(buf, (isNew ? "New " : "Edit ") + model.getCapName());
+
+        boolean newUser = isNew && model.isSecure();
 
         if (fields != null) {
 
@@ -1395,7 +1451,7 @@ public class RailsGen extends Generator {
                      continue;
 
                  // Special case: minimize the new user form:
-                 if (isNew && model.isSecure()) {
+                 if (newUser) {
                      if (!(f.getName().equals("email") || f.getName().equals("name") || f.getName().equals("username") || f.getName().indexOf("password") != -1))
                          continue;
                  }
@@ -1497,10 +1553,86 @@ public class RailsGen extends Generator {
 
                  aline(bodyContent, "");
              }
-
-            generateFormEnd(bodyContent, isNew ? "Submit" : "Update");
         }
 
+
+        ArrayList<Rel>      rels = model.getRelationships();
+        if (!newUser && rels != null) {
+            /**
+             * For each rel:
+             *
+             * if it's one-to-one, display link_to name and the show path
+             * if it's one-to-many or many-to-many, display read only table with link_to on name columns
+             */
+
+            /**
+             *  <div class="form-group">
+             <% if @user.tests.any? %>
+             <%= render @tests %>
+             <% else %>
+             <p> No tests for this user yet.</p>
+             <% end %>
+             <% if logged_in? && current_user?(@user) %>
+             <%= link_to "Add test", new_test_path, class: "btn btn-lg btn-primary" %>
+             <% end %>
+             </div>
+
+             <div class="form-group">
+             <% if @user.questions.any? %>
+             <%= render @questions %>
+             <% else %>
+             <p> No questions for this user yet.</p>
+             <% end %>
+             <% if logged_in? && current_user?(@user) %>
+             <%= link_to "Add question", new_question_path, class: "btn btn-lg btn-primary" %>
+             <% end %>
+
+             </div>
+
+             <div class="form-group">
+             <label class="col-sm-2 control-label">Employer</label>
+             <div class="text-left col-sm-8">
+             <% if @user.employer != nil %>
+             <%= link_to @@user.employer.name, employer_path(@user.employer) %>
+             <% else %>
+             None
+             <% end %>
+             <input class="btn btn-lg" name="commit" type="button" value="Change" />
+             </div>
+             </div>
+
+             */
+            for (Rel rel : rels) {
+                RelType rt = rel.getRelType();
+                String fName = rel.getModel().getName();
+                String nameFName = name + "." + fName;
+                String relNameField = "@" + nameFName + ".name"; // TODO
+                switch (rt) {
+                    case ONE_TO_ONE:
+                        generateReadOnlyLinkSectionInForm(bodyContent, rel.getModel().getCapName(), nameFName, fName + "_path");
+                        break;
+
+                    case ONE_TO_MANY:
+                        HTMLUtils.addDiv(bodyContent, "form-group");
+                        generateSublistView(bodyContent, name, fName, model.isSecure());
+                        HTMLUtils.closeDiv(bodyContent);
+                        break;
+
+                    case MANY_TO_MANY:
+                        HTMLUtils.addDiv(bodyContent, "form-group");
+                        generateSublistView(bodyContent, name, fName, model.isSecure());
+                        HTMLUtils.closeDiv(bodyContent);
+                        break;
+
+                    case MANY_TO_ONE:
+                        generateReadOnlyLinkSectionInForm(bodyContent, rel.getModel().getCapName(), nameFName, fName + "_path");
+                        break;
+                }
+            }
+
+        }
+
+        generateFormEnd(bodyContent, isNew ? "Submit" : "Update");
 
         // TODO: these side sections should be moved to the application.html.erb layout page ?
         switch (app.getAppConfig().getLayout()) {
@@ -1853,6 +1985,10 @@ public class RailsGen extends Generator {
             return ("integer");
         else  if (type.equals(Type.FLOAT))
             return ("float");
+        else if (type.equals(Type.SET_ONE_OR_MORE))
+            return ("text");
+        else if (type.equals(Type.SET_PICK_ONE))
+            return ("text");
         else  {
             return ("integer"); // assume it's a model type for now?
         }
@@ -2009,7 +2145,8 @@ public class RailsGen extends Generator {
         // Heroku stuff:
         addGemToGroup(gemfileLines, "production", "pg", "0.17.1", false);
         addGemToGroup(gemfileLines, "production", "rails_12factor", "0.0.2", false);
-        addGemToGroup(gemfileLines, "assets", "jquery-ui-rails", null, false);
+        //addGemToGroup(gemfileLines, "assets", "bootstrap-datepicker-rails", null, false);
+        addGemToGroup(gemfileLines, "assets", "jquery-ui-rails", "4.2.1", false);
 
         /**
          * group :assets do
@@ -2051,13 +2188,15 @@ public class RailsGen extends Generator {
     	//System.out.println(result);
     }
 
+    private String  getRailsCommand () {
+        return (app.isWindows() ? "C:/RailsInstaller/Ruby2.1.0/bin/rails.bat" : "rails");
+    }
+
     public void generateAppStructure () throws Exception {
         /**
          * run: rails new 'app name'
          */
-    	String 	railsCmd = app.isWindows() ? "C:/RailsInstaller/Ruby2.1.0/bin/rails.bat" : "rails";
-    	
-    	String result = runCommand(app.getRootDir(), railsCmd, "new", app.getName());
+    	String result = runCommand(app.getRootDir(), getRailsCommand(), "new", app.getName());
     	
     	System.out.println(result);
     }
