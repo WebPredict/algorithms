@@ -176,7 +176,6 @@ public class GeneratorTest {
     public static void exampleWithAllTypes (boolean windows) throws Exception {
 
         App app = initialApp("TestSiteAllTypes", "A Test Site With All Complex Types In Use", windows);
-        app.setGenerateUpgrades(false);
         // TODO: need to have a way to indicate when collections are readonly
         Model [] models = Model.parseModels(new String[] {
                 "user: dob date, work_hours range(time), username required, email required, password, tagline string, employed duration, premium boolean, " +
@@ -189,7 +188,7 @@ public class GeneratorTest {
         app.setNeedsAuth(true);
 
         app.setModels(models);
-        app.setColorScheme(ColorScheme.findByName("black-red-blue"));
+        app.setColorScheme(ColorScheme.findByName("finance"));
         app.setJumbotronImageAsStockphoto("high-tech");
         app.addPlaceholderPages(new String[] {"about", "help", "news", "contact"});
         app.addStaticMenuItems(new String[] {"about", "news", "help"});

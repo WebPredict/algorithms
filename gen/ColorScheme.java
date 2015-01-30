@@ -11,11 +11,11 @@ import java.util.HashMap;
  */
 public class ColorScheme {
 
-    private String color1;
-    private String color2;
-    private String color3;
-    private String color4;
-    private String color5;
+    private String bgPrimary;
+    private String bgSecondary;
+    private String firstAccent;
+    private String secondAccent;
+    private String lettering;
 
     public static HashMap<String, ColorScheme> niceColorSchemes = new HashMap<String, ColorScheme>();
 
@@ -25,6 +25,7 @@ public class ColorScheme {
         niceColorSchemes.put("pink-cyan", new ColorScheme("57102C", "4CA8A1", "7EC2AA", "BCC747", "A92159"));
         niceColorSchemes.put("beige-red", new ColorScheme("CDCAB9", "D6D3C4", "DFDED4", "432F21", "CA171B"));
         niceColorSchemes.put("green-red", new ColorScheme("9BCE7D", "72AC93", "699E87", "BD0102", "98002F"));
+        niceColorSchemes.put("finance", new ColorScheme("C1E1A6", "FFFFFF", "118C4E", "FF9009", "585858"));
 
     }
 
@@ -32,35 +33,35 @@ public class ColorScheme {
         return (niceColorSchemes.get(name));
     }
 
-    public ColorScheme(String color1, String color2, String color3, String color4) {
-        this(color1, color2, color3, color4, "000000");
+    public ColorScheme(String bgPrimary, String bgSecondary, String firstAccent, String secondAccent) {
+        this(bgPrimary, bgSecondary, firstAccent, secondAccent, "000000");
     }
 
-    public ColorScheme(String color1, String color2, String color3, String color4, String color5) {
-        this.color1 = color1;
-        this.color2 = color2;
-        this.color3 = color3;
-        this.color4 = color4;
-        this.color5 = color5;
+    public ColorScheme(String bgPrimary, String bgSecondary, String firstAccent, String secondAccent, String lettering) {
+        this.bgPrimary = bgPrimary;
+        this.bgSecondary = bgSecondary;
+        this.firstAccent = firstAccent;
+        this.secondAccent = secondAccent;
+        this.lettering = lettering;
     }
 
-    public String getColor1() {
-        return color1;
+    public String getBgPrimary() {
+        return bgPrimary;
     }
 
-    public String getColor2() {
-        return color2;
+    public String getBgSecondary() {
+        return bgSecondary;
     }
 
-    public String getColor3() {
-        return color3;
+    public String getFirstAccent() {
+        return firstAccent;
     }
 
-    public String getColor4() {
-        return color4;
+    public String getSecondAccent() {
+        return secondAccent;
     }
 
-    public String getColor5() {
-        return color5;
+    public String getLettering() {
+        return lettering;
     }
 }

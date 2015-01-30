@@ -61,7 +61,11 @@ public class HTMLUtils {
     }
 
     public static void      addButton (StringBuilder buf, String fieldName, String fieldLabel, String buttonType) {
-        buf.append("<input class=\"btn btn-lg btn-primary\" name=\"commit\" type=\"" + buttonType + "\" value=\"" + fieldLabel + "\" />\n");
+        buf.append("<input class=\"btn btn-lg btn-primary\" name=\"" + fieldName + "\" type=\"" + buttonType + "\" value=\"" + fieldLabel + "\" />\n");
+    }
+
+    public static void      addSmallButton (StringBuilder buf, String fieldName, String fieldLabel, String buttonType) {
+        buf.append("<input class=\"btn btn-sm btn-default\" name=\"" + fieldName + "\" type=\"" + buttonType + "\" value=\"" + fieldLabel + "\" />\n");
     }
 
     public static void      addForm (StringBuilder buf, String action) {
@@ -85,6 +89,10 @@ public class HTMLUtils {
 
     public static void		addDiv (StringBuilder buf, String divClass) {
     	buf.append("<div class=\"" + divClass + "\">\n");
+    }
+
+    public static void		addDivWithContent (StringBuilder buf, String divClass, String content) {
+        buf.append("<div class=\"" + divClass + "\">" + content + "</div>\n");
     }
 
     public static void		addSpan (StringBuilder buf, String content) {

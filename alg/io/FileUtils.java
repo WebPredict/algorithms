@@ -34,6 +34,24 @@ public class FileUtils {
         return (lines);
     }
 
+    public static boolean textContentSame (String content, File file) throws Exception {
+        StringBuilder fileContent = new StringBuilder();
+
+        BufferedReader br = null;
+        try {
+            br = new BufferedReader(new FileReader(file));
+            String line;
+            while ((line = br.readLine()) != null) {
+                fileContent.append(line + "\n");
+            }
+        }
+        finally {
+            if (br != null)
+                br.close();
+        }
+        return (fileContent.toString().equals(content));
+    }
+
     public static List<String> getLinesCreateIfEmpty (String file) throws Exception {
         File f = new File(file);
         if (!f.exists()) {
@@ -137,6 +155,11 @@ public class FileUtils {
         List<String> fileLines = getLines(from);
 
         putLines(fileLines, to);
+        return (true);
+    }
+
+    public static boolean copyFile (String from, String to) throws Exception {
+        org.apache.commons.io.FileUtils.copyFile(new File(from), new File(to), false);
         return (true);
     }
 

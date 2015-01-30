@@ -240,6 +240,9 @@ public class App {
 
         if (errors.isEmpty()) {
             if (needsAddressModel) {
+
+                // TODO: consider using value objects here like in: http://www.tweetegy.com/2011/07/using-value-objects-in-activerecord/
+
                 Model addressModel = Model.parseModel("address: adddressLine1, addressLine2, addressLine3, city, state, zip, country");
                 addressModel.setDependent(true);
                 List<String> addressModelErrors =  addressModel.doPreprocessing(this);
