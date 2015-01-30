@@ -441,20 +441,21 @@ public class RailsGen extends Generator {
          Model  frontPageModelList = app.getFrontPageListModel();
 
          if (frontPageModelList != null)
-             generateTableFor(buf, frontPageModelList, "static_pages");
+             generateTableFor(buf, frontPageModelList, "static_pages", true);
 
         HTMLUtils.addRuby(buf, "end");
         FileUtils.write(HTMLUtils.formatHTML(buf.toString(), 2), app.getWebAppDir() + "/app/views/static_pages/home.html.erb", true);
     }
 
-    public void generateTableFor(StringBuilder buf, Model model) {
-        generateTableFor(buf, model, null);
+    public void generateTableFor(StringBuilder buf, Model model, boolean paginate) {
+        generateTableFor(buf, model, null, paginate);
     }
 
-    public void generateTableFor(StringBuilder buf, Model model, String collectionOverride) {
+    public void generateTableFor(StringBuilder buf, Model model, String collectionOverride, boolean paginate) {
         String pluralModelList = model.getPluralName();
 
-        HTMLUtils.addRubyOutput(buf, "will_paginate");
+        if (paginate)
+            HTMLUtils.addRubyOutput(buf, "will_paginate"); // TODO figure out when to pass param here
         HTMLUtils.addRuby(buf, "if @" + (collectionOverride == null ? pluralModelList : collectionOverride) + ".any?");
         HTMLUtils.addDiv(buf, "table-responsive");
         StringUtils.addLine(buf, "<table class=\"table table-striped\">");
@@ -484,7 +485,9 @@ public class RailsGen extends Generator {
         StringUtils.addLine(buf, "</table>");
         HTMLUtils.closeDiv(buf);
         HTMLUtils.addRuby(buf, "end");
-        HTMLUtils.addRubyOutput(buf, "will_paginate");
+
+        if (paginate)
+            HTMLUtils.addRubyOutput(buf, "will_paginate");
     }
 
     public void generateTablePartial(StringBuilder buf, Model model) {
@@ -768,7 +771,11 @@ public class RailsGen extends Generator {
 //        addMethod(buf, "sign_in(" + name + ")", new String[] {"cookies.permanent[:remember_token] = " + name + ".remember_token", "self.current_" + name + " = " + name});
 //        addMethod(buf, "redirect_back_or(default)", new String[] {"redirect_to(session[:return_to] || default)", "session.delete(:return_to)"});
         addMethod(buf, "store_location", new String[] {"session[:forwarding_url] = request.url if request.get?"});
-//        addMethod(buf, "signed_in_" + name, new String[] {"unless signed_in?", "\tstore_location", "\tredirect_to signin_path, notice: \"Please sign in.\"", "end"});
+        addMethod(buf, "logged_in_" + name, new String[] {"unless logged_in?",
+                "store_location",
+                "flash[:danger] = \"Please log in.\"",
+                "redirect_to signin_url",
+                "end"});
 
         StringUtils.addLine(buf, "end ");
 
@@ -1417,13 +1424,16 @@ public class RailsGen extends Generator {
         StringUtils.addLine(builder, "</dd></dl>");
     }
 
-    private void generateSublistView (StringBuilder builder, String modelName, String collectionName, boolean addAddBtn, String additionalParams) throws Exception {
+    private void generateSublistView (StringBuilder builder, String modelName, String collectionName, boolean addAddBtn, String additionalParams, Model relModel) throws Exception {
         String pluralColName = WordUtils.pluralize(collectionName);
         StringUtils.addLine(builder, "<label class=\"control-label col-sm-2\">" + WordUtils.capitalize(pluralColName) + "</label>");
         HTMLUtils.addDiv(builder, "col-sm-8");
         StringUtils.addLine(builder, "<% if @" + modelName + "." + pluralColName + ".any? %>");
 
-        tabbed(builder, "<%= render @" + modelName + "." + pluralColName + " %>");
+        //tabbed(builder, "<%= render @" + modelName + "." + pluralColName + " %>");
+
+        generateTableFor(builder, relModel, null, false);
+
         tabbed(builder, "<% else %>");
         tabbed(builder, "<p> No " + pluralColName + " for this " + modelName + " yet.</p>");
         tabbed(builder, "<% end %>");
@@ -1456,7 +1466,7 @@ public class RailsGen extends Generator {
         HTMLUtils.addH1(bodyContent, WordUtils.pluralize(model.getCapName()));
         HTMLUtils.closeDiv(bodyContent);
 
-        generateTableFor(bodyContent, model);
+        generateTableFor(bodyContent, model, true);
 
         switch (app.getAppConfig().getLayout()) {
             case TWO_COL_THIN_LEFT: {
@@ -1682,13 +1692,14 @@ public class RailsGen extends Generator {
 
                     case ONE_TO_MANY:
                         HTMLUtils.addDiv(bodyContent, "form-group");
-                        generateSublistView(bodyContent, name, fName, model.isSecure(), additionalParams);
+                        //generateTableFor(bodyContent, rel.getModel());
+                        generateSublistView(bodyContent, name, fName, model.isSecure(), additionalParams, rel.getModel());
                         HTMLUtils.closeDiv(bodyContent);
                         break;
 
                     case MANY_TO_MANY:
                         HTMLUtils.addDiv(bodyContent, "form-group");
-                        generateSublistView(bodyContent, name, fName, model.isSecure(), additionalParams);
+                        generateSublistView(bodyContent, name, fName, model.isSecure(), additionalParams, rel.getModel());
                         HTMLUtils.closeDiv(bodyContent);
                         break;
 
@@ -1849,9 +1860,15 @@ public class RailsGen extends Generator {
                 StringBuilder buf = new StringBuilder();
                 String  className = WordUtils.capitalizeAndJoin(names, "controller");
                 StringUtils.addLine(buf, "class " + className + " < ApplicationController");
+                Model parentModel = model.getParentModel();  // TODO this is not going to work if there are multiple parents
                 if (model.isSecure()) {
                     tabbed(buf, "before_filter :logged_in_" + name + ", only: [:edit, :update, :destroy]");
                     tabbed(buf, "before_filter :correct_" + name + ", only: [:edit, :update]");
+                }
+                else if (parentModel != null) {
+                    if (parentModel.isSecure())
+                        tabbed(buf, "before_filter :logged_in_" + parentModel.getName() + ", only: [:edit, :update, :destroy]");
+                    tabbed(buf, "before_filter :correct_" + parentModel.getName() + ", only: [:edit, :update]");
                 }
                 // TODO: also need to restrict from editing items that they don't own with correct_user on other controllers
                 /**
@@ -1861,8 +1878,7 @@ public class RailsGen extends Generator {
                 tabbed(buf, "helper_method :sort_column, :sort_direction");
 
                 ArrayList<String> createLines = new ArrayList<String>();
-                Model parentModel = model.getParentModel();  // TODO this is not going to work if there are multiple parents
-                if (parentModel != null) {
+               if (parentModel != null) {
                     createLines.add("@" + parentModel.getName() + " = " + parentModel.getCapName() + ".find_by_id(params[:" + name + "][:" + parentModel.getName() + "_id])");
                     String modelDepName = model.getPluralName(); // TODO could be singular if relationship is one-to-one
                     createLines.add("@" + name + " = @" + parentModel.getName() + "." + modelDepName + ".build(" + name + "_params)");
@@ -1977,6 +1993,10 @@ public class RailsGen extends Generator {
                             "redirect_to(root_url) unless @" + name + " == current_" + name});
 
                     addMethod(buf, "logged_in_" + name, new String[] {"unless logged_in?", "store_location", "flash[:danger] = \"Please log in.\"", "redirect_to signin_url", "end"});
+                }
+                else if (parentModel != null) {
+                    addMethod(buf, "correct_" + parentModel.getName(), new String[] {"@" + name + " = current_" + parentModel.getName() + "." + model.getPluralName() + ".find_by_id(params[:id])",
+                            "redirect_to root_path if @" + name + ".nil?"});
                 }
 
                 addMethodTabbed(buf, "sort_column", new String[]{
