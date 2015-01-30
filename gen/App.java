@@ -43,8 +43,17 @@ public class App {
     private List<StaticPage> staticPages = new ArrayList<StaticPage>();
     private List<String> staticMenuItems = new ArrayList<String>();
     private boolean generateUpgrades;
+    private boolean fullWidthJumbotron = true;
 
     private ColorScheme colorScheme;
+
+    public boolean isFullWidthJumbotron() {
+        return fullWidthJumbotron;
+    }
+
+    public void setFullWidthJumbotron(boolean fullWidthJumbotron) {
+        this.fullWidthJumbotron = fullWidthJumbotron;
+    }
 
     public ColorScheme getColorScheme() {
         return colorScheme;

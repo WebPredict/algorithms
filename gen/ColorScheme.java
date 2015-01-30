@@ -25,7 +25,7 @@ public class ColorScheme {
         niceColorSchemes.put("pink-cyan", new ColorScheme("57102C", "4CA8A1", "7EC2AA", "BCC747", "A92159"));
         niceColorSchemes.put("beige-red", new ColorScheme("CDCAB9", "D6D3C4", "DFDED4", "432F21", "CA171B"));
         niceColorSchemes.put("green-red", new ColorScheme("9BCE7D", "72AC93", "699E87", "BD0102", "98002F"));
-        niceColorSchemes.put("finance", new ColorScheme("C1E1A6", "FFFFFF", "118C4E", "FF9009", "585858"));
+        niceColorSchemes.put("finance", new ColorScheme("FFFFFF", "C1E1A6", "118C4E", "FF9009", "585858"));
 
     }
 

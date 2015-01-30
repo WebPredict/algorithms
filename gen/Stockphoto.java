@@ -27,6 +27,7 @@ public class Stockphoto {
         nameToPhotoUrlMap.put("high-tech", "http://i.huffpost.com/gen/1476047/thumbs/o-TECHNOLOGY-facebook.jpg");
         nameToPhotoUrlMap.put("office-building", "http://upload.wikimedia.org/wikipedia/commons/f/fc/Skalar_Office_Building_Poznan.jpg");
         nameToPhotoUrlMap.put("nature", "https://chakracenter.files.wordpress.com/2013/02/nature1.jpg");
+        nameToPhotoUrlMap.put("finance", "https://www.debtcovered.com/wp-content/uploads/2012/08/alternative-financial-services.jpg");
     }
 
     public static Stockphoto find (String name) {

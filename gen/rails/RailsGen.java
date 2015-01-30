@@ -8,7 +8,9 @@ import gen.*;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -299,37 +301,22 @@ public class RailsGen extends Generator {
         StringUtils.addLine(buf, "<body>");
         HTMLUtils.addRubyOutput(buf, "render 'layouts/header'");
 
-        StringUtils.addLine(buf, "<div class=\"container\"> ");
+        if (!app.isFullWidthJumbotron()) {
+            StringUtils.addLine(buf, "<div class=\"container\"> ");
+        }
+
         HTMLUtils.addRuby(buf, "flash.each do |key, value|");
         StringUtils.addLine(buf, "<div class=\"alert alert-<%= key %>\"><%= value %></div>  ");
         HTMLUtils.addRuby(buf, "end");
         HTMLUtils.addRubyOutput(buf, "yield");
-        HTMLUtils.closeDiv(buf);
+
+        if (!app.isFullWidthJumbotron()) {
+            HTMLUtils.closeDiv(buf);
+        }
         HTMLUtils.addRubyOutput(buf, "render 'layouts/footer'");
         HTMLUtils.addRubyOutput(buf, "debug(params) if Rails.env.development?");
         StringUtils.addLine(buf, "</body>");
         StringUtils.addLine(buf, "</html>");
-
-        /**
-        <%= stylesheet_link_tag    "application", :media => "all" %>
-        <%= javascript_include_tag "application" %>
-        <%= csrf_meta_tags %>
-        <%= render 'layouts/shim' %>
-        </head>
-        <body>
-        <%= render 'layouts/header' %>
-
-        <div class="container">
-        <% flash.each do |key, value| %>
-        <div class="alert alert-<%= key %>"><%= value %></div>
-        <% end %>
-        <%= yield %>
-        </div>
-        <%= render 'layouts/footer' %>
-        </body>
-        </html>
-
-        */
 
         FileUtils.write(HTMLUtils.formatHTML(buf.toString(), 2), app.getWebAppDir() + "/app/views/layouts/application.html.erb", false);
 //        FileUtils.replaceInFile(app.getWebAppDir() + "/app/views/layouts/application.html.erb", new String[]{"<%= yield %>"},
@@ -446,7 +433,7 @@ public class RailsGen extends Generator {
             String plural =  frontSearchModel.getPluralName();
             HTMLUtils.addRubyOutput(buf, "link_to \"Search " + plural + "\", " + plural + "_path, class: \"btn btn-lg btn-primary\"");
         }
-        HTMLUtils.addRubyOutput(buf, "link_to \"Signup!\", signup_path, class: \"btn btn-primary btn-lg\"");
+        HTMLUtils.addRubyOutput(buf, "link_to \"Sign Up!\", signup_path, class: \"btn btn-default btn-lg\"");
         HTMLUtils.closeDiv(buf);
         HTMLUtils.closeDiv(buf);
         HTMLUtils.addLineBreak(buf);
@@ -467,27 +454,9 @@ public class RailsGen extends Generator {
     public void generateTableFor(StringBuilder buf, Model model, String collectionOverride) {
         String pluralModelList = model.getPluralName();
 
-        /**
-         * <container-fluid>
-         <row-fluid>
-         <span10>
-         <%= will_paginate %>
-         <% if @questions.any? %>
-         <table class="table table-striped">
-         <tr><th><%= sortable "name", "Name" %></th><th><%= sortable "description", "Description" %></th><th><%= sortable "answer", "Answer" %></th><th><%= sortable "code_snippet", "Code snippet" %></th><th><%= sortable "difficulty", "Difficulty" %></th><th><%= sortable "disabled", "Disabled" %></th><th><%= sortable "created_by", "Created by" %></th><th><%= sortable "created_at", "Created at" %></th><th><%= sortable "updated_by", "Updated by" %></th><th><%= sortable "updated_at", "Updated at" %></th><th>Actions</th></tr>
-         <% @questions.each do |question| %>
-         <%= render question %>
-         <% end %>
-         </table>
-         <% end %>
-         <%= will_paginate %>
-         </span10>
-         </row-fluid>
-         </container-fluid>
-         */
-
         HTMLUtils.addRubyOutput(buf, "will_paginate");
         HTMLUtils.addRuby(buf, "if @" + (collectionOverride == null ? pluralModelList : collectionOverride) + ".any?");
+        HTMLUtils.addDiv(buf, "table-responsive");
         StringUtils.addLine(buf, "<table class=\"table table-striped\">");
 
         ArrayList<Field> fields = model.getFields();
@@ -513,6 +482,7 @@ public class RailsGen extends Generator {
 
         //HTMLUtils.addRubyOutput(buf, "will_paginate @" + model.getPluralName());
         StringUtils.addLine(buf, "</table>");
+        HTMLUtils.closeDiv(buf);
         HTMLUtils.addRuby(buf, "end");
         HTMLUtils.addRubyOutput(buf, "will_paginate");
     }
@@ -603,11 +573,11 @@ public class RailsGen extends Generator {
         generateFormEnd(buf, "Sign in");
         HTMLUtils.addLineBreak(buf);
         HTMLUtils.addDiv(buf, "row");
-        HTMLUtils.addDiv(buf, "col-sm-offset-3 col-sm-3");
-        StringUtils.addLine(buf, "New " + userModelName + "? <%= link_to \"Sign up now!\", signup_path %>");
+        HTMLUtils.addDiv(buf, "col-sm-offset-2 col-sm-5");
+        StringUtils.addLine(buf, "Forgot password? <%= link_to \"Reset password\", send_password_path %>");
         HTMLUtils.closeDiv(buf);
         HTMLUtils.addDiv(buf, "col-sm-3");
-        StringUtils.addLine(buf, "Forgot password? <%= link_to \"Reset password\",  send_password_path %>");
+        StringUtils.addLine(buf, "New " + userModelName + "? <%= link_to \"Sign up now!\", signup_path, {:class => \"btn btn-default\"} %>");
         HTMLUtils.closeDiv(buf);
         HTMLUtils.closeDiv(buf);
 
@@ -966,9 +936,22 @@ public class RailsGen extends Generator {
             //$jumbotron-color: #007700;
             //$jumbotron-heading-color: #007700;
 
+            HashMap<String, String> varToColorMap = new HashMap<String, String>();
+            varToColorMap.put("jumbotron-color", scheme.getFirstAccent());
+            varToColorMap.put("jumbotron-heading-color", scheme.getFirstAccent());
+            varToColorMap.put("body-bg", scheme.getBgPrimary());
+            varToColorMap.put("text-color", scheme.getLettering());
+            varToColorMap.put("link-color", scheme.getSecondAccent());
+            varToColorMap.put("btn-default-bg", scheme.getSecondAccent());
+            if (!scheme.getSecondAccent().equals("FFFFFF"))
+                varToColorMap.put("btn-default-color", "FFFFFF"); // TODO better logic here for contrasting button text color
+            //varToColorMap.put("navbar-default-color", scheme.getFirstAccent());
+            varToColorMap.put("brand-primary", scheme.getFirstAccent());
+            varToColorMap.put("brand-info", scheme.getFirstAccent());
+            varToColorMap.put("navbar-inverse-bg", scheme.getBgSecondary());
+
             // TODO: full navbar, buttons, tables, forms, header, footer
-            overrideStyles(new String [] {"jumbotron-color", "jumbotron-heading-color", "body-bg", "text-color", "link-color", "brand-primary", "brand-info", "navbar-inverse"},
-                new String [] {scheme.getFirstAccent(), scheme.getFirstAccent(), scheme.getBgPrimary(), scheme.getLettering(), scheme.getSecondAccent(), scheme.getFirstAccent(), scheme.getSecondAccent(), scheme.getBgSecondary()});
+            overrideStyles(varToColorMap);
 
         }
         // TODO: not sure we need to do this if running with --without production:
@@ -982,11 +965,13 @@ public class RailsGen extends Generator {
         FileUtils.insertInFileIfNotExists(app.getWebAppDir() + "/app/assets/stylesheets/custom.css.scss", styleInfo);
     }
 
-    public void overrideStyles (String [] styleNames, String [] overrides) throws Exception {
+    public void overrideStyles (HashMap<String, String> varToColorMap) throws Exception {
         //FileUtils.append(app.getWebAppDir() + "/app/assets/stylesheets/bootstrap_and_overrides.css.less", styleInfo);
-        String [] lines = new String[styleNames.length];
-        for (int i = 0; i < lines.length; i++) {
-            lines [i] = "$" + styleNames[i] + ": #" + overrides [i] + ";";
+        String [] lines = new String[varToColorMap.size()];
+        int index = 0;
+        Set<String> keys = varToColorMap.keySet();
+        for (String key : keys) {
+            lines [index++] = "$" + key + ": #" + varToColorMap.get(key) + ";";
         }
         FileUtils.prependInFileIfNotExists(app.getWebAppDir() + "/app/assets/stylesheets/custom.css.scss", lines);
     }
@@ -1270,7 +1255,9 @@ public class RailsGen extends Generator {
                     generateReadOnlySection(bodyContent, "@" + nameFName, fName);
                 }
                 else if (fTypeName.equals(Type.CODE.getName())) {
-                	generateReadOnlySection(bodyContent, "CodeRay.scan(@" + nameFName + ", :ruby).div(:line_numbers => :table)", fName);               	
+                    // TODO: why isn't RedCloth working?
+                	//generateReadOnlySection(bodyContent, "RedCloth.new(CodeRay.scan(@" + nameFName + ", :ruby).div(:line_numbers => :table)).to_html", fName);
+                    generateReadOnlySection(bodyContent, "CodeRay.scan(@" + nameFName + ", :ruby).div(:line_numbers => :table)", fName);
                 }
                 else if (fTypeName.equals(Type.CURRENCY.getName())) {
                     generateReadOnlySection(bodyContent, "number_to_currency(@" + nameFName + ", :unit => \"$\")", fName);
@@ -1388,17 +1375,19 @@ public class RailsGen extends Generator {
         StringUtils.addLine(bodyContent, "</dd>");
     }
 
-    private void generateReadOnlyLinkSectionInForm (StringBuilder bodyContent, String fieldDisplayName, String fieldName, String linkPath) {
+    private void generateReadOnlyLinkSectionInForm (StringBuilder bodyContent, String fieldDisplayName, String fieldName, String linkPath, boolean addButton) {
         HTMLUtils.addDiv(bodyContent, "form-group");
         StringUtils.addLine(bodyContent, "<label class=\"control-label col-sm-2\">" + fieldDisplayName + "</label>");
         HTMLUtils.addDiv(bodyContent, "col-sm-8");
         HTMLUtils.addRuby(bodyContent, "if @" + fieldName + " != nil");
-        StringUtils.addLine(bodyContent, "<%= link_to @" + fieldName + ".name, " + linkPath + "(@" + fieldName + ") %>");
+        StringUtils.addLine(bodyContent, "<%= link_to @" + fieldName + ".id, " + linkPath + "(@" + fieldName + ") %>");
         HTMLUtils.addRuby(bodyContent, "else");
         StringUtils.addLine(bodyContent, "None");
         HTMLUtils.addRuby(bodyContent, "end");
-        // TODO: this button needs to allow use to select another item - either list selection, lookup field, popup from a table select?
-        HTMLUtils.addSmallButton(bodyContent, "change", "Change", "button");
+        if (addButton) {
+            // TODO: this button needs to allow use to select another item - either list selection, lookup field, popup from a table select?
+            HTMLUtils.addSmallButton(bodyContent, "change", "Change", "button");
+        }
         HTMLUtils.closeDiv(bodyContent);
         HTMLUtils.closeDiv(bodyContent);
     }
@@ -1420,7 +1409,7 @@ public class RailsGen extends Generator {
         StringUtils.addLine(builder, "<dl class=\"dl-horizontal\"><dt>" + WordUtils.capitalize(pluralColName) + "</dt><dd>");
         StringUtils.addLine(builder, "<% if @" + modelName + "." + pluralColName + ".any? %>");
 
-        tabbed(builder, "<%= render @" + pluralColName + " %>");
+        tabbed(builder, "<%= render @" + modelName + "." + pluralColName + " %>");
         tabbed(builder, "<% else %>");
         tabbed(builder, "No " + pluralColName + " for this " + modelName + " yet.");
         tabbed(builder, "<% end %>");
@@ -1428,19 +1417,23 @@ public class RailsGen extends Generator {
         StringUtils.addLine(builder, "</dd></dl>");
     }
 
-    private void generateSublistView (StringBuilder builder, String modelName, String collectionName, boolean addAddBtn) throws Exception {
+    private void generateSublistView (StringBuilder builder, String modelName, String collectionName, boolean addAddBtn, String additionalParams) throws Exception {
         String pluralColName = WordUtils.pluralize(collectionName);
         StringUtils.addLine(builder, "<label class=\"control-label col-sm-2\">" + WordUtils.capitalize(pluralColName) + "</label>");
         HTMLUtils.addDiv(builder, "col-sm-8");
         StringUtils.addLine(builder, "<% if @" + modelName + "." + pluralColName + ".any? %>");
 
-        tabbed(builder, "<%= render @" + pluralColName + " %>");
+        tabbed(builder, "<%= render @" + modelName + "." + pluralColName + " %>");
         tabbed(builder, "<% else %>");
         tabbed(builder, "<p> No " + pluralColName + " for this " + modelName + " yet.</p>");
         tabbed(builder, "<% end %>");
         if (addAddBtn) {
             tabbed(builder, "<% if logged_in? && current_" + modelName + "?(@" + modelName + ") %>");
-            tabbed(builder, "<%= link_to \"Add " + collectionName + "\", new_" + collectionName + "_path, class: \"btn btn-sm btn-default\" %>");
+            String path = "new_" + collectionName + "_path";
+            if (additionalParams != null) {
+                path += "(" + additionalParams + ")";
+            }
+            tabbed(builder, "<%= link_to \"Add " + collectionName + "\", " + path + ", class: \"btn btn-default btn-sm\" %>");
             tabbed(builder, "<% end %>");
         }
         HTMLUtils.closeDiv(builder);
@@ -1554,13 +1547,16 @@ public class RailsGen extends Generator {
                  if (fType.equals(Type.BOOLEAN)) {
                      generateCheckboxField(bodyContent, fName, capitalized + "?");
                  }
-                 else if (f.getName().equals("username")) {
+                 else if (f.getName().equals("username") && !newUser) {
                      generateStaticFormField(bodyContent, model.getName(), fName);
                  }
                  else if (fType.equals(Type.SHORT_STRING)) {
                      generateFormField(bodyContent, fName);
                  }
-                else if (fType.equals(Type.LONG_STRING)) {
+                 else if (fType.equals(Type.LONG_STRING)) {
+                     generateTextArea(bodyContent, fName, 5);
+                 }
+                 else if (fType.equals(Type.CODE)) {
                      generateTextArea(bodyContent, fName, 5);
                  }
                  else if (fType.equals(Type.STRING)) {
@@ -1673,74 +1669,39 @@ public class RailsGen extends Generator {
              * if it's one-to-many or many-to-many, display read only table with link_to on name columns
              */
 
-            /**
-             *  <div class="form-group">
-             <% if @user.tests.any? %>
-             <%= render @tests %>
-             <% else %>
-             <p> No tests for this user yet.</p>
-             <% end %>
-             <% if logged_in? && current_user?(@user) %>
-             <%= link_to "Add test", new_test_path, class: "btn btn-lg btn-primary" %>
-             <% end %>
-             </div>
-
-             <div class="form-group">
-             <% if @user.questions.any? %>
-             <%= render @questions %>
-             <% else %>
-             <p> No questions for this user yet.</p>
-             <% end %>
-             <% if logged_in? && current_user?(@user) %>
-             <%= link_to "Add question", new_question_path, class: "btn btn-lg btn-primary" %>
-             <% end %>
-
-             </div>
-
-             <div class="form-group">
-             <label class="col-sm-2 control-label">Employer</label>
-             <div class="text-left col-sm-8">
-             <% if @user.employer != nil %>
-             <%= link_to @@user.employer.name, employer_path(@user.employer) %>
-             <% else %>
-             None
-             <% end %>
-             <input class="btn btn-lg" name="commit" type="button" value="Change" />
-             </div>
-             </div>
-
-             */
             for (Rel rel : rels) {
                 RelType rt = rel.getRelType();
                 String fName = rel.getModel().getName();
                 String nameFName = name + "." + fName;
                 String relNameField = "@" + nameFName + ".name"; // TODO
+                String additionalParams = model.getName() + "_id: @" + model.getName() + ".id";
                 switch (rt) {
                     case ONE_TO_ONE:
-                        generateReadOnlyLinkSectionInForm(bodyContent, rel.getModel().getCapName(), nameFName, fName + "_path");
+                        generateReadOnlyLinkSectionInForm(bodyContent, rel.getModel().getCapName(), nameFName, fName + "_path", true);
                         break;
 
                     case ONE_TO_MANY:
                         HTMLUtils.addDiv(bodyContent, "form-group");
-                        generateSublistView(bodyContent, name, fName, model.isSecure());
+                        generateSublistView(bodyContent, name, fName, model.isSecure(), additionalParams);
                         HTMLUtils.closeDiv(bodyContent);
                         break;
 
                     case MANY_TO_MANY:
                         HTMLUtils.addDiv(bodyContent, "form-group");
-                        generateSublistView(bodyContent, name, fName, model.isSecure());
+                        generateSublistView(bodyContent, name, fName, model.isSecure(), additionalParams);
                         HTMLUtils.closeDiv(bodyContent);
                         break;
 
                     case MANY_TO_ONE:
-                        generateReadOnlyLinkSectionInForm(bodyContent, rel.getModel().getCapName(), nameFName, fName + "_path");
+                        generateReadOnlyLinkSectionInForm(bodyContent, rel.getModel().getCapName(), nameFName, fName + "_path", false);
+                        StringUtils.addLine(bodyContent, "<%= f.hidden_field :" + rel.getModelName() + "_id %>");
                         break;
                 }
             }
 
         }
 
-        generateFormEnd(bodyContent, isNew ? "Submit" : "Update");
+        generateFormEnd(bodyContent, isNew ? "Submit" : "Save");
 
         // TODO: these side sections should be moved to the application.html.erb layout page ?
         switch (app.getAppConfig().getLayout()) {
@@ -1888,24 +1849,75 @@ public class RailsGen extends Generator {
                 StringBuilder buf = new StringBuilder();
                 String  className = WordUtils.capitalizeAndJoin(names, "controller");
                 StringUtils.addLine(buf, "class " + className + " < ApplicationController");
-                tabbed(buf, "before_filter :logged_in_" + name + ", only: [:edit, :update, :destroy]");
-                tabbed(buf, "before_filter :correct_" + name + ", only: [:edit, :update]");
+                if (model.isSecure()) {
+                    tabbed(buf, "before_filter :logged_in_" + name + ", only: [:edit, :update, :destroy]");
+                    tabbed(buf, "before_filter :correct_" + name + ", only: [:edit, :update]");
+                }
+                // TODO: also need to restrict from editing items that they don't own with correct_user on other controllers
+                /**
+                 * If it's a dependent relationship, restrict access
+                 */
+
                 tabbed(buf, "helper_method :sort_column, :sort_direction");
 
                 ArrayList<String> createLines = new ArrayList<String>();
-                createLines.add("@" + name + " = " + capName + ".new(" + name + "_params)");
+                Model parentModel = model.getParentModel();  // TODO this is not going to work if there are multiple parents
+                if (parentModel != null) {
+                    createLines.add("@" + parentModel.getName() + " = " + parentModel.getCapName() + ".find_by_id(params[:" + name + "][:" + parentModel.getName() + "_id])");
+                    String modelDepName = model.getPluralName(); // TODO could be singular if relationship is one-to-one
+                    createLines.add("@" + name + " = @" + parentModel.getName() + "." + modelDepName + ".build(" + name + "_params)");
+                }
+                else {
+                    createLines.add("@" + name + " = " + capName + ".new(" + name + "_params)");
+                }
                 createLines.add("if @" + name + ".save");
                 if (model.isSecure())
                     createLines.add("flash[:success] = \"Welcome to " + app.getTitle() + "!\"");
                 else
-                    createLines.add("flash[:success] = \"Created new + " + model.getCapName() + ".\"");
+                    createLines.add("flash[:success] = \"Created new " + model.getName() + ".\"");
                 createLines.add("\tredirect_to root_path");
                 createLines.add("else");
                 createLines.add("\trender 'new'");
                 createLines.add("end");
 
                 addMethod(buf, "create", createLines);
-                addMethod(buf, "new", new String[] {"@" + name + " = " + capName + ".new"});
+
+                ArrayList<String> newLines = new ArrayList<String>();
+                newLines.add("@" + name + " = " + capName + ".new");
+                if (model.getRelationships() != null) {
+                    for (Rel rel : model.getRelationships()) {
+                        if (rel.getRelType().equals(RelType.MANY_TO_ONE)) {
+                            newLines.add("@" + name + "." + rel.getModelName() + "_id = params[:" + rel.getModelName() + "_id]");
+                        }
+                    }
+                }
+
+                addMethod(buf, "new", newLines);
+
+                addMethod(buf, "edit", new String[] {"@" + name + " = " + capName + ".find(params[:id])"});
+
+                addMethod(buf, "update", new String[] {"@" + name + " = " + capName + ".find(params[:id])",
+                    "if @" + name + ".update_attributes(" + name + "_params)",
+                        "flash[:success] = \"" + capName + " updated.\"",
+                        "redirect_to @" + name,
+                        "else",
+                        "render 'edit'",
+                        "end"
+                });
+
+                addMethod(buf, "disable", new String[] {"@" + name + " = " + capName + ".find(params[:id])",
+                        "@" + name + ".disabled = true",
+                        "@" + name + ".save",
+                        "flash[:success] = \"" + capName + " disabled.\"",
+                        "redirect_to :back"
+                });
+
+                addMethod(buf, "enable", new String[] {"@" + name + " = " + capName + ".find(params[:id])",
+                        "@" + name + ".disabled = false",
+                        "@" + name + ".save",
+                        "flash[:success] = \"" + capName + " enabled.\"",
+                        "redirect_to :back"
+                });
 
                 ArrayList<String> showMethod = new ArrayList<String>();
                 showMethod.add("@" + name + " = " + capName + ".find(params[:id])");
@@ -1960,10 +1972,13 @@ public class RailsGen extends Generator {
                 }
                 addMethod(buf, name + "_params", new String[] {"params.require(:" + name + ").permit(" + fieldList + ")"});
 
-                addMethod(buf, "correct_" + name, new String[] {"@" + name + " = " + capName + ".find(params[:id])",
-                        "redirect_to(root_url) unless @" + name + " == current_" + name});
+                if (model.isSecure()) {
+                    addMethod(buf, "correct_" + name, new String[] {"@" + name + " = " + capName + ".find(params[:id])",
+                            "redirect_to(root_url) unless @" + name + " == current_" + name});
 
-                addMethod(buf, "logged_in_" + name, new String[] {"unless logged_in?", "store_location", "flash[:danger] = \"Please log in.\"", "redirect_to signin_url", "end"});
+                    addMethod(buf, "logged_in_" + name, new String[] {"unless logged_in?", "store_location", "flash[:danger] = \"Please log in.\"", "redirect_to signin_url", "end"});
+                }
+
                 addMethodTabbed(buf, "sort_column", new String[]{
                         capName + ".column_names.include?(params[:sort]) ? params[:sort] : \"" + model.getUserIndentifierFieldName() + "\" "});
 
@@ -2286,6 +2301,7 @@ public class RailsGen extends Generator {
 
         addGem(gemfileLines, "actionmailer");
         addGem(gemfileLines, "coderay");
+        addGem(gemfileLines, "RedCloth");
         addGem(gemfileLines, "tabs_on_rails");
         //addGem(gemfileLines, "twitter-bootstrap-rails");
         addGem(gemfileLines, "bootstrap-sass", "3.2.0.0", false);

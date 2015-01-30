@@ -16,7 +16,7 @@ public class Rel {
     private Model through;
 
     public String getModelName() {
-        return modelName;
+        return modelName == null ? model.getName() : modelName;
     }
 
     public void setModelName(String modelName) {

@@ -24,6 +24,15 @@ public class Model extends Type {
     private boolean URL;
     private boolean dependent;
     private String  userIndentifierFieldName = "name";
+    private Model parentModel;
+
+    public Model getParentModel() {
+        return parentModel;
+    }
+
+    public void setParentModel(Model parentModel) {
+        this.parentModel = parentModel;
+    }
 
     public String getUserIndentifierFieldName() {
         return userIndentifierFieldName;
@@ -138,6 +147,7 @@ public class Model extends Type {
                         rel.setModel(found);
                         if (rel.getRelType().equals(RelType.ONE_TO_MANY)) {
                             found.addRel(this, RelType.MANY_TO_ONE);
+                            found.setParentModel(this);
                         }
                         else if (rel.getRelType().equals(RelType.ONE_TO_ONE)) {
                             found.addRel(this, RelType.ONE_TO_ONE);

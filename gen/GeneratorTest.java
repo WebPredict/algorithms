@@ -103,8 +103,6 @@ public class GeneratorTest {
         app.setRootDir(windows ? "C:/Users/jsanchez/Downloads/apps" : "/Users/jeffreysanchez/rails_projects/generated");
         app.setName(name);
         app.setTagLine(tagline);
-        //app.addPlaceholderPages(new String[] {"about", "help"});
-        //app.addStaticMenuItems(new String[] {"about"});
 
         AppConfig appConfig = app.getAppConfig();
         appConfig.setColor1("blue");
@@ -124,7 +122,6 @@ public class GeneratorTest {
         app.getAppConfig().setColor2("white");
         app.setJumbotronImageUrl("http://flickr.com/something/MtTom.jpg");
 
-        //app.setTopLevelModels("post"); -- should be unnecessary if there's only 1 model
         app.setFrontPageListModel(postModel);
         Generator.createAndGen(app, true);
     }
@@ -140,7 +137,7 @@ public class GeneratorTest {
         app.setModels(models);
         app.getAppConfig().setColor1("blue");
         app.getAppConfig().setColor2("white");
-        app.setJumbotronImage("TODOBG.jpg");  // TODO: support a list of stockphoto images like "office" or "high-tech" or "mountains" or something
+        app.setJumbotronImage("http://daryndajones.com/wp-content/uploads/2012/02/to-do-list.jpg");
 
         app.setTopLevelModels("todo");
         //app.setFrontPageListModel(models [1]);
@@ -189,7 +186,7 @@ public class GeneratorTest {
 
         app.setModels(models);
         app.setColorScheme(ColorScheme.findByName("finance"));
-        app.setJumbotronImageAsStockphoto("high-tech");
+        app.setJumbotronImageAsStockphoto("finance");
         app.addPlaceholderPages(new String[] {"about", "help", "news", "contact"});
         app.addStaticMenuItems(new String[] {"about", "news", "help"});
 
