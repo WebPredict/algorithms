@@ -538,11 +538,11 @@ public class RailsGen extends Generator {
         generateFormEnd(buf, "Sign in", 6);
         HTMLUtils.addLineBreak(buf);
         HTMLUtils.addDiv(buf, "row");
-        HTMLUtils.addDiv(buf, "col-sm-offset-4 col-sm-3");
+        HTMLUtils.addDiv(buf, "col-sm-offset-3 col-sm-3");
         StringUtils.addLine(buf, "Forgot password? <%= link_to \"Reset password\", send_password_path %>");
         HTMLUtils.closeDiv(buf);
         HTMLUtils.addDiv(buf, "col-sm-3");
-        StringUtils.addLine(buf, "New " + userModelName + "? <%= link_to \"Sign up now!\", signup_path, {:class => \"btn btn-default\"} %>");
+        StringUtils.addLine(buf, "New " + userModelName + "? <%= link_to \"Sign up now!\", signup_path%>");
         HTMLUtils.closeDiv(buf);
         HTMLUtils.closeDiv(buf);
 
@@ -559,7 +559,7 @@ public class RailsGen extends Generator {
          <div class="col-sm-offset-2 col-sm-8">
          */
         HTMLUtils.addDiv(buf, "form-group");
-        HTMLUtils.addDiv(buf, "col-sm-offset-" + (COL_WIDTH - width) + " col-sm-" + width);
+        HTMLUtils.addDiv(buf, "col-sm-offset-" + (2 + ((COL_WIDTH - width) / 2)) + " col-sm-" + width);
         HTMLUtils.addRubyOutput(buf, "f.submit \"" + buttonText + "\", class: \"btn btn-lg btn-primary\" ");
         HTMLUtils.closeDiv(buf);
         HTMLUtils.closeDiv(buf);
@@ -570,11 +570,11 @@ public class RailsGen extends Generator {
         generateFormField(buf, name, "text");
     }
 
-    private static final int COL_WIDTH = 10; // todo move
+    private static final int COL_WIDTH = 8; // todo move
     private void generateCheckboxField (StringBuilder buf, String name, String text, int width) {
         HTMLUtils.addDiv(buf, "form-group");
 
-        HTMLUtils.addDiv(buf, "col-sm-offset-" + (COL_WIDTH - width) + " col-sm-" + width);
+        HTMLUtils.addDiv(buf, "col-sm-offset-" + (2 + ((COL_WIDTH - width) / 2)) + " col-sm-" + width);
         HTMLUtils.addRubyOutput(buf, "f.label :" + name + ", class: \"checkbox inline\" do");
         HTMLUtils.addRubyOutput(buf, "f.check_box :" + name);
         HTMLUtils.addSpan(buf, text);
@@ -599,7 +599,7 @@ public class RailsGen extends Generator {
     private void generateFormField (StringBuilder buf, String name, String fieldType, int width) {
         HTMLUtils.addDiv(buf, "form-group");
 
-        int offset = COL_WIDTH - width;
+        int offset = (2 + ((COL_WIDTH - width) / 2));
         HTMLUtils.addRubyOutput(buf, "f.label(:" + name + ", class: \"col-sm-" + offset + " control-label\") ");
         HTMLUtils.addDiv(buf, "col-sm-" + width);
         HTMLUtils.addRubyOutput(buf, "f." + fieldType + "_field(:" + name + ", class: \"form-control\") ");
@@ -961,7 +961,7 @@ public class RailsGen extends Generator {
                 String relNameDisplayName = nameFName + "." + rel.getModel().getUserIndentifierFieldName();
                 switch (rt) {
                     case ONE_TO_ONE:
-                        generateReadOnlySection(bodyContent, "@" + nameFName, fName);
+                        //generateReadOnlySection(bodyContent, "@" + nameFName, fName);
                         //fieldDisplayName, String fieldName, String linkPath
                         /**
                          * <% if @blog.user != nil %>
@@ -1167,7 +1167,7 @@ public class RailsGen extends Generator {
         HTMLUtils.addH1(bodyContent, WordUtils.pluralize(model.getCapName()));
         HTMLUtils.closeDiv(bodyContent);
 
-        generateTableFor(bodyContent, model, false);
+        generateTableFor(bodyContent, model, null, true, true, false);
 
         switch (app.getAppConfig().getLayout()) {
             case TWO_COL_THIN_LEFT: {
