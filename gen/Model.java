@@ -86,6 +86,7 @@ public class Model extends Type {
 
         boolean sawPWConf = false;
         boolean sawDisabled = false;
+        boolean sawAdmin = false;
         for (int i = 0; i < fields.size(); i++) {
             Field f = fields.get(i);
             String fieldName = f.getName();
@@ -105,6 +106,9 @@ public class Model extends Type {
             else if (fieldName.equals("disabled")) {
                 sawDisabled = true;
             }
+            else if (fieldName.equals("admin")) {
+                sawAdmin = true;
+            }
             else if (fieldName.equals("email")) {
                 email = true;
             }
@@ -117,6 +121,9 @@ public class Model extends Type {
         }
         if (secure && !sawPWConf) {
              fields.add(new Field("password_confirmation", Type.PASSWORD));
+        }
+        if (secure && !sawAdmin) {
+            fields.add(new Field("admin", Type.BOOLEAN, false, true));
         }
         if (!sawDisabled) {
             fields.add(new Field("disabled", Type.BOOLEAN, false, true));

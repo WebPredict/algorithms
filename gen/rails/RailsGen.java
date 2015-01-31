@@ -40,12 +40,12 @@ public class RailsGen extends Generator {
                 generateAppStructure();
             generateDeploymentScript();
             generateGems();
-            generateModels();
+            new ModelsGen(app).generateModels();
 
             if (app.isGenerateUpgrades())
-                generateUpgrades();
+                new DBGen(app).generateUpgrades();
 
-            generateControllers();
+            new ControllersGen(app).generateControllers();
             generateViews();
 
             if (app.getAppConfig().isNeedsAuth())
@@ -53,7 +53,7 @@ public class RailsGen extends Generator {
 
             generateStaticPages();
             generateSharedPages();
-            generateHelperMethods();
+            new HelpersGen(app).generateHelperMethods();
             generateAssets();
 
             generateRoutes();
@@ -175,34 +175,6 @@ public class RailsGen extends Generator {
 
     public void generateHeader () throws Exception {
 
-        /**
-         * <nav class="navbar navbar-inverse navbar-fixed-top">
-         <div class="container">
-         <div class="navbar-header">
-         <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-         <span class="sr-only">Toggle navigation</span>
-         <span class="icon-bar"></span>
-         <span class="icon-bar"></span>
-         <span class="icon-bar"></span>
-         </button>
-         <a class="navbar-brand" id="logo" href="#">TechReviewNow</a>
-         </div>
-         <div id="navbar" class="navbar-collapse collapse">
-         <form class="navbar-form navbar-right">
-         <div class="form-group">
-         <input type="text" placeholder="Search" class="form-control">
-         </div>
-         <button type="submit" class="btn btn-success">Search</button>
-         </form>
-         <ul class="nav navbar-nav navbar-right">
-         <li><%= link_to "Home",   '#' %></li>
-         <li><%= link_to "Help",   help_path %></li>
-         <li><%= link_to "Log in", signin_path %></li>
-         </ul>
-         </div><!--/.navbar-collapse -->
-         </div>
-         </nav>
-         */
     	StringBuilder buf = new StringBuilder();
         StringUtils.addLine(buf, "<nav class=\"navbar navbar-inverse navbar-fixed-top\">");
         HTMLUtils.addDiv(buf, "container");
@@ -217,25 +189,6 @@ public class RailsGen extends Generator {
 
     	StringUtils.addLine(buf, "<%= link_to \"" + app.getTitle() + "\", root_path, class: \"navbar-brand\", id: \"logo\" %>");
         HTMLUtils.closeDiv(buf);
-
-        /**
-         *
-         * <div id="navbar" class="navbar-collapse collapse">
-         <form class="navbar-form navbar-right">
-         <div class="form-group">
-         <input type="text" placeholder="Search" class="form-control">
-         </div>
-         <button type="submit" class="btn btn-success">Search</button>
-         </form>
-         <ul class="nav navbar-nav navbar-right">
-         <li><%= link_to "Home",   '#' %></li>
-         <li><%= link_to "Help",   help_path %></li>
-         <li><%= link_to "Log in", signin_path %></li>
-         </ul>
-         </div><!--/.navbar-collapse -->
-         </div>
-         </nav>
-         */
 
         StringUtils.addLine(buf, "<div id=\"navbar\" class=\"navbar-collapse collapse\">");
         String searchModelName = app.getTopLevelSearchModelName();
@@ -441,17 +394,17 @@ public class RailsGen extends Generator {
          Model  frontPageModelList = app.getFrontPageListModel();
 
          if (frontPageModelList != null)
-             generateTableFor(buf, frontPageModelList, "static_pages", true);
+             generateTableFor(buf, frontPageModelList, "static_pages", true, false, false);
 
         HTMLUtils.addRuby(buf, "end");
         FileUtils.write(HTMLUtils.formatHTML(buf.toString(), 2), app.getWebAppDir() + "/app/views/static_pages/home.html.erb", true);
     }
 
     public void generateTableFor(StringBuilder buf, Model model, boolean paginate) {
-        generateTableFor(buf, model, null, paginate);
+        generateTableFor(buf, model, null, paginate, true, true);
     }
 
-    public void generateTableFor(StringBuilder buf, Model model, String collectionOverride, boolean paginate) {
+    public void generateTableFor(StringBuilder buf, Model model, String collectionOverride, boolean paginate, boolean emptyMsg, boolean actions) {
         String pluralModelList = model.getPluralName();
 
         if (paginate)
@@ -474,17 +427,24 @@ public class RailsGen extends Generator {
 
                 line += "<th><%= sortable \"" + f.getName() + "\", \"" + WordUtils.capitalizeAndSpace(f.getName()) + "\" %></th>";
             }
-            line += "<th>Actions</th></tr>";
+            if (actions)
+                line += "<th>Actions</th>";
+
+            line += "</tr>";
             StringUtils.addLine(buf, line);
         }
-        HTMLUtils.addRuby(buf, "@" + (collectionOverride == null ? pluralModelList : collectionOverride) + ".each do |" + model.getName() + "|");
-        HTMLUtils.addRubyOutput(buf, "render " + model.getName());
-        HTMLUtils.addRuby(buf, "end");
+        //HTMLUtils.addRuby(buf, "@" + (collectionOverride == null ? pluralModelList : collectionOverride) + ".each do |" + model.getName() + "|");
+        //HTMLUtils.addRubyOutput(buf, "render " + model.getName() + ", locals: {show_actions: " + actions + "}");
+        HTMLUtils.addRubyOutput(buf, "render partial: \"" + pluralModelList + "/" + model.getName() + "\", collection: @" +
+                (collectionOverride == null ? pluralModelList : collectionOverride) + ", locals: {show_actions: " + actions + "}");
+        //HTMLUtils.addRuby(buf, "end");
 
         //HTMLUtils.addRubyOutput(buf, "will_paginate @" + model.getPluralName());
         StringUtils.addLine(buf, "</table>");
         HTMLUtils.closeDiv(buf);
-        HTMLUtils.addRuby(buf, "end");
+        tabbed(buf, "<% else %>");
+        tabbed(buf, "<p> No " + model.getPluralName() + " yet.</p>");
+        tabbed(buf, "<% end %>");
 
         if (paginate)
             HTMLUtils.addRubyOutput(buf, "will_paginate");
@@ -527,7 +487,7 @@ public class RailsGen extends Generator {
                     line += "<td><%= " + modelName + "." + fieldName + " %></td>";
                 else if (fieldName.equals("created_at"))
                     line += "<td><%= time_ago_in_words(" + modelName + "." + fieldName + ")%> ago</td>";
-                else if (fieldName.equals("name"))
+                else if (fieldName.equals("name") || fieldName.equals("username"))
                     line += "<td><%= link_to " + modelName + "." + fieldName + ", " + modelName + " %></td>";
                 else
                     line += "<td><%= " + modelName + "." + fieldName + " %></td>";
@@ -535,6 +495,7 @@ public class RailsGen extends Generator {
 
             StringUtils.addLine(buf, line);
 
+            HTMLUtils.addRuby(buf, "if show_actions");
             // Actions:
             StringUtils.addLine(buf, "<td>");
             //HTMLUtils.addRuby(buf, "if current_" + app.getUserModel().getName() + "?(" + modelName + ".user)"); // || (current_user != nil && current_user.admin?)");
@@ -552,6 +513,7 @@ public class RailsGen extends Generator {
             HTMLUtils.addRuby(buf, "end");
 
             StringUtils.addLine(buf, "</td>");
+            HTMLUtils.addRuby(buf, "end");
             StringUtils.addLine(buf, "</tr>");
 
         }
@@ -568,15 +530,15 @@ public class RailsGen extends Generator {
 
         generateFormForStart(buf, "session");
 
-        generateFormField(buf, "email");
-        generateFormField(buf, "password", "password");
+        generateFormField(buf, "email", "text", 6);
+        generateFormField(buf, "password", "password", 6);
 
-        generateCheckboxField(buf, "remember_me", "Remember me on this computer");
+        generateCheckboxField(buf, "remember_me", "Remember me on this computer", 6);
 
-        generateFormEnd(buf, "Sign in");
+        generateFormEnd(buf, "Sign in", 6);
         HTMLUtils.addLineBreak(buf);
         HTMLUtils.addDiv(buf, "row");
-        HTMLUtils.addDiv(buf, "col-sm-offset-2 col-sm-5");
+        HTMLUtils.addDiv(buf, "col-sm-offset-4 col-sm-3");
         StringUtils.addLine(buf, "Forgot password? <%= link_to \"Reset password\", send_password_path %>");
         HTMLUtils.closeDiv(buf);
         HTMLUtils.addDiv(buf, "col-sm-3");
@@ -591,13 +553,13 @@ public class RailsGen extends Generator {
         HTMLUtils.addRubyOutput(buf, "form_for(:" + modelName + ", url: " + WordUtils.pluralize(modelName) + "_path, :html => {:class => \"form-horizontal\" }) do |f|");
     }
 
-    private void generateFormEnd (StringBuilder buf, String buttonText) {
+    private void generateFormEnd (StringBuilder buf, String buttonText, int width) {
         /**
          * <div class="form-group">
          <div class="col-sm-offset-2 col-sm-8">
          */
         HTMLUtils.addDiv(buf, "form-group");
-        HTMLUtils.addDiv(buf, "col-sm-offset-2 col-sm-8");
+        HTMLUtils.addDiv(buf, "col-sm-offset-" + (COL_WIDTH - width) + " col-sm-" + width);
         HTMLUtils.addRubyOutput(buf, "f.submit \"" + buttonText + "\", class: \"btn btn-lg btn-primary\" ");
         HTMLUtils.closeDiv(buf);
         HTMLUtils.closeDiv(buf);
@@ -608,9 +570,11 @@ public class RailsGen extends Generator {
         generateFormField(buf, name, "text");
     }
 
-    private void generateCheckboxField (StringBuilder buf, String name, String text) {
+    private static final int COL_WIDTH = 10; // todo move
+    private void generateCheckboxField (StringBuilder buf, String name, String text, int width) {
         HTMLUtils.addDiv(buf, "form-group");
-        HTMLUtils.addDiv(buf, "col-sm-offset-2 col-sm-8");
+
+        HTMLUtils.addDiv(buf, "col-sm-offset-" + (COL_WIDTH - width) + " col-sm-" + width);
         HTMLUtils.addRubyOutput(buf, "f.label :" + name + ", class: \"checkbox inline\" do");
         HTMLUtils.addRubyOutput(buf, "f.check_box :" + name);
         HTMLUtils.addSpan(buf, text);
@@ -629,9 +593,15 @@ public class RailsGen extends Generator {
     }
 
     private void generateFormField (StringBuilder buf, String name, String fieldType) {
+        generateFormField(buf, name, fieldType, 8);
+    }
+
+    private void generateFormField (StringBuilder buf, String name, String fieldType, int width) {
         HTMLUtils.addDiv(buf, "form-group");
-        HTMLUtils.addRubyOutput(buf, "f.label(:" + name + ", class: \"col-sm-2 control-label\") ");
-        HTMLUtils.addDiv(buf, "col-sm-8");
+
+        int offset = COL_WIDTH - width;
+        HTMLUtils.addRubyOutput(buf, "f.label(:" + name + ", class: \"col-sm-" + offset + " control-label\") ");
+        HTMLUtils.addDiv(buf, "col-sm-" + width);
         HTMLUtils.addRubyOutput(buf, "f." + fieldType + "_field(:" + name + ", class: \"form-control\") ");
         HTMLUtils.closeDiv(buf);
         HTMLUtils.closeDiv(buf);
@@ -684,9 +654,9 @@ public class RailsGen extends Generator {
 
     private void generateFileUploadField (StringBuilder buf, String name) {
         HTMLUtils.addDiv(buf, "form-group");
-        rubyout(buf, "f.label(:" + name + ", \"Your " + WordUtils.capitalize(name) + " File\", class: \"col-sm-2 control-label\") ");
+        rubyout(buf, "f.label(:" + name + ", \"" + WordUtils.capitalize(name) + " File\", class: \"col-sm-2 control-label\") ");
         HTMLUtils.addDiv(buf, "col-sm-8");
-        rubyout(buf, "file_for(@" + name + ")");         // TODO support for file_for
+        //rubyout(buf, "file_for(@" + name + ")");         // TODO support for file_for
         HTMLUtils.addDiv(buf, "fileUpload btn");
         aline(buf, "<span>Change File</span>");
         rubyout(buf, "f.file_field :" + name + ", :class => \"form-control upload\"");
@@ -738,48 +708,6 @@ public class RailsGen extends Generator {
         StringUtils.addLine(buf, "</form>");
 
         FileUtils.write(buf, app.getWebAppDir() + "/app/views/static_pages/contact.html.erb", true);
-    }
-
-    public void generateHelperMethods () throws Exception {
-        if (app.getAppConfig().isNeedsAuth())
-            generateSessionsHelper();
-        generateApplicationHelper();
-    }
-
-    public void generateSessionsHelper () throws Exception {
-
-        Model userModel = app.getUserModel();
-        String  name = userModel.getName();
-        String  capName = userModel.getCapName();
-
-        StringBuilder buf = new StringBuilder();
-        StringUtils.addLine(buf, "module SessionsHelper");
-        StringUtils.addLineBreak(buf);
-
-        addMethod(buf, "logged_in?", new String[] {"!current_" + name + ".nil?"});
-        addMethod(buf, "log_in(" + name + ")", new String[] {"session[:" + name + "_id] = " + name + ".id"});
-        addMethod(buf, "remember(" + name + ")", new String[] {name + ".remember", "cookies.permanent.signed[:" + name + "_id] = " + name + ".id",
-                "cookies.permanent[:remember_token] = " + name + ".remember_token"});
-        addMethod(buf, "forget(" + name + ")", new String[] {name + ".forget", "cookies.delete(:" + name + "_id)", "cookies.delete(:remember_token)"});
-        addMethod(buf, "log_out", new String[] {"forget(current_" + name + ")", "session.delete(:" + name + "_id)", "@current_" + name + " = nil"});
-
-        addMethod(buf, "current_" + name, new String[] {"@current_" + name + " ||= " + capName + ".find_by(id: session[:" + name + "_id])"});
-
-        addMethod(buf, "current_" + name + "?(" + name + ")", new String[] {name + " == current_" + name});
-//        addMethod(buf, "current_" + name + "=(" + name + ")", new String[] {"@current_" + name + " = " + name});
-        addMethod(buf, "redirect_back_or(default)", new String[] {"redirect_to(session[:forwarding_url] || default)", "session.delete(:forwarding_url)"});
-//        addMethod(buf, "sign_in(" + name + ")", new String[] {"cookies.permanent[:remember_token] = " + name + ".remember_token", "self.current_" + name + " = " + name});
-//        addMethod(buf, "redirect_back_or(default)", new String[] {"redirect_to(session[:return_to] || default)", "session.delete(:return_to)"});
-        addMethod(buf, "store_location", new String[] {"session[:forwarding_url] = request.url if request.get?"});
-        addMethod(buf, "logged_in_" + name, new String[] {"unless logged_in?",
-                "store_location",
-                "flash[:danger] = \"Please log in.\"",
-                "redirect_to signin_url",
-                "end"});
-
-        StringUtils.addLine(buf, "end ");
-
-        FileUtils.write(buf, app.getWebAppDir() + "/app/helpers/sessions_helper.rb", true);
     }
 
     public void generateRoutes () throws Exception {
@@ -844,83 +772,6 @@ public class RailsGen extends Generator {
         */
     }
 
-    public void generateApplicationHelper () throws Exception {
-        StringBuilder buf = new StringBuilder();
-
-        StringUtils.addLine(buf, "module ApplicationHelper ");
-        StringUtils.addLineBreak(buf);
-        tabbed(buf, "def sortable(column, title = nil)");
-        tabbed(buf, "title ||= column.titleize ", 2);
-        tabbed(buf, "css_class = column == sort_column ? \"current #{sort_direction}\" : nil", 2);
-        tabbed(buf, "direction = column == sort_column && sort_direction == \"asc\" ? \"desc\" : \"asc\" ", 2);
-        tabbed(buf, "link_to title, {:sort => column, :direction => direction}, {:class => css_class}", 2);
-        tabbed(buf, "end");
-        StringUtils.addLineBreak(buf);
-        tabbed(buf, "def full_title(page_title)");
-        tabbed(buf, "base_title = \"" + WordUtils.capitalize(app.getName()) + "\" ", 2);
-        tabbed(buf, "if page_title.empty? ", 2);
-        tabbed(buf, "base_title  ", 3);
-        tabbed(buf, "else  ", 2);
-        tabbed(buf, "\"#{base_title} | #{page_title}\"  ", 3);
-        tabbed(buf, "end   ", 2);
-        StringUtils.addLineBreak(buf);
-        tabbed(buf, "end  ");
-
-        StringUtils.addLineBreak(buf);
-        tabbed(buf, "def yesno(value)");
-        tabbed(buf, "if value", 2);
-        tabbed(buf, "\"Yes\"", 3);
-        tabbed(buf, "else", 2);
-        tabbed(buf, "\"No\"", 3);
-        tabbed(buf, "end", 2);
-        StringUtils.addLine(buf, "end");
-        StringUtils.addLineBreak(buf);
-
-        tabbed(buf, "def image_for_options(imageholder, options)");
-        tabbed(buf, "if imageholder.nil? or imageholder.url.nil?", 2);
-        tabbed(buf, "image_tag(\"ImagePlaceholderSmall.png\", options)", 3);
-        tabbed(buf, "else", 2);
-        tabbed(buf, "image_tag(imageholder.url, options)", 3);
-        tabbed(buf, "end", 2);
-        tabbed(buf, "end");
-
-        StringUtils.addLineBreak(buf);
-        tabbed(buf, "def image_for(imageholder)");
-        tabbed(buf, "if imageholder.nil? or imageholder.url.nil?", 2);
-        tabbed(buf, "image_tag(\"ImagePlaceholderSmall.png\")", 3);
-        tabbed(buf, "else", 2);
-        tabbed(buf, "image_tag(imageholder.url)", 3);
-        tabbed(buf, "end", 2);
-        tabbed(buf, "end");
-
-        ArrayList<String> methodLines = new ArrayList<String>();
-
-        methodLines.add("ret = ''");
-        methodLines.add("if website != nil");
-        methodLines.add("\tif website[0..7] == \"http://\" ");
-        methodLines.add("\t\tret = website");
-        methodLines.add("\telse");
-        methodLines.add("\t\tret = \"http://\" + website ");
-        methodLines.add("\tend");
-        methodLines.add("end");
-
-        addMethod(buf, "render_website(website)", methodLines);
-
-        methodLines.clear();
-        methodLines.add("addr = ''");
-        methodLines.addAll(generateIf("address.addressLine1 != nil", "addr = address.addressLine1"));
-
-        methodLines.addAll(generateIf("address.city != nil", "addr != '' ? addr += ' ' + address.city : address.city"));
-        methodLines.addAll(generateIf("address.state != nil", "addr != '' ? addr += ', ' + address.state : address.state"));
-        methodLines.addAll(generateIf("address.postal != nil", "addr != '' ? addr += ', ' + address.postal : address.postal"));
-
-        addMethod(buf, "render_address(address)", methodLines);
-
-        StringUtils.addLine(buf, "end");
-
-        FileUtils.write(buf, app.getWebAppDir() + "/app/helpers/application_helper.rb", true);
-    }
-
     public void generateAssets () throws Exception {
 
         FileUtils.insertAfterInFileIfNotExists(app.getWebAppDir() + "/app/assets/javascripts/application.js", "//= require jquery_ujs",
@@ -983,196 +834,6 @@ public class RailsGen extends Generator {
         FileUtils.prependInFileIfNotExists(app.getWebAppDir() + "/app/assets/stylesheets/custom.css.scss", lines);
     }
 
-    public void generateModels () throws Exception {
-        ArrayList<Model>  models = app.getModels();
-        if (models != null) {
-            for (Model model : models) {
-                String name = model.getName();
-                String              capName = model.getCapName();
-                ArrayList<Field>    fields = model.getFields();
-                ArrayList<Rel>      rels = model.getRelationships();
-
-                StringBuilder buf = new StringBuilder();
-                StringUtils.addLine(buf, "class " + capName + " < ActiveRecord::Base");
-                String attrs = "attr_accessible ";
-
-                ArrayList<Field> computedFields = new ArrayList<Field>();
-
-                if (fields != null) {
-                    for (int i = 0; i < fields.size(); i++) {
-                        Field f = fields.get(i);
-                        attrs += ":" + f.getName();
-
-                        if (f.isComputed())
-                            computedFields.add(f);
-
-                        if (f.getTheType().equals(Type.SET_ONE_OR_MORE)) {
-                            tabbed(buf, "serialize :" + f.getName() + ", Array");
-                        }
-                        if (i < fields.size() - 1) {
-                            attrs += ", ";
-                        }
-                    }
-                }
-
-                if (rels != null) {
-                    // Need to do the _ids
-                    for (Rel rel : rels) {
-                        if (rel.getRelType().equals(RelType.MANY_TO_ONE)) {
-                            attrs += ", :" + rel.getModel().getName() + "_id";
-                        }
-                        else if (rel.getRelType().equals(RelType.ONE_TO_MANY)) {
-                            attrs += ", :" + rel.getModel().getName() + "_ids";
-                        }
-                    }
-                }
-
-                if (model.isSecure()) {
-                    tabbed(buf, "attr_accessor :remember_token");
-                    tabbed(buf, "has_secure_password");
-                }
-
-                if (rels != null) {
-                    for (int i = 0; i < rels.size(); i++) {
-                        Rel rel = rels.get(i);
-
-                        RelType relType = rel.getRelType();
-                        Model   relModel = rel.getModel();
-                        if (relType.equals(RelType.ONE_TO_MANY)) {
-                            String  toAdd =  "has_many :" + relModel.getPluralName();
-                            if (rel.isDependent())
-                                toAdd += ", dependent: :destroy";
-
-                            StringUtils.addTabbedLine(buf, toAdd);
-                        }
-                        else if (relType.equals(RelType.MANY_TO_ONE)) {
-                            tabbed(buf, "belongs_to :" + relModel.getName());
-                        }
-                        else if (relType.equals(RelType.ONE_TO_ONE)) {
-                            tabbed(buf, "has_one :" + relModel.getName());
-                        }
-                        else if (relType.equals(RelType.MANY_TO_MANY)) {
-                            String  toAdd;
-                            if (rel.getThrough() != null)
-                                toAdd =  "has_many :" + relModel.getPluralName() + ", through: " + rel.getThrough().getPluralName();
-                            else
-                                toAdd = "has_and_belongs_to_many :" + relModel.getPluralName();
-                            tabbed(buf, toAdd);
-                        }
-                    }
-                }
-                if (model.hasImages()) {
-                    List<Field> imageFields = model.getImageFields();
-
-                    for (Field imageField : imageFields) {
-                        // TODO: this needs to change for a model with a set of images as opposed to just one:
-                        tabbed(buf, "mount_uploader :" + imageField.getName() + ", " + WordUtils.capitalize(imageField.getName()) + "Uploader");
-
-                        String imgGenCmd = getRailsCommand() + " generate uploader " + imageField.getName();
-                        // generate uploader
-
-                        // TODO: is this working?
-                        //runCommandInApp(imgGenCmd);
-                    }
-                }
-
-                StringUtils.addLineBreak(buf);
-
-                if (model.hasEmail ()) {
-                    tabbed(buf, "before_save { self.email = email.downcase }");
-                }
-                //if (model.isSecure()) {
-                    //tabbed(buf, "before_save :create_remember_token");
-                  //  StringUtils.addLineBreak(buf);
-                //}
-
-                if (fields != null) {
-                    if (model.hasEmail()) {
-                        tabbed(buf, "VALID_EMAIL_REGEX = /\\A[\\w+\\-.]+@[a-z\\d\\-.]+\\.[a-z]+\\z/i");
-                    }
-                    if (model.hasURL()) {
-                        tabbed(buf, "VALID_URL_REGEX = /\\A[\\w+\\-.]+[a-z\\d\\-.]+\\.[a-z]+\\z/i");
-                    }
-                    for (int i = 0; i < fields.size(); i++) {
-                        Field f = fields.get(i);
-                        List<Validation> validations = f.getValidations();
-                        if (validations != null) {
-                            for (Validation validation : validations) {
-                                ValidationType validationType = validation.getValidationType();
-                                switch (validationType) {
-                                    case NOT_NULL:
-                                        tabbed(buf, "validates :" + f.getName() + ", presence: true");
-                                        break;
-                                    case MIN_LENGTH:
-                                        tabbed(buf, "validates :" + f.getName() + ", length: { minimum: " + validation.getDetailsAsInt().toString() + " }");
-                                        break;
-                                    case MAX_LENGTH:
-                                        tabbed(buf, "validates :" + f.getName() + ", length: { maximum: " + validation.getDetailsAsInt().toString() + " }");
-                                        break;
-                                    case EMAIL:
-                                        tabbed(buf, "validates :" + f.getName() + ", format: { with: VALID_EMAIL_REGEX }");
-                                        break;
-                                    case URL:
-                                        tabbed(buf, "validates :" + f.getName() + ", format: { with: VALID_URL_REGEX }");
-                                        break;
-                                    case UNIQUE:
-                                        tabbed(buf, "validates :" + f.getName() + ", uniqueness: { case_sensitive: false }");
-                                        break;
-                                }
-                            }
-                        }
-                    }
-
-                    if (rels != null) {
-                        // Need to do the _ids
-                        for (Rel rel : rels) {
-                            if (rel.getRelType().equals(RelType.MANY_TO_ONE)) {
-                                if (rel.isDependent())
-                                    tabbed(buf, "validates :" + rel.getModel().getName() + "_id, presence: true");
-                            }
-                        }
-                    }
-
-                    if (model.isSecure()) {
-                        tabbed(buf, "validates :password, presence: true, :if => :should_validate_password?, length: { minimum: 6 }");
-                        tabbed(buf, "validates :password_confirmation, presence: true, :if => :should_validate_password?");
-                        StringUtils.addLineBreak(buf);
-
-                        tabbed(buf, "def should_validate_password?");
-                        tabbed(buf, "new_record?", 2);
-                        tabbed(buf, "end");
-                        StringUtils.addLineBreak(buf);
-                    }
-                }
-
-                StringUtils.addLineBreak(buf);
-
-                for (Field f : computedFields) {
-                    tabbed(buf, "def compute_" + f.getName());
-                    tabbed(buf, "# TODO: fill in custom logic to compute this field!!!", 2);
-                    tabbed(buf, "end");
-                    StringUtils.addLineBreak(buf);
-                }
-
-
-                if (model.isSecure()) {
-                    addMethod(buf, model.getCapName() + ".digest(string)", new String[] {"cost = ActiveModel::SecurePassword.min_cost ? BCrypt::Engine::MIN_COST :",
-                            "                 BCrypt::Engine.cost",
-                            "                 BCrypt::Password.create(string, cost: cost)"});
-
-                    addMethod(buf, model.getCapName() + ".new_token", new String[] {"SecureRandom.urlsafe_base64"});
-                    addMethod(buf, "remember", new String[] {"self.remember_token = " + model.getCapName() + ".new_token", "update_attribute(:remember_digest, User.digest(remember_token))"});
-                    addMethod(buf, "authenticated?(remember_token)", new String[] {"return false if remember_digest.nil?",
-                            "BCrypt::Password.new(remember_digest).is_password?(remember_token)"});
-                    addMethod(buf, "forget", new String[] {"update_attribute(:remember_digest, nil)"});
-                }
-
-                StringUtils.addLine(buf, "end");
-
-                FileUtils.write(buf, app.getWebAppDir() + "/app/models/" + capName + ".rb", true);
-            }
-        }
-    }
 
     private void tabbed (StringBuilder buf, String content) {
         StringUtils.addTabbedLine(buf, content);
@@ -1213,14 +874,6 @@ public class RailsGen extends Generator {
         String              name = model.getName();
         String              names = model.getPluralName();
         ArrayList<Field>    fields = model.getFields();
-        StringBuilder       buf = new StringBuilder();
-        
-        // TODO: need to not hardcode this
-        StringUtils.addLine(buf, "<% provide(:title, @" + name + "." + model.getUserIndentifierFieldName() + ") %>");
-
-        HTMLUtils.addDiv(buf, "page-header");
-        HTMLUtils.addH1(buf, model.getCapName() + ": <%= @" + name + "." + model.getUserIndentifierFieldName() + " %>");
-        HTMLUtils.closeDiv(buf);
 
         StringBuilder       bodyContent = new StringBuilder();
 
@@ -1252,9 +905,9 @@ public class RailsGen extends Generator {
                         generateSublistViewReadonly(bodyContent, name, fName);
                     }
                 }
-                else if (fName.equals("name")) {
-                    HTMLUtils.addH3(bodyContent, "<%= @" + nameFName + " %>");
-                }
+//                else if (fName.equals("name")) {
+//                    HTMLUtils.addH3(bodyContent, "<%= @" + nameFName + " %>");
+//                }
                 else if (fTypeName.equals(Type.IMAGE.getName())) {
                     generateReadOnlySection(bodyContent, "image_for(@" + nameFName + ")", fName);
                 }
@@ -1264,7 +917,7 @@ public class RailsGen extends Generator {
                 else if (fTypeName.equals(Type.CODE.getName())) {
                     // TODO: why isn't RedCloth working?
                 	//generateReadOnlySection(bodyContent, "RedCloth.new(CodeRay.scan(@" + nameFName + ", :ruby).div(:line_numbers => :table)).to_html", fName);
-                    generateReadOnlySection(bodyContent, "CodeRay.scan(@" + nameFName + ", :ruby).div(:line_numbers => :table)", fName);
+                    generateReadOnlySection(bodyContent, "CodeRay.scan(@" + nameFName + ", :ruby).div(:line_numbers => :table).html_safe", fName);
                 }
                 else if (fTypeName.equals(Type.CURRENCY.getName())) {
                     generateReadOnlySection(bodyContent, "number_to_currency(@" + nameFName + ", :unit => \"$\")", fName);
@@ -1300,36 +953,67 @@ public class RailsGen extends Generator {
              * if it's one-to-one, display link_to name and the show path
              * if it's one-to-many or many-to-many, display read only table with link_to on name columns
              */
-
+            StringUtils.addLine(bodyContent, "<dl class=\"dl-horizontal\">");
             for (Rel rel : rels) {
                 RelType rt = rel.getRelType();
                 String fName = rel.getModel().getName();
                 String nameFName = name + "." + fName;
+                String relNameDisplayName = nameFName + "." + rel.getModel().getUserIndentifierFieldName();
                 switch (rt) {
                     case ONE_TO_ONE:
-                        //generateReadOnlyLinkSection(bodyContent, "link_to @" + nameFName, fName + ", show_" + fName + "_path");
+                        generateReadOnlySection(bodyContent, "@" + nameFName, fName);
+                        //fieldDisplayName, String fieldName, String linkPath
+                        /**
+                         * <% if @blog.user != nil %>
+                         <%= link_to @blog.user.username, user_path(@blog.user) %>
+                         <% else %>
+                         None
+                         <% end %>
+
+                         */
+                        generateReadOnlyLinkSection(bodyContent, WordUtils.capitalizeAndSpace(rel.getModel().getName()), relNameDisplayName, nameFName, fName + "_path");
                         break;
 
                     case ONE_TO_MANY:
-                        generateSublistViewReadonly(bodyContent, name, fName);
+                        generateSublistViewAsTableReadonly(bodyContent, name, rel.getModel());
                         break;
 
                     case MANY_TO_MANY:
-                        generateSublistViewReadonly(bodyContent, name, fName);
+                        generateSublistViewAsTableReadonly(bodyContent, name, rel.getModel());
                         break;
 
                     case MANY_TO_ONE:
-                       // generateReadOnlyLinkSection(bodyContent, "link_to @" + nameFName, fName + ", show_" + fName + "_path");
+                        generateReadOnlyLinkSection(bodyContent, WordUtils.capitalizeAndSpace(rel.getModel().getName()), relNameDisplayName, nameFName, fName + "_path");
+                        //generateReadOnlyLinkSection(bodyContent, "link_to @" + nameFName, fName + ", show_" + fName + "_path");
                         break;
                 }
             }
+            StringUtils.addLine(bodyContent, "</dl>");
 
         }
+
+        /**
+         * TODO: fix this logic... should be:
+         * if user is logged in and owns this object, show the link
+         * else if user is logged in and anyone can edit it, show edit link (uncommon scenario)
+         * else if user is admin, allow edit
+         */
+        StringUtils.addLine(bodyContent, "<% if logged_in? %>");
+        StringUtils.addLine(bodyContent, "<%= link_to \"Edit " + model.getCapName() + "\", edit_" + name + "_path(@" + name + "), class: \"btn btn-default btn-sm\" %></li>");
+        StringUtils.addLine(bodyContent, "<% end %>");
 
         Layout layout = app.getAppConfig().getLayout();
 
         if (layout == null)
             layout = Layout.ONE_COL;
+
+        StringBuilder       buf = new StringBuilder();
+        // TODO: need to not hardcode this
+        StringUtils.addLine(buf, "<% provide(:title, @" + name + "." + model.getUserIndentifierFieldName() + ") %>");
+
+        HTMLUtils.addDiv(buf, "page-header");
+        HTMLUtils.addH1(buf, model.getCapName() + ": <%= @" + name + "." + model.getUserIndentifierFieldName() + " %>");
+        HTMLUtils.closeDiv(buf);
 
         switch (layout) {
             case TWO_COL_THIN_LEFT: {
@@ -1399,21 +1083,29 @@ public class RailsGen extends Generator {
         HTMLUtils.closeDiv(bodyContent);
     }
 
-    private void generateReadOnlyLinkSection (StringBuilder bodyContent, String fieldDisplayName, String fieldName, String linkPath) {
-        StringUtils.addLine(bodyContent, "<dl><dt>" + fieldDisplayName + "</dt><dd>");
+    private void generateReadOnlyLinkSection (StringBuilder bodyContent, String fieldDisplayValue, String fieldDisplayName, String fieldName, String linkPath) {
+        StringUtils.addLine(bodyContent, "<dt>" + fieldDisplayValue + "</dt><dd>");
+        /**
+         * <% if @blog.user != nil %>
+         <%= link_to @blog.user.username, user_path(@blog.user) %>
+         <% else %>
+         None
+         <% end %>
+
+         */
         HTMLUtils.addRuby(bodyContent, "if @" + fieldName + " != nil");
         //"Breeder Profile", breeder_path(@listing.breeder),
         StringUtils.addLine(bodyContent, "<%= link_to @" + fieldDisplayName + ", " + linkPath + "(@" + fieldName + ") %>");
         HTMLUtils.addRuby(bodyContent, "else");
         StringUtils.addLine(bodyContent, "None");
         HTMLUtils.addRuby(bodyContent, "end");
-        StringUtils.addLine(bodyContent, "</dd></dl>");
+        StringUtils.addLine(bodyContent, "</dd>");
         //StringUtils.addLine(bodyContent, "</dd>");
     }
 
     private void generateSublistViewReadonly (StringBuilder builder, String modelName, String collectionName) throws Exception {
         String pluralColName = WordUtils.pluralize(collectionName);
-        StringUtils.addLine(builder, "<dl class=\"dl-horizontal\"><dt>" + WordUtils.capitalize(pluralColName) + "</dt><dd>");
+        StringUtils.addLine(builder, "<dt>" + WordUtils.capitalize(pluralColName) + "</dt><dd>");
         StringUtils.addLine(builder, "<% if @" + modelName + "." + pluralColName + ".any? %>");
 
         tabbed(builder, "<%= render @" + modelName + "." + pluralColName + " %>");
@@ -1421,22 +1113,31 @@ public class RailsGen extends Generator {
         tabbed(builder, "No " + pluralColName + " for this " + modelName + " yet.");
         tabbed(builder, "<% end %>");
 
-        StringUtils.addLine(builder, "</dd></dl>");
+        StringUtils.addLine(builder, "</dd>");
     }
+
+    private void generateSublistViewAsTableReadonly (StringBuilder builder, String modelName, Model collectionModel) throws Exception {
+        String pluralColName = WordUtils.pluralize(collectionModel.getName());
+        StringUtils.addLine(builder, "<dt>" + WordUtils.capitalize(pluralColName) + "</dt><dd>");
+
+        generateTableFor(builder, collectionModel, modelName + "." + pluralColName, false, true, false);
+
+        StringUtils.addLine(builder, "</dd>");
+    }
+
+    //generateTableFor(builder, relModel, fullCollectionName, false, true);
 
     private void generateSublistView (StringBuilder builder, String modelName, String collectionName, boolean addAddBtn, String additionalParams, Model relModel) throws Exception {
         String pluralColName = WordUtils.pluralize(collectionName);
         StringUtils.addLine(builder, "<label class=\"control-label col-sm-2\">" + WordUtils.capitalize(pluralColName) + "</label>");
         HTMLUtils.addDiv(builder, "col-sm-8");
-        StringUtils.addLine(builder, "<% if @" + modelName + "." + pluralColName + ".any? %>");
+        String fullCollectionName = modelName + "." + pluralColName;
+        //StringUtils.addLine(builder, "<% if @" + collectionName + ".any? %>");
 
         //tabbed(builder, "<%= render @" + modelName + "." + pluralColName + " %>");
 
-        generateTableFor(builder, relModel, null, false);
+        generateTableFor(builder, relModel, fullCollectionName, false, true, true);
 
-        tabbed(builder, "<% else %>");
-        tabbed(builder, "<p> No " + pluralColName + " for this " + modelName + " yet.</p>");
-        tabbed(builder, "<% end %>");
         if (addAddBtn) {
             tabbed(builder, "<% if logged_in? && current_" + modelName + "?(@" + modelName + ") %>");
             String path = "new_" + collectionName + "_path";
@@ -1466,7 +1167,7 @@ public class RailsGen extends Generator {
         HTMLUtils.addH1(bodyContent, WordUtils.pluralize(model.getCapName()));
         HTMLUtils.closeDiv(bodyContent);
 
-        generateTableFor(bodyContent, model, true);
+        generateTableFor(bodyContent, model, false);
 
         switch (app.getAppConfig().getLayout()) {
             case TWO_COL_THIN_LEFT: {
@@ -1555,7 +1256,7 @@ public class RailsGen extends Generator {
                  String capitalized = WordUtils.capitalizeAndSpace(fName);
 
                  if (fType.equals(Type.BOOLEAN)) {
-                     generateCheckboxField(bodyContent, fName, capitalized + "?");
+                     generateCheckboxField(bodyContent, fName, capitalized + "?", 8);
                  }
                  else if (f.getName().equals("username") && !newUser) {
                      generateStaticFormField(bodyContent, model.getName(), fName);
@@ -1576,8 +1277,7 @@ public class RailsGen extends Generator {
                      HTMLUtils.addDiv(bodyContent, "form-group");
                      HTMLUtils.addRubyOutput(bodyContent, "f.label(:" + fName + ", class: \"col-sm-2 control-label\") ");
                      HTMLUtils.addDiv(bodyContent, "col-sm-8");
-                     //rubyout(bodyContent, "f.label :" + fName + ", \"" + WordUtils.capitalize(fName) + " Image\"");
-                     rubyout(bodyContent, "image_for(@" + fName + ")");
+                     rubyout(bodyContent, "image_for(@" + name + "." + fName + ")");
                      HTMLUtils.addDiv(bodyContent, "fileUpload btn");
                      //aline(bodyContent, "<span>Change Image</span>");
                      rubyout(bodyContent, "f.file_field :" + fName + ", :class => \"upload\"");
@@ -1712,7 +1412,7 @@ public class RailsGen extends Generator {
 
         }
 
-        generateFormEnd(bodyContent, isNew ? "Submit" : "Save");
+        generateFormEnd(bodyContent, isNew ? "Submit" : "Save", 8);
 
         // TODO: these side sections should be moved to the application.html.erb layout page ?
         switch (app.getAppConfig().getLayout()) {
@@ -1808,23 +1508,7 @@ public class RailsGen extends Generator {
         StringUtils.addLineBreak(buf);
     }
 
-    protected List<String> generateIf (String condition, String content, String elseCond, String elseContent) {
-        ArrayList<String> ret = new ArrayList<String>();
 
-        ret.add("if " + condition);
-        ret.add("\t" + content);
-        if (elseCond != null) {
-            ret.add("else if " + elseCond);
-            ret.add("\t" + elseContent);
-        }
-        ret.add("end");
-
-        return (ret);
-    }
-
-    protected List<String> generateIf (String condition, String content) {
-         return (generateIf(condition, content, null, null));
-    }
 
     protected void addMethodTabbed (StringBuilder buf, String name, String [] contentLines) {
         StringUtils.addLineBreak(buf);
@@ -1846,364 +1530,6 @@ public class RailsGen extends Generator {
             }
         }
         buf.append("\tend\n");
-    }
-
-    public void generateControllers () throws Exception {
-        ArrayList<Model>  models = app.getModels();
-        if (models != null) {
-            for (Model model : models) {
-                String              name = model.getName();
-                String              capName = WordUtils.capitalize(name);
-                String              names = model.getPluralName();
-                ArrayList<Rel>      rels = model.getRelationships();
-
-                StringBuilder buf = new StringBuilder();
-                String  className = WordUtils.capitalizeAndJoin(names, "controller");
-                StringUtils.addLine(buf, "class " + className + " < ApplicationController");
-                Model parentModel = model.getParentModel();  // TODO this is not going to work if there are multiple parents
-                if (model.isSecure()) {
-                    tabbed(buf, "before_filter :logged_in_" + name + ", only: [:edit, :update, :destroy]");
-                    tabbed(buf, "before_filter :correct_" + name + ", only: [:edit, :update]");
-                }
-                else if (parentModel != null) {
-                    if (parentModel.isSecure())
-                        tabbed(buf, "before_filter :logged_in_" + parentModel.getName() + ", only: [:edit, :update, :destroy]");
-                    tabbed(buf, "before_filter :correct_" + parentModel.getName() + ", only: [:edit, :update]");
-                }
-                // TODO: also need to restrict from editing items that they don't own with correct_user on other controllers
-                /**
-                 * If it's a dependent relationship, restrict access
-                 */
-
-                tabbed(buf, "helper_method :sort_column, :sort_direction");
-
-                ArrayList<String> createLines = new ArrayList<String>();
-               if (parentModel != null) {
-                    createLines.add("@" + parentModel.getName() + " = " + parentModel.getCapName() + ".find_by_id(params[:" + name + "][:" + parentModel.getName() + "_id])");
-                    String modelDepName = model.getPluralName(); // TODO could be singular if relationship is one-to-one
-                    createLines.add("@" + name + " = @" + parentModel.getName() + "." + modelDepName + ".build(" + name + "_params)");
-                }
-                else {
-                    createLines.add("@" + name + " = " + capName + ".new(" + name + "_params)");
-                }
-                createLines.add("if @" + name + ".save");
-                if (model.isSecure())
-                    createLines.add("flash[:success] = \"Welcome to " + app.getTitle() + "!\"");
-                else
-                    createLines.add("flash[:success] = \"Created new " + model.getName() + ".\"");
-                createLines.add("\tredirect_to root_path");
-                createLines.add("else");
-                createLines.add("\trender 'new'");
-                createLines.add("end");
-
-                addMethod(buf, "create", createLines);
-
-                ArrayList<String> newLines = new ArrayList<String>();
-                newLines.add("@" + name + " = " + capName + ".new");
-                if (model.getRelationships() != null) {
-                    for (Rel rel : model.getRelationships()) {
-                        if (rel.getRelType().equals(RelType.MANY_TO_ONE)) {
-                            newLines.add("@" + name + "." + rel.getModelName() + "_id = params[:" + rel.getModelName() + "_id]");
-                        }
-                    }
-                }
-
-                addMethod(buf, "new", newLines);
-
-                addMethod(buf, "edit", new String[] {"@" + name + " = " + capName + ".find(params[:id])"});
-
-                addMethod(buf, "update", new String[] {"@" + name + " = " + capName + ".find(params[:id])",
-                    "if @" + name + ".update_attributes(" + name + "_params)",
-                        "flash[:success] = \"" + capName + " updated.\"",
-                        "redirect_to @" + name,
-                        "else",
-                        "render 'edit'",
-                        "end"
-                });
-
-                addMethod(buf, "disable", new String[] {"@" + name + " = " + capName + ".find(params[:id])",
-                        "@" + name + ".disabled = true",
-                        "@" + name + ".save",
-                        "flash[:success] = \"" + capName + " disabled.\"",
-                        "redirect_to :back"
-                });
-
-                addMethod(buf, "enable", new String[] {"@" + name + " = " + capName + ".find(params[:id])",
-                        "@" + name + ".disabled = false",
-                        "@" + name + ".save",
-                        "flash[:success] = \"" + capName + " enabled.\"",
-                        "redirect_to :back"
-                });
-
-                ArrayList<String> showMethod = new ArrayList<String>();
-                showMethod.add("@" + name + " = " + capName + ".find(params[:id])");
-
-                if (rels != null && rels.size() > 0) {
-                    for (Rel rel : rels) {
-                        // TODO: we need additional information to know if this relationship is needed for this particular action
-                        Model   relModel = rel.getModel();
-                        RelType relType = rel.getRelType();
-                        String  relModelName = relModel.getName();
-
-                        switch (relType) {
-                            case ONE_TO_MANY:
-                                showMethod.add("@" + relModel.getPluralName() + " = @" + name + "." + relModel.getPluralName() + ".paginate(page: params[:page])");
-                                break;
-
-                            case ONE_TO_ONE:
-                                showMethod.add("@" + relModel.getName() + " = @" + name + "." +relModelName);  // TODO: needed?
-                                break;
-
-                            case MANY_TO_MANY:
-                                showMethod.add("@" + relModel.getPluralName() + " = @" + name +
-                                        "." + relModel.getPluralName() + ".paginate(page: params[:page])");  // TODO: verify this
-                                break;
-                        }
-                    }
-                }
-                addMethod(buf, "show", showMethod);
-
-                ArrayList<String> indexMethod = new ArrayList<String>();
-                //indexMethod.add("query = \"(disabled = 'f' or disabled is null)\"");
-                //indexMethod.add("condarr = [query]");
-                //indexMethod.add("@" + names + " = " + capName + ".where(\"disabled = 'f' or disabled is null\").order(sort_column + \" \" + sort_direction).paginate(:page => params[:page])");
-                // TODO: debug what's up with this where clause not working
-                indexMethod.add("@" + names + " = " + capName + ".order(sort_column + \" \" + sort_direction).paginate(:page => params[:page])");
-                addMethod(buf, "index", indexMethod);
-
-                addMethod(buf, "destroy", new String[] {capName + ".find(params[:id]).destroy",
-                        "flash[:success] = \"" + capName + " removed from system.\"",
-                        "redirect_to " + names + "_path"});
-
-                StringUtils.addLineBreak(buf);
-                tabbed(buf, "private");
-
-                String fieldList = "";
-                for (int i = 0; i < model.getFields().size(); i++) {
-                    Field f = model.getFields().get(i);
-
-                    fieldList += ":" + f.getName();
-                    if (i < model.getFields().size() - 1)
-                        fieldList += ", ";
-                }
-                addMethod(buf, name + "_params", new String[] {"params.require(:" + name + ").permit(" + fieldList + ")"});
-
-                if (model.isSecure()) {
-                    addMethod(buf, "correct_" + name, new String[] {"@" + name + " = " + capName + ".find(params[:id])",
-                            "redirect_to(root_url) unless @" + name + " == current_" + name});
-
-                    addMethod(buf, "logged_in_" + name, new String[] {"unless logged_in?", "store_location", "flash[:danger] = \"Please log in.\"", "redirect_to signin_url", "end"});
-                }
-                else if (parentModel != null) {
-                    addMethod(buf, "correct_" + parentModel.getName(), new String[] {"@" + name + " = current_" + parentModel.getName() + "." + model.getPluralName() + ".find_by_id(params[:id])",
-                            "redirect_to root_path if @" + name + ".nil?"});
-                }
-
-                addMethodTabbed(buf, "sort_column", new String[]{
-                        capName + ".column_names.include?(params[:sort]) ? params[:sort] : \"" + model.getUserIndentifierFieldName() + "\" "});
-
-                addMethodTabbed(buf, "sort_direction", new String[]{"%w[asc desc].include?(params[:direction]) ? params[:direction] : \"asc\" "});
-
-                StringUtils.addLine(buf, "end");
-
-                FileUtils.write(buf, app.getWebAppDir() + "/app/controllers/" + names + "_controller.rb", true);
-            }
-
-            if (app.getAppConfig().isNeedsAuth()) {
-
-                StringBuilder buf = new StringBuilder();
-                StringUtils.addLine(buf, "class SessionsController < ApplicationController");
-
-                addMethod(buf, "new", new String[] {});
-                StringUtils.addLineBreak(buf);
-
-                Model   userModel = app.getUserModel();
-                String  userModelName = userModel.getName();
-
-                tabbed(buf, "def create ");
-                 tabbed(buf, userModelName + " = " + userModel.getCapName() + ".find_by(email: params[:session][:email].downcase)", 2);
-                 tabbed(buf, "if " + userModelName + " && " + userModelName + ".authenticate(params[:session][:password])", 2);
-                 tabbed(buf, "log_in " + userModelName, 2);
-                tabbed(buf, "params[:session][:remember_me] == '1' ? remember(" + userModelName + ") : forget(" + userModelName + ")", 2);
-                 tabbed(buf, "redirect_to " + userModelName, 2);
-                 tabbed(buf, "else", 2);
-                 tabbed(buf, "flash.now[:danger] = 'Invalid email/password combination'", 3);
-                 tabbed(buf, "render 'new'", 3);
-                 tabbed(buf, "end ", 2);
-                 tabbed(buf, "end ");
-
-                addMethod(buf, "destroy", new String[] {"log_out if logged_in?", "redirect_to root_path"});
-
-                StringUtils.addLine(buf, "end");
-
-                FileUtils.write(buf, app.getWebAppDir() + "/app/controllers/sessions_controller.rb", true);
-                
-                buf = new StringBuilder();
-               
-                StringUtils.addLine(buf, "class ApplicationController < ActionController::Base");
-                tabbed(buf, "protect_from_forgery");
-                tabbed(buf, "include SessionsHelper");
-                StringUtils.addLine(buf, "end");
-
-                FileUtils.write(buf, app.getWebAppDir() + "/app/controllers/application_controller.rb", true);
-
-            }
-        }
-        generateStaticPagesController();
-    }
-
-    public void generateStaticPagesController () throws Exception {
-
-        StringBuilder buf = new StringBuilder();
-        StringUtils.addLine(buf, "class StaticPagesController < ApplicationController");
-        tabbed(buf, "protect_from_forgery");
-        tabbed(buf, "include SessionsHelper");
-        tabbed(buf, "helper_method :sort_column, :sort_direction");
-
-        StringUtils.addLineBreak(buf);
-
-        String [] frontContent = new String[] {""};
-
-        Model frontListModel = app.getFrontPageListModel();
-        if (frontListModel != null) {
-            frontContent = new String []
-                    {"query = \"(disabled = 'f' or disabled is null)\"",
-                            "paramarr = []",
-                            "",
-                            "condarr = [query]",
-                            "condarr.concat(paramarr)",
-                            "@static_pages = " + frontListModel.getCapName() + ".paginate(page: params[:page])"
-                     //       "@" + frontListModel.getPluralName() + " = " + frontListModel.getCapName() + ".paginate(:page => params[:page], per_page: 10, :conditions => condarr, :order => sort_column + \" \" + sort_direction)"};
-                    };
-
-        }
-        addMethod(buf, "home", frontContent);
-
-        for (StaticPage page : app.getStaticPages()) {
-            addMethod(buf, page.getName(), new String[] {""});
-        }
-
-        // TODO: needs to be configurable
-        frontContent = new String[] {"UserMailer.contact_admin(params[:email], params[:name], params[:comment]).deliver",
-        "flash[:success] = \"Thanks for your feedback... we will review it soon.\"",
-        "redirect_to root_path"};
-        addMethod(buf, "submitcontact", frontContent);
-
-
-        tabbed(buf, "private");
-        addMethod(buf, "sort_column", new String[] {frontListModel.getCapName() + ".column_names.include?(params[:sort]) ? params[:sort] : \"created_at\""});
-        addMethod(buf, "sort_direction", new String[] {"%w[asc desc].include?(params[:direction]) ? params[:direction] : \"desc\""});
-
-        StringUtils.addLine(buf, "end");
-
-        FileUtils.write(buf, app.getWebAppDir() + "/app/controllers/static_pages_controller.rb", true);
-    }
-
-    public String getRailsType (Type type) {
-        if (type.equals(Type.STRING))
-            return ("string");
-        else  if (type.equals(Type.BOOLEAN))
-            return ("boolean");
-        else  if (type.equals(Type.EMAIL))
-            return ("string");
-        else  if (type.equals(Type.PASSWORD))
-            return ("string");
-        else  if (type.equals(Type.CODE))
-            return ("string");
-        else  if (type.equals(Type.SHORT_STRING))
-            return ("string");
-        else  if (type.equals(Type.PHONE))
-            return ("string");
-        else  if (type.equals(Type.URL))
-            return ("string");
-        else  if (type.equals(Type.DATE))
-            return ("date");
-        else  if (type.equals(Type.IMAGE))
-            return ("string");
-        else  if (type.equals(Type.TIME))
-            return ("time");
-        else  if (type.equals(Type.DATETIME))
-            return ("datetime");
-        else  if (type.equals(Type.LONG_STRING))
-            return ("text");
-        else  if (type.equals(Type.INT))
-            return ("integer");
-        else  if (type.equals(Type.RANGE))
-            return ("string");
-        else  if (type.equals(Type.FLOAT))
-            return ("float");
-        else if (type.equals(Type.SET_ONE_OR_MORE))
-            return ("text");
-        else if (type.equals(Type.SET_PICK_ONE))
-            return ("text");
-        else  {
-            return ("integer"); // assume it's a model type for now?
-        }
-//        else
-//            throw new RuntimeException("Unsupported type: " + type);
-    }
-
-    public void generateUpgrades () throws Exception {
-        ArrayList<Model>  models = app.getModels();
-        if (models != null) {
-            for (Model model : models) {
-                String name = model.getName();
-                ArrayList<Field>    fields = model.getFields();
-                ArrayList<Rel>      rels = model.getRelationships();
-
-                StringBuilder buf = new StringBuilder();
-
-                String upperPluralName = WordUtils.pluralize(WordUtils.capitalize(name));
-                String className = "Create" + upperPluralName;
-                StringUtils.addLine(buf, "class " + className + " < ActiveRecord::Migration");
-
-                tabbed(buf, "def change");
-                tabbed(buf, "create_table :" + model.getPluralName() + " do |t|", 2);
-
-                if (fields != null) {
-                    for (Field field : fields) {
-                        if (field.isComputed() || field.getName().equals("created_at") || field.getName().equals("updated_at"))
-                            continue;
-
-                        tabbed(buf, "t." + getRailsType(field.getTheType()) + " :" + field.getName(), 3);
-                    }
-                }
-
-                if (model.isSecure()) {
-                    tabbed(buf, "t.string :remember_digest", 3);
-                    tabbed(buf, "t.string :password_digest", 3);
-                }
-
-                if (rels != null) {
-                    for (Rel rel : rels) {
-                        // TODO: do we need to generate belongs_to here instead in some cases?
-                        tabbed(buf, "t.integer :" + rel.getModel().getName() + "_id", 3);
-                    }
-                }
-                tabbed(buf, "t.timestamps null: false", 3);
-                tabbed(buf, "end", 2);
-                tabbed(buf, "end");
-                StringUtils.addLine(buf, "end");
-
-                String endFileName = "_create_" + WordUtils.pluralize(name) + ".rb";
-
-                File f = FileUtils.fileEndingIn(app.getWebAppDir() + "/db/migrate/", endFileName);
-
-                if (f != null) {
-                    if (FileUtils.textContentSame(buf.toString(), f))
-                        continue;
-                    else
-                        f.delete();
-                }
-
-                String fileName = String.valueOf(System.nanoTime()) + endFileName;
-                FileUtils.write(buf, app.getWebAppDir() + "/db/migrate/" + fileName, true);
-            }
-        }
-
-        String 	railsCmd = app.isWindows() ? "C:/RailsInstaller/Ruby2.1.0/bin/bundle.bat" : "bundle";
-
-        //runCommandInApp(railsCmd + " exec rake db:migrate");
     }
 
     private void runCommandInApp (String command) throws Exception {
