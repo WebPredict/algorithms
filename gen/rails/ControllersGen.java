@@ -58,6 +58,11 @@ public class ControllersGen extends RailsGenBase {
                 else {
                     createLines.add("@" + name + " = " + capName + ".new(" + name + "_params)");
                 }
+                String currentUser = "current_user"; // TODO don't hardcode
+                createLines.add("if !" + currentUser + ".nil?");
+                createLines.add("@" + name + ".created_by = " + currentUser + ".username");
+                createLines.add("end");
+
                 createLines.add("if @" + name + ".save");
                 if (model.isSecure())
                     createLines.add("flash[:success] = \"Welcome to " + app.getTitle() + "!\"");
@@ -86,7 +91,11 @@ public class ControllersGen extends RailsGenBase {
 
                 addMethod(buf, "update", new String[] {"@" + name + " = " + capName + ".find(params[:id])",
                         "if @" + name + ".update_attributes(" + name + "_params)",
-                        "flash[:success] = \"" + capName + " updated.\"",
+                        "if !" + currentUser + ".nil?",
+                        "@" + name + ".updated_by = " + currentUser + ".username",
+                        "@" + name + ".save",
+                        "end",
+                "flash[:success] = \"" + capName + " updated.\"",
                         "redirect_to @" + name,
                         "else",
                         "render 'edit'",

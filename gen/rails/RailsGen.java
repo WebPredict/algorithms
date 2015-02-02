@@ -583,6 +583,36 @@ public class RailsGen extends Generator {
         HTMLUtils.closeDiv(buf);
     }
 
+    private void generateDateField (StringBuilder buf, String fieldName, String modelName) {
+        /**
+         * <div class="col-sm-8">
+         <%= f.text_field(:dob, value: (@user.dob.blank? ? '' : @user.dob.strftime('%m/%d/%Y')), class: "form-control datepicker")  %>
+         </div>
+         <script type="text/javascript">
+         $(document).ready(function() {
+         $('.datepicker').datepicker({format: 'mm/dd/yyyy'});
+         });
+         </script>
+
+         */
+
+        HTMLUtils.addDiv(buf, "form-group");
+
+        int width = 8; // TODO get rid of this
+        int offset = (2 + ((COL_WIDTH - width) / 2));
+        HTMLUtils.addRubyOutput(buf, "f.label(:" + fieldName + ", class: \"col-sm-" + offset + " control-label\") ");
+        HTMLUtils.addDiv(buf, "col-sm-" + width);
+        String fullName = modelName + "." + fieldName;
+        HTMLUtils.addRubyOutput(buf, "f.text_field(:" + fieldName + ", value: (@" + fullName + ".blank? ? '' : @" + fullName + ".strftime('%m/%d/%Y')), class: \"form-control datepicker\") ");
+        HTMLUtils.closeDiv(buf);
+        HTMLUtils.closeDiv(buf);
+        StringUtils.addLine(buf, "<script type=\"text/javascript\">");
+        StringUtils.addLine(buf, "$(document).ready(function () {");
+        StringUtils.addLine(buf, "$('.datepicker').datepicker({format: 'mm/dd/yyyy'});");
+        StringUtils.addLine(buf, "});");
+        StringUtils.addLine(buf, "</script>");
+    }
+
     private void generateTextArea (StringBuilder buf, String name, int rows) {
         HTMLUtils.addDiv(buf, "form-group");
         HTMLUtils.addRubyOutput(buf, "f.label(:" + name + ", class: \"col-sm-2 control-label\") ");
@@ -778,11 +808,12 @@ public class RailsGen extends Generator {
                 "//= require bootstrap", true, true);
 
         // Where is datepicker now?
-//        FileUtils.insertAfterInFileIfNotExists(app.getWebAppDir() + "/app/assets/javascripts/application.js", "//= require jquery_ujs",
-//                "//= require jquery-ui", true, true);
+        FileUtils.insertAfterInFileIfNotExists(app.getWebAppDir() + "/app/assets/javascripts/application.js", "//= require jquery_ujs",
+                "//= require bootstrap-datepicker", true, true);
 //
-//        FileUtils.insertAfterInFileIfNotExists(app.getWebAppDir() + "/app/assets/stylesheets/application.css", " *= require_self",
-//               " *= require jquery-ui", true, true);
+        // TODO: perhaps this needs to come before require_self?
+        FileUtils.insertAfterInFileIfNotExists(app.getWebAppDir() + "/app/assets/stylesheets/application.css", " *= require_self",
+               " *= require bootstrap-datepicker3", true, true);
 
         FileUtils.copyTextFile("C:/Users/jsanchez/Downloads/apps/resources/simple2.css.scss", app.getWebAppDir() + "/app/assets/stylesheets/custom.css.scss");
         FileUtils.copyFile("C:/Users/jsanchez/Downloads/apps/resources/ImagePlaceholderSmall.png", app.getWebAppDir() + "/app/assets/images/ImagePlaceholderSmall.png");
@@ -877,6 +908,11 @@ public class RailsGen extends Generator {
 
         StringBuilder       bodyContent = new StringBuilder();
 
+        // TODO: genericize this into a collection of actions available for this screen
+        StringUtils.addLine(bodyContent, "<% if logged_in? %>");
+        StringUtils.addLine(bodyContent, "<dl class=\"dl-horizontal\"><dd><%= link_to \"Edit " + model.getCapName() + "\", edit_" + name + "_path(@" + name + "), class: \"btn btn-default btn-sm\" %></dd></dl>");
+        StringUtils.addLine(bodyContent, "<% end %>");
+
         StringUtils.addLine(bodyContent, "<dl class=\"dl-horizontal\">");
         if (fields != null) {
             for (Field f : fields) {
@@ -912,10 +948,14 @@ public class RailsGen extends Generator {
                     generateReadOnlySection(bodyContent, "image_for(@" + nameFName + ")", fName);
                 }
                 else if (fTypeName.equals(Type.DATETIME.getName())) {
-                    generateReadOnlySection(bodyContent, "@" + nameFName, fName);
+                    //  @user.dob.strftime("%m/%d/%Y") unless @user.dob.nil?
+                    generateReadOnlySection(bodyContent, "@" + nameFName + ".strftime(\"%m/%d/%Y %I:%M %P\") unless @" + nameFName + ".nil?", fName);
+                }
+                else if (fTypeName.equals(Type.DATE.getName())) {
+                    //  @user.dob.strftime("%m/%d/%Y") unless @user.dob.nil?
+                    generateReadOnlySection(bodyContent, "@" + nameFName + ".strftime(\"%m/%d/%Y\") unless @" + nameFName + ".nil?", fName);
                 }
                 else if (fTypeName.equals(Type.CODE.getName())) {
-                    // TODO: why isn't RedCloth working?
                 	//generateReadOnlySection(bodyContent, "RedCloth.new(CodeRay.scan(@" + nameFName + ", :ruby).div(:line_numbers => :table)).to_html", fName);
                     generateReadOnlySection(bodyContent, "CodeRay.scan(@" + nameFName + ", :ruby).div(:line_numbers => :table).html_safe", fName);
                 }
@@ -999,7 +1039,7 @@ public class RailsGen extends Generator {
          * else if user is admin, allow edit
          */
         StringUtils.addLine(bodyContent, "<% if logged_in? %>");
-        StringUtils.addLine(bodyContent, "<%= link_to \"Edit " + model.getCapName() + "\", edit_" + name + "_path(@" + name + "), class: \"btn btn-default btn-sm\" %></li>");
+        StringUtils.addLine(bodyContent, "<dl class=\"dl-horizontal\"><dd><%= link_to \"Edit " + model.getCapName() + "\", edit_" + name + "_path(@" + name + "), class: \"btn btn-default btn-sm\" %></dd></dl>");
         StringUtils.addLine(bodyContent, "<% end %>");
 
         Layout layout = app.getAppConfig().getLayout();
@@ -1290,6 +1330,9 @@ public class RailsGen extends Generator {
                  }
                  else if (fType.equals(Type.DURATION)) {
                      generateDurationField(bodyContent, fName, fType.getSubtype());
+                 }
+                 else if (fType.equals(Type.DATE)) {
+                     generateDateField(bodyContent, fName, model.getName());
                  }
                  else if (fType.equals(Type.RANGE)) {
                      generateRangeFields(bodyContent, fName, fType.getSubtype());
@@ -1647,12 +1690,13 @@ public class RailsGen extends Generator {
 
         addGem(gemfileLines, "actionmailer");
         addGem(gemfileLines, "coderay");
-        addGem(gemfileLines, "RedCloth");
+        //addGem(gemfileLines, "RedCloth");
         addGem(gemfileLines, "tabs_on_rails");
         //addGem(gemfileLines, "twitter-bootstrap-rails");
         addGem(gemfileLines, "bootstrap-sass", "3.2.0.0", false);
         addGem(gemfileLines, "bcrypt", "3.1.7", false);
         addGem(gemfileLines, "will_paginate", "3.0.5", false);      //gem 'will_paginate', '~> 3.0.5'
+        addGem(gemfileLines, "bootstrap-datepicker-rails", "1.3.1.1", false);
         addGem(gemfileLines, "bootstrap-will_paginate", "0.0.6", true);
         addGem(gemfileLines, "faker", "1.0.1", true);
 
