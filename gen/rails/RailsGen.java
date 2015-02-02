@@ -662,7 +662,7 @@ public class RailsGen extends Generator {
         HTMLUtils.addDiv(buf, "form-group");
         HTMLUtils.addRubyOutput(buf, "f.label(:" + name + ", class: \"col-sm-2 control-label\") ");
         HTMLUtils.addDiv(buf, "col-sm-8");
-        String typeName = subType == null ? "Minutes:Hours" : subType.getName();
+        String typeName = subType == null ? "HH:MM" : subType.getName();
         HTMLUtils.addRubyOutput(buf, "f.text_field(:" + name + ", class: \"form-control\", placeholder:  \"" + typeName + "\") ");
         HTMLUtils.closeDiv(buf);
         HTMLUtils.closeDiv(buf);
@@ -1349,16 +1349,20 @@ public class RailsGen extends Generator {
                      HTMLUtils.addRubyOutput(bodyContent, "f.label(:" + fName + ", class: \"col-sm-2 control-label\") ");
                      HTMLUtils.addDiv(bodyContent, "col-sm-8");
 
-                     StringUtils.addLine(bodyContent, "<select name=\"" + name + "[" + fName + "]\" id=\"" + name + "_" + fName + "\" class=\"form-control\">");
-                     StringUtils.addLine(bodyContent, "<%= options_for_select ([");
+                     // <%= f.select(:gender, ["male", "female"], class: "form-control") %>
+                     //StringUtils.addLine(bodyContent, "<select name=\"" + name + "[" + fName + "]\" id=\"" + name + "_" + fName + "\" class=\"form-control\">");
+                     StringUtils.addLine(bodyContent, "<%= f.select :" + fName + ", [");
+//                     StringUtils.addLine(bodyContent, "<select name=\"" + name + "[" + fName + "]\" id=\"" + name + "_" + fName + "\" class=\"form-control\">");
+//                     StringUtils.addLine(bodyContent, "<%= options_for_select ([");
 
                      if (values != null) {
                          for (int i = 0; i < values.length; i++) {
                              StringUtils.addLine(bodyContent, "\"" + values [i].toString() + "\"" + (i < values.length - 1 ? ", " : ""));
                          }
                      }
-                     StringUtils.addLine(bodyContent, "]) %>"); //  TODO: fix this , selected: @" + name + "." + fName + ") %>");
-                     HTMLUtils.close(bodyContent, "select");
+                     StringUtils.addLine(bodyContent, "], :class => \"form-control\" %>");
+                     //StringUtils.addLine(bodyContent, "]) %>"); //  TODO: fix this , selected: @" + name + "." + fName + ") %>");
+                     //HTMLUtils.close(bodyContent, "select");
                      HTMLUtils.closeDiv(bodyContent);
                      HTMLUtils.closeDiv(bodyContent);
                  }

@@ -64,10 +64,12 @@ public abstract class RailsGenBase {
             return ("string");
         else  if (type.equals(Type.FLOAT))
             return ("float");
-        else if (type.equals(Type.SET_ONE_OR_MORE))
+        else if (type.getName().equals(Type.SET_ONE_OR_MORE.getName()))
             return ("text");
-        else if (type.equals(Type.SET_PICK_ONE))
+        else if (type.getName().equals(Type.SET_PICK_ONE.getName()))
             return ("text");
+        else if (type.getName().equals(Type.FIXED_LIST.getName()))
+            return ("string");
         else  {
             return ("integer"); // assume it's a model type for now?
         }

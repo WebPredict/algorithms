@@ -103,6 +103,7 @@ public class GeneratorTest {
         app.setRootDir(windows ? "C:/Users/jsanchez/Downloads/apps" : "/Users/jeffreysanchez/rails_projects/generated");
         app.setName(name);
         app.setTagLine(tagline);
+        app.setGenerateUpgrades(true);
 
         AppConfig appConfig = app.getAppConfig();
         appConfig.setColor1("blue");
