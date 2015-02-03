@@ -64,8 +64,10 @@ public class ControllersGen extends RailsGenBase {
                 createLines.add("end");
 
                 createLines.add("if @" + name + ".save");
-                if (model.isSecure())
+                if (model.isSecure()) {
+                    createLines.add( "log_in @" + name);
                     createLines.add("flash[:success] = \"Welcome to " + app.getTitle() + "!\"");
+                }
                 else
                     createLines.add("flash[:success] = \"Created new " + model.getName() + ".\"");
                 createLines.add("\tredirect_to root_path");
@@ -243,21 +245,27 @@ public class ControllersGen extends RailsGenBase {
 
         StringUtils.addLineBreak(buf);
 
-        String [] frontContent = new String[] {""};
+        ArrayList<String> frontContent = new ArrayList<String>();
 
         Model frontListModel = app.getFrontPageListModel();
         if (frontListModel != null) {
-            frontContent = new String []
-                    {"query = \"(disabled = 'f' or disabled is null)\"",
-                            "paramarr = []",
-                            "",
-                            "condarr = [query]",
-                            "condarr.concat(paramarr)",
-                            "@static_pages = " + frontListModel.getCapName() + ".paginate(page: params[:page])"
+            frontContent.add("query = \"(disabled = 'f' or disabled is null)\"");
+            frontContent.add("paramarr = []");
+            frontContent.add("");
+            frontContent.add("condarr = [query]");
+            frontContent.add("condarr.concat(paramarr)");
+            frontContent.add("@static_pages = " + frontListModel.getCapName() + ".paginate(page: params[:page])");
                             //       "@" + frontListModel.getPluralName() + " = " + frontListModel.getCapName() + ".paginate(:page => params[:page], per_page: 10, :conditions => condarr, :order => sort_column + \" \" + sort_direction)"};
-                    };
 
         }
+
+        // TODO: need to trim this down
+        if (app.getTopLevelModels() != null) {
+            for (Model model : app.getTopLevelModels()) {
+                frontContent.add("@" + model.getPluralName() + " = " + model.getCapName() + ".all");
+            }
+        }
+
         addMethod(buf, "home", frontContent);
 
         for (StaticPage page : app.getStaticPages()) {
@@ -265,10 +273,10 @@ public class ControllersGen extends RailsGenBase {
         }
 
         // TODO: needs to be configurable
-        frontContent = new String[] {"UserMailer.contact_admin(params[:email], params[:name], params[:comment]).deliver",
+        String [] frontContentArr = new String[] {"UserMailer.contact_admin(params[:email], params[:name], params[:comment]).deliver",
                 "flash[:success] = \"Thanks for your feedback... we will review it soon.\"",
                 "redirect_to root_path"};
-        addMethod(buf, "submitcontact", frontContent);
+        addMethod(buf, "submitcontact", frontContentArr);
 
 
         tabbed(buf, "private");

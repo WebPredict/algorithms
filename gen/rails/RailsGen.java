@@ -159,15 +159,15 @@ public class RailsGen extends Generator {
         StringBuilder buf = new StringBuilder();
         HTMLUtils.addRuby(buf, "if object.errors.any?");
         HTMLUtils.addDivId(buf, "error_explanation");
-        HTMLUtils.addDiv(buf, "alert alert-danger");
+        div(buf, "alert alert-danger");
         StringUtils.addLine(buf, "Please correct the following <%= pluralize(object.errors.count, \"error\") %>.");
-        HTMLUtils.closeDiv(buf);
+        closeDiv(buf);
         StringUtils.addLine(buf, "<ul>");
         StringUtils.addLine(buf, "<% object.errors.full_messages.each do |msg| %>");
         StringUtils.addLine(buf, "<li>* <%= msg %></li>");
         StringUtils.addLine(buf, "<% end %>");
         StringUtils.addLine(buf, "</ul>");
-        HTMLUtils.closeDiv(buf);
+        closeDiv(buf);
         StringUtils.addLine(buf, "<% end %>");
 
         writeViewFile(buf, "shared", "_error_messages");
@@ -177,8 +177,8 @@ public class RailsGen extends Generator {
 
     	StringBuilder buf = new StringBuilder();
         StringUtils.addLine(buf, "<nav class=\"navbar navbar-inverse navbar-fixed-top\">");
-        HTMLUtils.addDiv(buf, "container");
-        HTMLUtils.addDiv(buf, "navbar-header");
+        div(buf, "container");
+        div(buf, "navbar-header");
 
         StringUtils.addLine(buf, "<button type=\"button\" class=\"navbar-toggle collapsed\" data-toggle=\"collapse\" data-target=\"#navbar\" aria-expanded=\"false\" aria-controls=\"navbar\">");
         StringUtils.addLine(buf, "<span class=\"sr-only\">Toggle navigation</span>");
@@ -188,15 +188,15 @@ public class RailsGen extends Generator {
     	StringUtils.addLine(buf, "</button>");
 
     	StringUtils.addLine(buf, "<%= link_to \"" + app.getTitle() + "\", root_path, class: \"navbar-brand\", id: \"logo\" %>");
-        HTMLUtils.closeDiv(buf);
+        closeDiv(buf);
 
         StringUtils.addLine(buf, "<div id=\"navbar\" class=\"navbar-collapse collapse\">");
         String searchModelName = app.getTopLevelSearchModelName();
         if (searchModelName != null) {
             StringUtils.addLine(buf, "<form action=\"/" + searchModelName + "\" class=\"navbar-form navbar-right\">");
-            HTMLUtils.addDiv(buf, "form-group");
+            div(buf, "form-group");
             StringUtils.addLine(buf, "<input type=\"text\" class=\"form-control\" id=\"search\" name=\"search\" placeholder=\"Search\">");
-            HTMLUtils.closeDiv(buf);
+            closeDiv(buf);
             StringUtils.addLine(buf, "<button type=\"submit\" class=\"btn btn-primary\">Search</button>");
             StringUtils.addLine(buf, "</form>");
         }
@@ -232,8 +232,8 @@ public class RailsGen extends Generator {
 
     	//StringUtils.addLine(buf, "<li><%= link_to \"Help\", help_path %></li>");
     	StringUtils.addLine(buf, "</ul>");
-        HTMLUtils.closeDiv(buf);
-        HTMLUtils.closeDiv(buf);
+        closeDiv(buf);
+        closeDiv(buf);
         StringUtils.addLine(buf, "</nav>");
 
     	FileUtils.write(buf, app.getWebAppDir() + "/app/views/layouts/_header.html.erb", true);
@@ -264,7 +264,7 @@ public class RailsGen extends Generator {
         HTMLUtils.addRubyOutput(buf, "yield");
 
         if (!app.isFullWidthJumbotron()) {
-            HTMLUtils.closeDiv(buf);
+            closeDiv(buf);
         }
         HTMLUtils.addRubyOutput(buf, "render 'layouts/footer'");
         HTMLUtils.addRubyOutput(buf, "debug(params) if Rails.env.development?");
@@ -341,18 +341,119 @@ public class RailsGen extends Generator {
         if (app.getUserModel() != null) {
             HTMLUtils.addRuby(buf, "if logged_in?");
             Model userModel = app.getUserModel();
-            HTMLUtils.addH3(buf, userModel.getCapName() + " Dashboard for <%= current_" +userModel.getName() + "." + userModel.getUserIndentifierFieldName() +" %>");
+            HTMLUtils.addLineBreak(buf);
+            //HTMLUtils.addH3(buf, userModel.getCapName() + " Dashboard for <%= current_" +userModel.getName() + "." + userModel.getUserIndentifierFieldName() +" %>");
 
             boolean topLevelModelsInTabs = true; // TODO
             
+            // Not sure about this approach:
+//            if (topLevelModelsInTabs) {
+//            	HTMLUtils.addRubyOutput(buf, "tabs_tag do |tab|");
+//            	for (Model model : app.getTopLevelModels()) {
+//            		HTMLUtils.addRubyOutput(buf, "tab." + model.getName() + "' " +
+//            				model.getCapName() + "', " + model.getPluralName() + "_path");
+//            	}
+//            	HTMLUtils.addRuby(buf, "end");
+//            }
+
+
             if (topLevelModelsInTabs) {
-            	HTMLUtils.addRubyOutput(buf, "tabs_tag do |tab|");
-            	for (Model model : app.getTopLevelModels()) {
-            		HTMLUtils.addRubyOutput(buf, "tab." + model.getName() + "' " +
-            				model.getCapName() + "', " + model.getPluralName() + "_path");
-            	}
-            	HTMLUtils.addRuby(buf, "end");
+                div(buf, "container");
+                
+                StringUtils.addLine(buf, "<ul class=\"nav nav-tabs\" role=\"tablist\">");
+
+                StringUtils.addLine(buf, "<li class=\"active\">");
+                StringUtils.addLine(buf, "<a href=\"#home\" role=\"tab\" data-toggle=\"tab\"><icon class=\"fa fa-home\"></icon> Home</a>");
+                StringUtils.addLine(buf, "</li>");
+
+                for (Model model : app.getTopLevelModels()) {
+                    StringUtils.addLine(buf, "<li>");
+                    StringUtils.addLine(buf, "<a href=\"#" + model.getName() + "\" role=\"tab\" data-toggle=\"tab\"> " + WordUtils.capitalize(model.getPluralName()) + "</a>");
+                    StringUtils.addLine(buf, "</li>");
+                }
+                StringUtils.addLine(buf, "</ul>");
+
+
+                div(buf, "tab-content");
+                div(buf, "tab-pane fade active in", "home");
+                HTMLUtils.addH3(buf, userModel.getCapName() + " Dashboard for <%= current_" +userModel.getName() + "." + userModel.getUserIndentifierFieldName() +" %>");
+                closeDiv(buf);
+
+
+                for (Model model : app.getTopLevelModels()) {
+                    div(buf, "tab-pane fade", model.getName());
+                    HTMLUtils.addH3(buf, WordUtils.capitalize(model.getPluralName()));
+
+                    generateTableFor(buf, model, model.getPluralName(), true, false, false);
+
+                    closeDiv(buf);
+                }
+
+                closeDiv(buf);
+
+                /**
+                 * <div class="tab-content">
+                 <div class="tab-pane fade active in" id="home">
+                 <h3>User Dashboard for <%= current_user.username %></h3>
+                 <img src="http://lorempixel.com/400/400/cats/1" alt="Cats"/>
+                 </div>
+                 <div class="tab-pane fade" id="profile">
+                 <h2>Profile Content Goes Here</h2>
+                 <img src="http://lorempixel.com/400/400/cats/2" alt="Cats"/>
+                 </div>
+                 */
+                closeDiv(buf);
             }
+            
+            
+            
+            /**
+             * <div class="container">
+
+             <!-- Nav tabs -->
+             <ul class="nav nav-tabs" role="tablist">
+             <li class="active">
+             <a href="#home" role="tab" data-toggle="tab"><icon class="fa fa-home"></icon> Home</a>
+             </li>
+             <li><a href="#profile" role="tab" data-toggle="tab">
+             <i class="fa fa-user"></i> Profile
+             </a>
+             </li>
+             <li>
+             <a href="#messages" role="tab" data-toggle="tab">
+             <i class="fa fa-envelope"></i> Messages
+             </a>
+             </li>
+             <li>
+             <a href="#settings" role="tab" data-toggle="tab">
+             <i class="fa fa-cog"></i> Settings
+             </a>
+             </li>
+             </ul>
+
+             <!-- Tab panes -->
+             <div class="tab-content">
+             <div class="tab-pane fade active in" id="home">
+             <h3>User Dashboard for <%= current_user.username %></h3>
+             <img src="http://lorempixel.com/400/400/cats/1" alt="Cats"/>
+             </div>
+             <div class="tab-pane fade" id="profile">
+             <h2>Profile Content Goes Here</h2>
+             <img src="http://lorempixel.com/400/400/cats/2" alt="Cats"/>
+             </div>
+             <div class="tab-pane fade" id="messages">
+             <h2>Messages Content Goes Here</h2>
+             <img src="http://lorempixel.com/400/400/cats/3" alt="Cats"/>
+             </div>
+             <div class="tab-pane fade" id="settings">
+             <h2>Settings Content Goes Here</h2>
+             <img src="http://lorempixel.com/400/400/cats/4" alt="Cats"/>
+             </div>
+             </div>
+
+             </div>
+
+             */
             /**
              * <%= tabs_tag do |tab| %>
   <%= tab.home      'Homepage', root_path %>
@@ -374,8 +475,8 @@ public class RailsGen extends Generator {
         }
 
         HTMLUtils.addRuby(buf, "else");
-        HTMLUtils.addDiv(buf, "jumbotron");
-        HTMLUtils.addDiv(buf, "container");
+        div(buf, "jumbotron");
+        div(buf, "container");
         HTMLUtils.addH1(buf, "Welcome to " + app.getTitle());
 
         HTMLUtils.addParagraph(buf, app.getTagLine(), "lead text-center");
@@ -387,8 +488,8 @@ public class RailsGen extends Generator {
             HTMLUtils.addRubyOutput(buf, "link_to \"Search " + plural + "\", " + plural + "_path, class: \"btn btn-lg btn-primary\"");
         }
         HTMLUtils.addRubyOutput(buf, "link_to \"Sign Up!\", signup_path, class: \"btn btn-default btn-lg\"");
-        HTMLUtils.closeDiv(buf);
-        HTMLUtils.closeDiv(buf);
+        closeDiv(buf);
+        closeDiv(buf);
         HTMLUtils.addLineBreak(buf);
 
          Model  frontPageModelList = app.getFrontPageListModel();
@@ -398,6 +499,18 @@ public class RailsGen extends Generator {
 
         HTMLUtils.addRuby(buf, "end");
         FileUtils.write(HTMLUtils.formatHTML(buf.toString(), 2), app.getWebAppDir() + "/app/views/static_pages/home.html.erb", true);
+    }
+
+    protected void div (StringBuilder builder, String className) {
+        HTMLUtils.addDiv(builder, className);
+    }
+
+    protected void div (StringBuilder builder, String className, String id) {
+        HTMLUtils.addDivWithId(builder, className, id);
+    }
+
+    protected void closeDiv (StringBuilder builder) {
+        HTMLUtils.closeDiv(builder);
     }
 
     public void generateTableFor(StringBuilder buf, Model model, boolean paginate) {
@@ -410,7 +523,7 @@ public class RailsGen extends Generator {
         if (paginate)
             HTMLUtils.addRubyOutput(buf, "will_paginate"); // TODO figure out when to pass param here
         HTMLUtils.addRuby(buf, "if @" + (collectionOverride == null ? pluralModelList : collectionOverride) + ".any?");
-        HTMLUtils.addDiv(buf, "table-responsive");
+        div(buf, "table-responsive");
         StringUtils.addLine(buf, "<table class=\"table table-striped\">");
 
         ArrayList<Field> fields = model.getFields();
@@ -441,7 +554,7 @@ public class RailsGen extends Generator {
 
         //HTMLUtils.addRubyOutput(buf, "will_paginate @" + model.getPluralName());
         StringUtils.addLine(buf, "</table>");
-        HTMLUtils.closeDiv(buf);
+        closeDiv(buf);
         tabbed(buf, "<% else %>");
         tabbed(buf, "<p> No " + model.getPluralName() + " yet.</p>");
         tabbed(buf, "<% end %>");
@@ -537,14 +650,14 @@ public class RailsGen extends Generator {
 
         generateFormEnd(buf, "Sign in", 6);
         HTMLUtils.addLineBreak(buf);
-        HTMLUtils.addDiv(buf, "row");
-        HTMLUtils.addDiv(buf, "col-sm-offset-3 col-sm-3");
+        div(buf, "row");
+        div(buf, "col-sm-offset-3 col-sm-3");
         StringUtils.addLine(buf, "Forgot password? <%= link_to \"Reset password\", send_password_path %>");
-        HTMLUtils.closeDiv(buf);
-        HTMLUtils.addDiv(buf, "col-sm-3");
+        closeDiv(buf);
+        div(buf, "col-sm-3");
         StringUtils.addLine(buf, "New " + userModelName + "? <%= link_to \"Sign up now!\", signup_path%>");
-        HTMLUtils.closeDiv(buf);
-        HTMLUtils.closeDiv(buf);
+        closeDiv(buf);
+        closeDiv(buf);
 
         FileUtils.write(buf, app.getWebAppDir() + "/app/views/sessions/new.html.erb", true);
     }
@@ -558,11 +671,11 @@ public class RailsGen extends Generator {
          * <div class="form-group">
          <div class="col-sm-offset-2 col-sm-8">
          */
-        HTMLUtils.addDiv(buf, "form-group");
-        HTMLUtils.addDiv(buf, "col-sm-offset-" + (2 + ((COL_WIDTH - width) / 2)) + " col-sm-" + width);
+        div(buf, "form-group");
+        div(buf, "col-sm-offset-" + (2 + ((COL_WIDTH - width) / 2)) + " col-sm-" + width);
         HTMLUtils.addRubyOutput(buf, "f.submit \"" + buttonText + "\", class: \"btn btn-lg btn-primary\" ");
-        HTMLUtils.closeDiv(buf);
-        HTMLUtils.closeDiv(buf);
+        closeDiv(buf);
+        closeDiv(buf);
         HTMLUtils.addRuby(buf, "end");
     }
 
@@ -572,15 +685,15 @@ public class RailsGen extends Generator {
 
     private static final int COL_WIDTH = 8; // todo move
     private void generateCheckboxField (StringBuilder buf, String name, String text, int width) {
-        HTMLUtils.addDiv(buf, "form-group");
+        div(buf, "form-group");
 
-        HTMLUtils.addDiv(buf, "col-sm-offset-" + (2 + ((COL_WIDTH - width) / 2)) + " col-sm-" + width);
+        div(buf, "col-sm-offset-" + (2 + ((COL_WIDTH - width) / 2)) + " col-sm-" + width);
         HTMLUtils.addRubyOutput(buf, "f.label :" + name + ", class: \"checkbox inline\" do");
         HTMLUtils.addRubyOutput(buf, "f.check_box :" + name);
         HTMLUtils.addSpan(buf, text);
         HTMLUtils.addRuby(buf, "end");
-        HTMLUtils.closeDiv(buf);
-        HTMLUtils.closeDiv(buf);
+        closeDiv(buf);
+        closeDiv(buf);
     }
 
     private void generateDateField (StringBuilder buf, String fieldName, String modelName) {
@@ -596,16 +709,16 @@ public class RailsGen extends Generator {
 
          */
 
-        HTMLUtils.addDiv(buf, "form-group");
+        div(buf, "form-group");
 
         int width = 8; // TODO get rid of this
         int offset = (2 + ((COL_WIDTH - width) / 2));
         HTMLUtils.addRubyOutput(buf, "f.label(:" + fieldName + ", class: \"col-sm-" + offset + " control-label\") ");
-        HTMLUtils.addDiv(buf, "col-sm-" + width);
+        div(buf, "col-sm-" + width);
         String fullName = modelName + "." + fieldName;
         HTMLUtils.addRubyOutput(buf, "f.text_field(:" + fieldName + ", value: (@" + fullName + ".blank? ? '' : @" + fullName + ".strftime('%m/%d/%Y')), class: \"form-control datepicker\") ");
-        HTMLUtils.closeDiv(buf);
-        HTMLUtils.closeDiv(buf);
+        closeDiv(buf);
+        closeDiv(buf);
         StringUtils.addLine(buf, "<script type=\"text/javascript\">");
         StringUtils.addLine(buf, "$(document).ready(function () {");
         StringUtils.addLine(buf, "$('.datepicker').datepicker({format: 'mm/dd/yyyy'});");
@@ -614,12 +727,12 @@ public class RailsGen extends Generator {
     }
 
     private void generateTextArea (StringBuilder buf, String name, int rows) {
-        HTMLUtils.addDiv(buf, "form-group");
+        div(buf, "form-group");
         HTMLUtils.addRubyOutput(buf, "f.label(:" + name + ", class: \"col-sm-2 control-label\") ");
-        HTMLUtils.addDiv(buf, "col-sm-8");
+        div(buf, "col-sm-8");
         HTMLUtils.addRubyOutput(buf, "f.text_area(:" + name + ", :rows => \"" + rows + "\", class: \"form-control\") ");
-        HTMLUtils.closeDiv(buf);
-        HTMLUtils.closeDiv(buf);
+        closeDiv(buf);
+        closeDiv(buf);
     }
 
     private void generateFormField (StringBuilder buf, String name, String fieldType) {
@@ -627,82 +740,82 @@ public class RailsGen extends Generator {
     }
 
     private void generateFormField (StringBuilder buf, String name, String fieldType, int width) {
-        HTMLUtils.addDiv(buf, "form-group");
+        div(buf, "form-group");
 
         int offset = (2 + ((COL_WIDTH - width) / 2));
         HTMLUtils.addRubyOutput(buf, "f.label(:" + name + ", class: \"col-sm-" + offset + " control-label\") ");
-        HTMLUtils.addDiv(buf, "col-sm-" + width);
+        div(buf, "col-sm-" + width);
         HTMLUtils.addRubyOutput(buf, "f." + fieldType + "_field(:" + name + ", class: \"form-control\") ");
-        HTMLUtils.closeDiv(buf);
-        HTMLUtils.closeDiv(buf);
+        closeDiv(buf);
+        closeDiv(buf);
     }
 
     private void generateStaticFormField (StringBuilder buf, String modelName, String fieldName) {
-        HTMLUtils.addDiv(buf, "form-group");
+        div(buf, "form-group");
         HTMLUtils.addRubyOutput(buf, "f.label(:" + fieldName + ", class: \"col-sm-2 control-label\") ");
-        HTMLUtils.addDiv(buf, "col-sm-8");
+        div(buf, "col-sm-8");
         HTMLUtils.addParagraph(buf, "<%= @" + modelName + "." + fieldName + " %>", "form-control-static");
-        HTMLUtils.closeDiv(buf);
-        HTMLUtils.closeDiv(buf);
+        closeDiv(buf);
+        closeDiv(buf);
     }
 
     private void generateCurrencyField (StringBuilder buf, String name) {
-        HTMLUtils.addDiv(buf, "form-group");
+        div(buf, "form-group");
         HTMLUtils.addRubyOutput(buf, "f.label(:" + name + ", class: \"col-sm-2 control-label\") ");
-        HTMLUtils.addDiv(buf, "col-sm-8");
-        HTMLUtils.addDiv(buf, "input-group");
+        div(buf, "col-sm-8");
+        div(buf, "input-group");
         HTMLUtils.addDivWithContent(buf, "input-group-addon", "$");
         HTMLUtils.addRubyOutput(buf, "f.text_field(:" + name + ", class: \"form-control\") ");
-        HTMLUtils.closeDiv(buf);
-        HTMLUtils.closeDiv(buf);
-        HTMLUtils.closeDiv(buf);
+        closeDiv(buf);
+        closeDiv(buf);
+        closeDiv(buf);
     }
 
     private void generateDurationField (StringBuilder buf, String name, Type subType) {
-        HTMLUtils.addDiv(buf, "form-group");
+        div(buf, "form-group");
         HTMLUtils.addRubyOutput(buf, "f.label(:" + name + ", class: \"col-sm-2 control-label\") ");
-        HTMLUtils.addDiv(buf, "col-sm-8");
+        div(buf, "col-sm-8");
         String typeName = subType == null ? "HH:MM" : subType.getName();
         HTMLUtils.addRubyOutput(buf, "f.text_field(:" + name + ", class: \"form-control\", placeholder:  \"" + typeName + "\") ");
-        HTMLUtils.closeDiv(buf);
-        HTMLUtils.closeDiv(buf);
+        closeDiv(buf);
+        closeDiv(buf);
     }
 
     private void generateRangeFields (StringBuilder buf, String name, Type subType) {
-        HTMLUtils.addDiv(buf, "form-group");
+        div(buf, "form-group");
         HTMLUtils.addRubyOutput(buf, "f.label(:" + name + ", class: \"col-sm-2 control-label\") ");
         String fieldType = "text"; // TODO switch on subType
-        HTMLUtils.addDiv(buf, "col-sm-3");
+        div(buf, "col-sm-3");
         HTMLUtils.addRubyOutput(buf, "f." + fieldType + "_field(:" + name + ", class: \"form-control\") ");
         StringUtils.addLine(buf, "...");
-        HTMLUtils.closeDiv(buf);
-        HTMLUtils.addDiv(buf, "col-sm-3");
+        closeDiv(buf);
+        div(buf, "col-sm-3");
         HTMLUtils.addRubyOutput(buf, "f." + fieldType + "_field(:" + name + ", class: \"form-control\") ");
-        HTMLUtils.closeDiv(buf);
-        HTMLUtils.closeDiv(buf);
+        closeDiv(buf);
+        closeDiv(buf);
     }
 
     private void generateFileUploadField (StringBuilder buf, String name) {
-        HTMLUtils.addDiv(buf, "form-group");
+        div(buf, "form-group");
         rubyout(buf, "f.label(:" + name + ", \"" + WordUtils.capitalize(name) + " File\", class: \"col-sm-2 control-label\") ");
-        HTMLUtils.addDiv(buf, "col-sm-8");
+        div(buf, "col-sm-8");
         //rubyout(buf, "file_for(@" + name + ")");         // TODO support for file_for
-        HTMLUtils.addDiv(buf, "fileUpload btn");
+        div(buf, "fileUpload btn");
         aline(buf, "<span>Change File</span>");
         rubyout(buf, "f.file_field :" + name + ", :class => \"form-control upload\"");
-        HTMLUtils.closeDiv(buf);
-        HTMLUtils.closeDiv(buf);
-        HTMLUtils.closeDiv(buf);
+        closeDiv(buf);
+        closeDiv(buf);
+        closeDiv(buf);
     }
 
     private void generateRadioButtonsField (StringBuilder buf, String name) {
-        HTMLUtils.addDiv(buf, "form-group");
+        div(buf, "form-group");
         HTMLUtils.addRubyOutput(buf, "f.label(:" + name + ", class: \"col-sm-2 control-label\") ");
-        HTMLUtils.addDiv(buf, "col-sm-8");
+        div(buf, "col-sm-8");
         // TODO finish
         HTMLUtils.addRubyOutput(buf, "f.radio_button(:" + name + ", class: \"form-control\") ");
-        HTMLUtils.closeDiv(buf);
-        HTMLUtils.closeDiv(buf);
+        closeDiv(buf);
+        closeDiv(buf);
         /**
          * <div class="form-group">
          <div class="controls-row"
@@ -728,12 +841,12 @@ public class RailsGen extends Generator {
         HTMLUtils.addFormElement(buf, "name", "string", "Your Name");
         HTMLUtils.addFormElement(buf, "comment", "long_string", "Your Message");
 
-        HTMLUtils.addDiv(buf, "form-group");
-        HTMLUtils.addDiv(buf, "col-sm-offset-2 col-sm-8");
+        div(buf, "form-group");
+        div(buf, "col-sm-offset-2 col-sm-8");
         HTMLUtils.addSubmitButton(buf, "commit", "Send Message");
 
-        HTMLUtils.closeDiv(buf);
-        HTMLUtils.closeDiv(buf);
+        closeDiv(buf);
+        closeDiv(buf);
 
         StringUtils.addLine(buf, "</form>");
 
@@ -1051,9 +1164,9 @@ public class RailsGen extends Generator {
         // TODO: need to not hardcode this
         StringUtils.addLine(buf, "<% provide(:title, @" + name + "." + model.getUserIndentifierFieldName() + ") %>");
 
-        HTMLUtils.addDiv(buf, "page-header");
+        div(buf, "page-header");
         HTMLUtils.addH1(buf, model.getCapName() + ": <%= @" + name + "." + model.getUserIndentifierFieldName() + " %>");
-        HTMLUtils.closeDiv(buf);
+        closeDiv(buf);
 
         switch (layout) {
             case TWO_COL_THIN_LEFT: {
@@ -1107,9 +1220,9 @@ public class RailsGen extends Generator {
     }
 
     private void generateReadOnlyLinkSectionInForm (StringBuilder bodyContent, String fieldDisplayName, String fieldName, String linkPath, boolean addButton) {
-        HTMLUtils.addDiv(bodyContent, "form-group");
+        div(bodyContent, "form-group");
         StringUtils.addLine(bodyContent, "<label class=\"control-label col-sm-2\">" + fieldDisplayName + "</label>");
-        HTMLUtils.addDiv(bodyContent, "col-sm-8");
+        div(bodyContent, "col-sm-8");
         HTMLUtils.addRuby(bodyContent, "if @" + fieldName + " != nil");
         StringUtils.addLine(bodyContent, "<%= link_to @" + fieldName + ".id, " + linkPath + "(@" + fieldName + ") %>");
         HTMLUtils.addRuby(bodyContent, "else");
@@ -1119,8 +1232,8 @@ public class RailsGen extends Generator {
             // TODO: this button needs to allow use to select another item - either list selection, lookup field, popup from a table select?
             HTMLUtils.addSmallButton(bodyContent, "change", "Change", "button");
         }
-        HTMLUtils.closeDiv(bodyContent);
-        HTMLUtils.closeDiv(bodyContent);
+        closeDiv(bodyContent);
+        closeDiv(bodyContent);
     }
 
     private void generateReadOnlyLinkSection (StringBuilder bodyContent, String fieldDisplayValue, String fieldDisplayName, String fieldName, String linkPath) {
@@ -1170,7 +1283,7 @@ public class RailsGen extends Generator {
     private void generateSublistView (StringBuilder builder, String modelName, String collectionName, boolean addAddBtn, String additionalParams, Model relModel) throws Exception {
         String pluralColName = WordUtils.pluralize(collectionName);
         StringUtils.addLine(builder, "<label class=\"control-label col-sm-2\">" + WordUtils.capitalize(pluralColName) + "</label>");
-        HTMLUtils.addDiv(builder, "col-sm-8");
+        div(builder, "col-sm-8");
         String fullCollectionName = modelName + "." + pluralColName;
         //StringUtils.addLine(builder, "<% if @" + collectionName + ".any? %>");
 
@@ -1187,7 +1300,7 @@ public class RailsGen extends Generator {
             tabbed(builder, "<%= link_to \"Add " + collectionName + "\", " + path + ", class: \"btn btn-default btn-sm\" %>");
             tabbed(builder, "<% end %>");
         }
-        HTMLUtils.closeDiv(builder);
+        closeDiv(builder);
     }
 
     public void generateListView (Model model) throws Exception {
@@ -1203,9 +1316,9 @@ public class RailsGen extends Generator {
 
         StringBuilder bodyContent = new StringBuilder();
 
-        HTMLUtils.addDiv(bodyContent, "page-header");
+        div(bodyContent, "page-header");
         HTMLUtils.addH1(bodyContent, WordUtils.pluralize(model.getCapName()));
-        HTMLUtils.closeDiv(bodyContent);
+        closeDiv(bodyContent);
 
         generateTableFor(bodyContent, model, null, true, true, false);
 
@@ -1314,16 +1427,16 @@ public class RailsGen extends Generator {
                      generateTextArea(bodyContent, fName, 2);
                  }
                  else if (fType.equals(Type.IMAGE)) {
-                     HTMLUtils.addDiv(bodyContent, "form-group");
+                     div(bodyContent, "form-group");
                      HTMLUtils.addRubyOutput(bodyContent, "f.label(:" + fName + ", class: \"col-sm-2 control-label\") ");
-                     HTMLUtils.addDiv(bodyContent, "col-sm-8");
+                     div(bodyContent, "col-sm-8");
                      rubyout(bodyContent, "image_for(@" + name + "." + fName + ")");
-                     HTMLUtils.addDiv(bodyContent, "fileUpload btn");
+                     div(bodyContent, "fileUpload btn");
                      //aline(bodyContent, "<span>Change Image</span>");
                      rubyout(bodyContent, "f.file_field :" + fName + ", :class => \"upload\"");
-                     HTMLUtils.closeDiv(bodyContent);
-                     HTMLUtils.closeDiv(bodyContent);
-                     HTMLUtils.closeDiv(bodyContent);
+                     closeDiv(bodyContent);
+                     closeDiv(bodyContent);
+                     closeDiv(bodyContent);
                  }
                  else if (fType.equals(Type.PHONE)) {
                      generateFormField(bodyContent, fName, "phone");
@@ -1345,9 +1458,9 @@ public class RailsGen extends Generator {
                      FixedList fl = (FixedList)fType;
                      Object []  values = fl.getValues();
 
-                     HTMLUtils.addDiv(bodyContent, "form-group");
+                     div(bodyContent, "form-group");
                      HTMLUtils.addRubyOutput(bodyContent, "f.label(:" + fName + ", class: \"col-sm-2 control-label\") ");
-                     HTMLUtils.addDiv(bodyContent, "col-sm-8");
+                     div(bodyContent, "col-sm-8");
 
                      // <%= f.select(:gender, ["male", "female"], class: "form-control") %>
                      //StringUtils.addLine(bodyContent, "<select name=\"" + name + "[" + fName + "]\" id=\"" + name + "_" + fName + "\" class=\"form-control\">");
@@ -1363,8 +1476,8 @@ public class RailsGen extends Generator {
                      StringUtils.addLine(bodyContent, "], :class => \"form-control\" %>");
                      //StringUtils.addLine(bodyContent, "]) %>"); //  TODO: fix this , selected: @" + name + "." + fName + ") %>");
                      //HTMLUtils.close(bodyContent, "select");
-                     HTMLUtils.closeDiv(bodyContent);
-                     HTMLUtils.closeDiv(bodyContent);
+                     closeDiv(bodyContent);
+                     closeDiv(bodyContent);
                  }
                  else if (fType instanceof Collection) {
 
@@ -1438,16 +1551,16 @@ public class RailsGen extends Generator {
                         break;
 
                     case ONE_TO_MANY:
-                        HTMLUtils.addDiv(bodyContent, "form-group");
+                        div(bodyContent, "form-group");
                         //generateTableFor(bodyContent, rel.getModel());
                         generateSublistView(bodyContent, name, fName, model.isSecure(), additionalParams, rel.getModel());
-                        HTMLUtils.closeDiv(bodyContent);
+                        closeDiv(bodyContent);
                         break;
 
                     case MANY_TO_MANY:
-                        HTMLUtils.addDiv(bodyContent, "form-group");
+                        div(bodyContent, "form-group");
                         generateSublistView(bodyContent, name, fName, model.isSecure(), additionalParams, rel.getModel());
-                        HTMLUtils.closeDiv(bodyContent);
+                        closeDiv(bodyContent);
                         break;
 
                     case MANY_TO_ONE:

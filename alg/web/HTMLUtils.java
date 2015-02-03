@@ -95,6 +95,10 @@ public class HTMLUtils {
         buf.append("<div class=\"" + divClass + "\">" + content + "</div>\n");
     }
 
+    public static void		addDivWithId (StringBuilder buf, String divClass, String id) {
+        buf.append("<div class=\"" + divClass + "\" id=\"" + id + "\">");
+    }
+
     public static void		addSpan (StringBuilder buf, String content) {
         buf.append("<span>" + content + "</span>\n");
     }

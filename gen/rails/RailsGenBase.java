@@ -1,6 +1,7 @@
 package gen.rails;
 
 import alg.strings.StringUtils;
+import alg.web.HTMLUtils;
 import gen.App;
 import gen.Generator;
 import gen.Type;
@@ -93,6 +94,14 @@ public abstract class RailsGenBase {
         ret.add("end");
 
         return (ret);
+    }
+
+    protected void div (StringBuilder builder, String className) {
+        HTMLUtils.addDiv(builder, className);
+    }
+
+    protected void closeDiv (StringBuilder builder) {
+        HTMLUtils.closeDiv(builder);
     }
 
     protected List<String> generateIf (String condition, String content) {
