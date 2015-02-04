@@ -20,7 +20,9 @@ public class WordTest {
 
     public static void main (String [] args) throws Exception {
 
-        testShortJustify();
+        List<String> lines = WordUtils.leftRightTextJustificationParagraphs(Arrays.asList("This is a test."), 10);
+
+        //testShortJustify();
         testLonger();
 
         testAutocorrect();
@@ -72,16 +74,16 @@ public class WordTest {
     }
 
     public static void testLonger () {
-        String text = "Welcome, dear Rosencrantz and Guildenstern!\n" +
-                "Moreover that we much did long to see you,\n" +
-                "The need we have to use you did provoke\n" +
-                "Our hasty sending. Something have you heard\n" +
-                "Of Hamlet's transformation; so call it,\n" +
-                "Sith nor the exterior nor the inward man\n" +
-                "Resembles that it was. What it should be,\n" +
-                "More than his father's death, that thus hath put him\n" +
-                "So much from the understanding of himself,\n" +
-                "I cannot dream of: I entreat you both,\n" +
+        String text = "Welcome, dear Rosencrantz and Guildenstern! " +
+                "Moreover that we much did long to see you, " +
+                "The need we have to use you did provoke " +
+                "Our hasty sending. Something have you heard " +
+                "Of Hamlet's transformation; so call it, " +
+                "Sith nor the exterior nor the inward man " +
+                "Resembles that it was. What it should be, " +
+                "More than his father's death, that thus hath put him " +
+                "So much from the understanding of himself, " +
+                "I cannot dream of: I entreat you both, " +
                 "That, being of so young days brought up with him,\n" +
                 "And sith so neighbour'd to his youth and havior,\n" +
                 "That you vouchsafe your rest here in our court\n" +

@@ -175,6 +175,13 @@ public class StringUtils {
 
     @InterestingAlgorithm
     public static boolean areAnagrams (String s1, String s2) {
+//        Gson gson = new Gson();
+//        String [] strings = gson.fromJson(input, String[].class);
+//        if (strings == null || strings.length == 0 || strings.length == 1)
+//            return ("false");
+//        String s1 = strings [0];
+//        String s2 = strings [1];
+
         if (s1 == null)
             return (s2 == null);
         else if (s2 == null)

@@ -26,6 +26,8 @@ public class MiscUtilsTest {
 
     public static void main (String [] args) throws Exception {
 
+        List<WordUtils.WordFrequency> frequencies = WordUtils.getWordFrequencies("This is an example of some great sample text that is my finest work. I hope it is some good stuff.", 5, true, true);
+
         StackWithMin<Integer> stackWithMin = new StackWithMin<Integer>();
         stackWithMin.push(3);
         int min = stackWithMin.min();

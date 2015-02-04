@@ -140,7 +140,102 @@ public class WordUtils {
 
     @InterestingAlgorithm
     public static String []     syllables (String s) {
-        return (null); // TODO
+
+        /**
+         * ex am ple
+         * no thing
+         * start
+         * missed
+         * ap ple
+         * this
+         * sen tence
+         * lit tle
+         *
+         * vo cab u lar y
+         */
+
+        // Seems like there are too many exceptions to do this succinctly and correctly for all common english words.
+        // for example: wicked vs. picked
+
+        if (s == null)
+            return (null);
+
+        ArrayList<String> syls = new ArrayList<String>();
+        int startIdx = 0;
+        for (int i = 0; i < s.length(); i++) {
+
+            boolean syllableBreak = false;
+
+            if (syllableBreak) {
+
+                syls.add(s.substring(startIdx, i));
+                startIdx = i;
+            }
+        }
+        if (startIdx < s.length() - 1)
+            syls.add(s.substring(startIdx));
+
+        String [] ret = new String[syls.size()];
+        for (int i = 0; i < syls.size(); i++)
+            ret [i] = syls.get(i);
+
+        return (ret);
+    }
+
+    @InterestingAlgorithm
+    public static List<WordFrequency> getWordFrequencies(String text, int cutoff, boolean ignoreCapitalization, final boolean highestToLowest) {
+        if (text == null)
+            return (null);
+
+        HashMap<String, Integer> freqMap = new HashMap<String, Integer>();
+
+        StringTokenizer tok = new StringTokenizer(text, " ");
+        String[] words = text.replaceAll("[^a-zA-Z0-9 ]", "").toLowerCase().split("\\s+");
+
+        for (int i = 0; i < words.length; i++) {
+            String word = words [i];
+
+            if (ignoreCapitalization)
+                word = word.toLowerCase();
+
+            Integer freq = freqMap.get(word);
+            if (freq == null)
+                freqMap.put(word, 1);
+            else
+                freqMap.put(word, freq + 1);
+        }
+
+        List<WordFrequency> ret = new ArrayList<WordFrequency>();
+        for (String word : freqMap.keySet()) {
+            ret.add(new WordFrequency(word, freqMap.get(word)));
+        }
+
+        Collections.sort(ret, new Comparator<WordFrequency>() {
+
+            public int compare(WordFrequency first, WordFrequency second) {
+                if (first.frequency < second.frequency)
+                    return (highestToLowest ? 1 : -1);
+                else if (first.frequency == second.frequency)
+                    return (0);
+                else
+                    return (highestToLowest ? -1 : 1);
+            }
+        });
+
+        if (ret.size() > cutoff) {
+            ret = ret.subList(0, cutoff);
+        }
+        return (ret);
+    }
+
+    public static class WordFrequency {
+        public String word;
+        public int frequency;
+
+        public WordFrequency(String word, int frequency) {
+            this.word = word;
+            this.frequency = frequency;
+        }
     }
 
     @InterestingAlgorithm
@@ -389,7 +484,7 @@ public class WordUtils {
                 // TODO: add all words to curLine with a single space
                 for (int j = lastWordIdx; j < i; j++) {
                     builder.append(words.get(j));
-                    if (i < words.size() - 1)
+                    if (j < words.size() - 1)
                         builder.append(" ");
                 }
 
