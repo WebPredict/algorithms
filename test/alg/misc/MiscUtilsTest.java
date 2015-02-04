@@ -2,6 +2,8 @@ package test.alg.misc;
 
 import alg.arrays.ArrayUtils;
 import alg.arrays.Interval;
+import alg.graphics.ImageMap;
+import alg.graphics.ImageUtils;
 import alg.math.MathUtils;
 import alg.math.finance.StockUtils;
 import alg.misc.MiscUtils;
@@ -25,6 +27,27 @@ import java.util.List;
 public class MiscUtilsTest {
 
     public static void main (String [] args) throws Exception {
+
+        ImageMap map = new ImageMap(5, 5, 2);
+        map.setColorAt(2, 2, 1);
+        map.setColorAt(3, 3, 1);
+        map.setColorAt(3, 1, 1);
+        map.setColorAt(4, 2, 1);
+
+        System.out.println(map);
+
+        //map.dilate();
+        System.out.println(map);
+
+        //map.erode();
+        System.out.println(map);
+
+        //map.convertToManhattanDistance();
+        System.out.println(map);
+
+        ImageMap corrected = ImageUtils.correctSnow(map, 1);
+
+        System.out.println(corrected);
 
         double value = MathUtils.evaluateArithmeticExpression("2 + 3 * 3 * 3");
 

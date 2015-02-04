@@ -21,7 +21,8 @@ public class ImageUtils {
     public static ImageMap correctSnow (ImageMap imageMap, int radiusOfSnow) {
         ImageMap blackAndWhiteImage = imageMap.clone().threshold(1);
         // Copy the threshold and dilate and erode the copy
-        ImageMap dilatedAndEroded = blackAndWhiteImage.clone().dilate(radiusOfSnow).erode(radiusOfSnow);
+        ImageMap dilatedAndEroded = blackAndWhiteImage.clone().dilate(radiusOfSnow);
+        dilatedAndEroded.erode(radiusOfSnow);
 
         // Figure out which pixels were snow based on the difference
         // between the thresholded image and the dilated and eroded image

@@ -20,12 +20,24 @@ public class WordTest {
 
     public static void main (String [] args) throws Exception {
 
+        String soundex = WordUtils.soundex("Smith");
+
+        soundex  = WordUtils.soundex("Smythe");
+        soundex  = WordUtils.soundex("Rubin");
+        soundex  = WordUtils.soundex("Ashcraft");
+
+        soundex  = WordUtils.soundex("Ashcroft");
+
+        soundex  = WordUtils.soundex("thing");
+
+        soundex  = WordUtils.soundex("sing");
+
         String [] syllables = WordUtils.syllables("example");
 
-        syllables = WordUtils.syllables("testing");
-        syllables = WordUtils.syllables("friends");
+        syllables = WordUtils.syllables("Testing");
+        syllables = WordUtils.syllables("Friends");
         syllables = WordUtils.syllables("nothing");
-        syllables = WordUtils.syllables("vocabulary");
+        syllables = WordUtils.syllables("Vocabulary");
         syllables = WordUtils.syllables("rabbit");
         syllables = WordUtils.syllables("picked");
 

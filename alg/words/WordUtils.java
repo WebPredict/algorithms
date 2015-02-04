@@ -31,30 +31,32 @@ public class WordUtils {
             return ("");
         String  trim = s.trim();
 
-        String ret = s.substring(0, 1);
+        String ret = s.substring(0, 1).toUpperCase();
 
         ArrayList<Character> chars = new ArrayList<Character>();
 
-        // TODO: need to first remove characters that would result in duplicate numbers, before removing vowels it looks like
-        for (int i = 1; i < s.length(); i++) {
+        int previous = -1;
+        // need to first remove characters that would result in duplicate numbers, before removing vowels it looks like
+        for (int i = 0; i < s.length(); i++) {
             char c = Character.toLowerCase(s.charAt(i));
-            if (c != 'a' && c != 'e' && c != 'i' && c != 'o' && c != 'u' && c != 'y' && c != 'h' && c != 'w')
+            int num = getSoundexNumberFor(c);
+
+            if (num == -1 || num != previous) {
                 chars.add(c);
+            }
+            previous = num;
         }
-        for (int i = 0; i < chars.size(); i++) {
-            char c = chars.get(i);
-            if (c == 'b' || c == 'f' || c == 'p' || c == 'v')
-                ret += "1";
-            else if (c == 'c' || c == 'g' || c == 'j' || c == 'k' || c == 'q' || c == 's' || c == 'x' || c == 'z')
-                ret += "2";
-            else if (c == 'd' || c == 't')
-                ret += "3";
-            else if (c == 'l')
-                ret += "4";
-            else if (c == 'm' || c == 'n')
-                ret += "5";
-            else if (c == 'r')
-                ret += "6";
+
+        ArrayList<Character> secondPassChars = new ArrayList<Character>();
+        for (int i = 1; i < chars.size(); i++) {
+            char c = Character.toLowerCase(chars.get(i));
+            if (c != 'a' && c != 'e' && c != 'i' && c != 'o' && c != 'u' && c != 'y' && c != 'h' && c != 'w')
+                secondPassChars.add(c);
+        }
+
+        for (int i = 0; i < secondPassChars.size(); i++) {
+            char c = secondPassChars.get(i);
+            ret += getSoundexNumberFor(c);
 
             if (ret.length() > 3)
                 break;
@@ -63,6 +65,23 @@ public class WordUtils {
             ret = StringUtils.pad(ret, '0', 4 - ret.length());
 
         return (ret);
+    }
+
+    public static int getSoundexNumberFor(char c) {
+        if (c == 'b' || c == 'f' || c == 'p' || c == 'v')
+            return (1);
+        else if (c == 'c' || c == 'g' || c == 'j' || c == 'k' || c == 'q' || c == 's' || c == 'x' || c == 'z')
+            return (2);
+        else if (c == 'd' || c == 't')
+            return (3);
+        else if (c == 'l')
+            return (4);
+        else if (c == 'm' || c == 'n')
+            return (5);
+        else if (c == 'r')
+            return (6);
+        else
+            return (-1);
     }
 
     @InterestingAlgorithm
@@ -143,7 +162,11 @@ public class WordUtils {
     }
 
     @InterestingAlgorithm
-    public static String []     syllables (String s) {
+    public static String []     syllables (String input) {
+
+        /**
+         * TODO: for this to really work, need to first split out common prefixes, suffixes, and root words (e.g. some/thing
+         */
 
         /**
          * ex am ple
@@ -161,27 +184,28 @@ public class WordUtils {
         // Seems like there are too many exceptions to do this succinctly and correctly for all common english words.
         // for example: wicked vs. picked
 
-        if (s == null)
+        if (input == null)
             return (null);
 
-        s = s.toLowerCase();
+        String              s = input.toLowerCase();
 
-        ArrayList<String> syls = new ArrayList<String>();
-        int startIdx = 0;
-        Character previousConsonant = null;
-        boolean syllableBreak = false;
+        ArrayList<String>   syls = new ArrayList<String>();
+        int                 startIdx = 0;
+        Character           previousConsonant = null;
+        boolean             syllableBreak = false;
+        boolean             startingSyllable = true;
         for (int i = 0; i < s.length(); i++) {
 
-            boolean startingSyllable = false;
             if (syllableBreak) {
                 syllableBreak = false;
                 startingSyllable = true;
             }
 
-            char c = s.charAt(i);
+            char    c = s.charAt(i);
             boolean isVowel = isVowel(c);
+            boolean includeCurrentChar = false;
             if (isVowel) {
-
+                startingSyllable = false;
             }
             else {
                 if (previousConsonant != null && !startingSyllable) {
@@ -192,7 +216,7 @@ public class WordUtils {
                             // e.g. nothing... we have a th but need to separate after previous vowel o
                             if (i > 1 && isVowel(s.charAt(i - 2))) {
                                 syllableBreak = true;
-                                syls.add(s.substring(startIdx, i - 1));
+                                syls.add(input.substring(startIdx, i - 1));
                                 startIdx = i - 1;
                                 continue;
                             }
@@ -210,13 +234,17 @@ public class WordUtils {
                                 else if (i < s.length() - 3) {
                                     if (s.charAt(i + 1) == 'l' && s.charAt(i + 2) == 'e') {
                                         syllableBreak = true;
-                                        i++;
+                                        includeCurrentChar = true;
                                     }
                                 }
                             }
                         }
                         else {
-                            syllableBreak = vowelsAhead;
+                            // special cases: words ending with nce
+                            if (previousConsonant == 'n' && c == 'c' && i < s.length() - 1 && s.charAt(i + 1) == 'e')
+                                syllableBreak = false;
+                            else
+                                syllableBreak = vowelsAhead;
                         }
 
                     }
@@ -229,15 +257,20 @@ public class WordUtils {
                             // Hard part: how to know if previous vowel is long or soft?
                             syllableBreak = true;
                             if (c == 'x')
-                                i++; // special case
+                                includeCurrentChar = true; // special case
                         }
                     }
                 }
             }
             if (syllableBreak) {
-
-                syls.add(s.substring(startIdx, i));
-                startIdx = i;
+                if (includeCurrentChar) {
+                    syls.add(input.substring(startIdx, i + 1));
+                    startIdx = i + 1;
+                }
+                else {
+                    syls.add(input.substring(startIdx, i));
+                    startIdx = i;
+                }
             }
             if (isVowel)
                 previousConsonant = null;
@@ -245,7 +278,7 @@ public class WordUtils {
                 previousConsonant = c;
         }
         if (startIdx < s.length() - 1)
-            syls.add(s.substring(startIdx));
+            syls.add(input.substring(startIdx));
 
         String [] ret = new String[syls.size()];
         for (int i = 0; i < syls.size(); i++)

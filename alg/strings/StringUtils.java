@@ -278,7 +278,7 @@ public class StringUtils {
     }
 
     public static String        pad (String s, char padding, int amount) {
-        return ((s == null ? "" : s) + String.copyValueOf(new char[] {padding}, 0, amount));
+        return ((s == null ? "" : s) + repeat(padding, amount));
     }
 
     @InterestingAlgorithm

@@ -16,7 +16,7 @@ public class ImageMap {
     private int cols;
     private int [][] data;
 
-    public ImageMap (int maxColors, int rows, int cols) {
+    public ImageMap (int rows, int cols, int maxColors) {
         this.maxColors = maxColors;
         this.rows = rows;
         this.cols = cols;
@@ -31,6 +31,18 @@ public class ImageMap {
         if (color == TMP_SET_COLOR)
             throw new RuntimeException("Cannot use color: " + TMP_SET_COLOR);
         data [row][col] = color;
+    }
+
+    public String toString () {
+        StringBuilder buf = new StringBuilder();
+        for (int i = 0; i < data.length; i++) {
+            for (int j = 0; j < data [i].length; j++) {
+                buf.append(data[i][j]);
+                buf.append(" ");
+            }
+            buf.append("\n");
+        }
+        return (buf.toString());
     }
 
     public int getMaxColors() {
@@ -122,18 +134,52 @@ public class ImageMap {
 
     @InterestingAlgorithm
     public ImageMap erode (int k) {
-        convertToManhattanDistance();
 
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                data[i][j] = (data [i][j] <= k ? 0 : 1);
-            }
-        }
+        // TODO: remove this inefficiency
+        for (int i = 0; i < k; i++)
+            erode();
+
+//        System.out.println(this);
+//        convertToManhattanDistance();
+//        System.out.println(this);
+
+//        for (int i = 0; i < rows; i++) {
+//            for (int j = 0; j < cols; j++) {
+//                data[i][j] = (data [i][j] >= k ? 0 : 1);
+//            }
+//        }
+//
+//        for (int i = 0; i < rows; i++) {
+//            for (int j = 0; j < cols; j++) {
+//                int value = data [i][j];
+//                if (value == 0) {
+//                    if (i > 0 && data [i - 1][j] <= k)
+//                        data [i - 1][j] = TMP_SET_COLOR;
+//                    if (j > 0 && data [i][j - 1] <= k)
+//                        data [i][j - 1] = TMP_SET_COLOR;
+//                    if (i + 1 < rows && data [i + 1][j] != 0)
+//                        data [i + 1][j] = TMP_SET_COLOR;
+//                    if (j + 1 < cols && data [i][j + 1] != 0)
+//                        data [i][j + 1] = TMP_SET_COLOR;
+//                }
+//            }
+//        }
+//
+//        for (int i = 0; i < rows; i++) {
+//            for (int j = 0; j < cols; j++) {
+//                int value = data [i][j];
+//                if (value == TMP_SET_COLOR) {
+//                    data[i][j] = 0;
+//                }
+//            }
+//        }
+//
+//        return (this);
         return (this);
     }
 
     public ImageMap  clone () {
-        ImageMap copy = new ImageMap(maxColors, rows, cols);
+        ImageMap copy = new ImageMap(rows, cols, maxColors);
 
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
@@ -196,36 +242,52 @@ public class ImageMap {
         int ctr = 0;
         if (i - 1 > 0) {
             if (j - 1 > 0) {
-                total += data [i - 1][j - 1];
+                if (data [i - 1][j - 1] > 0) {
+                    total += data [i - 1][j - 1];
+                    ctr++;
+                }
+            }
+            if (data [i - 1][j] > 0) {
+                total += data [i - 1][j];
                 ctr++;
             }
-            total += data [i - 1][j];
-            ctr++;
 
             if (j + 1 < cols) {
-                total += data [i - 1][j + 1];
-                ctr++;
+                if (data [i - 1][j + 1] > 0) {
+                    total += data [i - 1][j + 1];
+                    ctr++;
+                }
             }
         }
         if (j - 1 > 0) {
-            total += data [i][j - 1];
-            ctr++;
+            if (data [i][j - 1] > 0) {
+                total += data [i][j - 1];
+                ctr++;
+            }
         }
         if (j + 1 < cols) {
-            total += data [i][j + 1];
-            ctr++;
+            if (data [i][j + 1] > 0) {
+                total += data [i][j + 1];
+                ctr++;
+            }
         }
         if (i + 1 < rows) {
             if (j - 1 > 0) {
-                total += data [i + 1][j - 1];
+                if (data [i + 1][j - 1] > 0) {
+                    total += data [i + 1][j - 1];
+                    ctr++;
+                }
+            }
+            if (data [i + 1][j] > 0) {
+                total += data [i + 1][j];
                 ctr++;
             }
-            total += data [i + 1][j];
-            ctr++;
 
             if (j + 1 < cols) {
-                total += data [i + 1][j + 1];
-                ctr++;
+                if (data [i + 1][j + 1] > 0) {
+                    total += data [i + 1][j + 1];
+                    ctr++;
+                }
             }
         }
 
