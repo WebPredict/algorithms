@@ -200,8 +200,8 @@ public class DriverSignatureComputer implements FitnessEvaluator {
             return (new TripData()); // TODO what are we doing with this case?
 
         // TODO:
-        double [] speedData = new double [trip.data.length - 1];
-        double [] accelData = new double [trip.data.length == 1 ? 0 : trip.data.length - 2];
+//        double [] speedData = new double [trip.data.length - 1];
+//        double [] accelData = new double [trip.data.length == 1 ? 0 : trip.data.length - 2];
 
         Double maxSpeed = null;
         Double maxAccel = null;
@@ -229,7 +229,7 @@ public class DriverSignatureComputer implements FitnessEvaluator {
         for (int i = 0; i < trip.data.length; i++) {
             double x = trip.data [i][0];
             double y = trip.data [i][1];
-            Double speed = null;
+            Double speed = 0d;
             if (lastX != null) {
                 double distance = MathUtils.distance(x, y, lastX, lastY);
                 speed = distance; // m/s

@@ -20,6 +20,15 @@ public class WordTest {
 
     public static void main (String [] args) throws Exception {
 
+        String [] syllables = WordUtils.syllables("example");
+
+        syllables = WordUtils.syllables("testing");
+        syllables = WordUtils.syllables("friends");
+        syllables = WordUtils.syllables("nothing");
+        syllables = WordUtils.syllables("vocabulary");
+        syllables = WordUtils.syllables("rabbit");
+        syllables = WordUtils.syllables("picked");
+
         List<String> lines = WordUtils.leftRightTextJustificationParagraphs(Arrays.asList("This is a test."), 10);
 
         //testShortJustify();

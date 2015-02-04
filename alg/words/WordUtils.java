@@ -138,6 +138,10 @@ public class WordUtils {
         return (s); // TODO
     }
 
+    public static boolean   isVowel (char c) {
+        return (c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u' || c == 'y');
+    }
+
     @InterestingAlgorithm
     public static String []     syllables (String s) {
 
@@ -160,17 +164,85 @@ public class WordUtils {
         if (s == null)
             return (null);
 
+        s = s.toLowerCase();
+
         ArrayList<String> syls = new ArrayList<String>();
         int startIdx = 0;
+        Character previousConsonant = null;
+        boolean syllableBreak = false;
         for (int i = 0; i < s.length(); i++) {
 
-            boolean syllableBreak = false;
+            boolean startingSyllable = false;
+            if (syllableBreak) {
+                syllableBreak = false;
+                startingSyllable = true;
+            }
 
+            char c = s.charAt(i);
+            boolean isVowel = isVowel(c);
+            if (isVowel) {
+
+            }
+            else {
+                if (previousConsonant != null && !startingSyllable) {
+                    if (c == 'h') {
+                        if (previousConsonant != 't' && previousConsonant != 's' && previousConsonant != 'p' && previousConsonant != 'c' && previousConsonant != 'w')
+                            syllableBreak = vowelsAhead(s, i);
+                        else {
+                            // e.g. nothing... we have a th but need to separate after previous vowel o
+                            if (i > 1 && isVowel(s.charAt(i - 2))) {
+                                syllableBreak = true;
+                                syls.add(s.substring(startIdx, i - 1));
+                                startIdx = i - 1;
+                                continue;
+                            }
+                        }
+                    }
+                    else {
+                        boolean vowelsAhead = vowelsAhead(s, i);
+                        if (previousConsonant == 'c' && c == 'k')  {
+                            if (vowelsAhead) {
+                                // "ed" doesn't count
+                                if (i == s.length() - 3) {
+                                    if (s.charAt(i + 1) == 'e' && s.charAt(i + 2) == 'd')
+                                        syllableBreak = false;
+                                }
+                                else if (i < s.length() - 3) {
+                                    if (s.charAt(i + 1) == 'l' && s.charAt(i + 2) == 'e') {
+                                        syllableBreak = true;
+                                        i++;
+                                    }
+                                }
+                            }
+                        }
+                        else {
+                            syllableBreak = vowelsAhead;
+                        }
+
+                    }
+                }
+                else if (i > 0) {
+                    if (i < s.length() - 1) {
+                        if (isVowel(s.charAt(i - 1)) && isVowel(s.charAt(i + 1))) {
+                            // surrounded by vowels
+
+                            // Hard part: how to know if previous vowel is long or soft?
+                            syllableBreak = true;
+                            if (c == 'x')
+                                i++; // special case
+                        }
+                    }
+                }
+            }
             if (syllableBreak) {
 
                 syls.add(s.substring(startIdx, i));
                 startIdx = i;
             }
+            if (isVowel)
+                previousConsonant = null;
+            else
+                previousConsonant = c;
         }
         if (startIdx < s.length() - 1)
             syls.add(s.substring(startIdx));
@@ -180,6 +252,14 @@ public class WordUtils {
             ret [i] = syls.get(i);
 
         return (ret);
+    }
+
+    public static boolean vowelsAhead (String s, int startIdx) {
+        for (int i = startIdx; i < s.length(); i++) {
+            if (isVowel(s.charAt(i)))
+                return true;
+        }
+        return (false);
     }
 
     @InterestingAlgorithm

@@ -26,6 +26,8 @@ public class MiscUtilsTest {
 
     public static void main (String [] args) throws Exception {
 
+        double value = MathUtils.evaluateArithmeticExpression("2 + 3 * 3 * 3");
+
         List<WordUtils.WordFrequency> frequencies = WordUtils.getWordFrequencies("This is an example of some great sample text that is my finest work. I hope it is some good stuff.", 5, true, true);
 
         StackWithMin<Integer> stackWithMin = new StackWithMin<Integer>();
@@ -40,7 +42,7 @@ public class MiscUtilsTest {
         stackWithMin.pop();
         min = stackWithMin.min();
 
-        double value = MathUtils.evaluateArithmeticExpression("2 * (3 + ((4 - 2) + 1))");
+        value = MathUtils.evaluateArithmeticExpression("2.1 * (3 + ((4 - 2) + 1))");
 
         String roman = WordUtils.toRomanNumeral(3434);
 
@@ -63,7 +65,7 @@ public class MiscUtilsTest {
 
         value = MathUtils.evaluateArithmeticExpression("-2");
 
-        value = MathUtils.evaluateArithmeticExpression("2 * (3 + ((4 - 2) + 1))");
+        value = MathUtils.evaluateArithmeticExpression("2.1 * (3 + ((4 - 2) + 1))");
 
         int     len = ArrayUtils.removeElement(values, 1);
 

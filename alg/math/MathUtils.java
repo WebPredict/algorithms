@@ -25,11 +25,11 @@ public class MathUtils {
     @InterestingAlgorithm
     public static double evaluateArithmeticExpression (String expression) throws Exception {
 
-        EvalInfo info = evaluateArithmeticSubExpression(expression);
+        EvalInfo info = evaluateArithmeticSubExpression(expression, false, null);
         return (info.value);
     }
 
-    public static EvalInfo evaluateArithmeticSubExpression (String expression) throws Exception {
+    public static EvalInfo evaluateArithmeticSubExpression (String expression, boolean highPrecedenceMode, Double firstOperandValue) throws Exception {
 
         if (expression == null)
             return (new EvalInfo());
@@ -40,11 +40,17 @@ public class MathUtils {
         int state = 0;
         int tokenStartIdx = 0;
         String operation = null;
-        Double firstOperand = null;
+        Double firstOperand = firstOperandValue;
         Double secondOperand = null;
+
+        if (firstOperandValue != null)
+            state = 2;
 
         for (int i = 0; i < trimmed.length(); i++) {
             char c = trimmed.charAt(i);
+
+            // 3 + 2 / 5  TODO operator precedence
+            // lookahead to next operator
 
             // "3 + (3 * (4 / (5 - 2))) * -1.2"
 
@@ -64,7 +70,7 @@ public class MathUtils {
                         // nothing to do
                     }
                     else if (c == '(') {
-                        EvalInfo info =  evaluateArithmeticSubExpression(trimmed.substring(i + 1));
+                        EvalInfo info =  evaluateArithmeticSubExpression(trimmed.substring(i + 1), false, null);
                         i += info.strLen;
                         if (firstOperand == null)
                             firstOperand = info.value;
@@ -98,8 +104,35 @@ public class MathUtils {
                             if (operation == null)
                                 throw new RuntimeException("Syntax error: missing operation at index " + i);
 
-                           firstOperand = computeValue(firstOperand, secondOperand, operation);
+                            /**
+                             * TODO: operator precedence:
+                             *
+                             * If next operator is higher precedence (i.e. it is / or * and current operator is not either of those)
+                             * then second operand needs to be the computed value of those higher precedence operations
+                             */
+                            String nextOperator = null;
+                            for (int j = i; j < trimmed.length(); j++) {
+                                char nextChar = trimmed.charAt(j);
+                                if (nextChar == '-' || nextChar == '/' || nextChar == '*' || nextChar == '+') {
+                                    nextOperator = String.valueOf(nextChar);
+                                    break;
+                                }
+                            }
+                            if (operation.equals("-") || operation.equals("+")) {
+                                if (nextOperator != null && (nextOperator.equals("*") || nextOperator.equals("/"))) {
+                                    EvalInfo info = evaluateArithmeticSubExpression(trimmed.substring(i + 1), true, num);
+                                    i += info.strLen;
+                                    secondOperand = info.value;
+                                }
+                            }
+                            firstOperand = computeValue(firstOperand, secondOperand, operation);
 
+                            if (highPrecedenceMode && (nextOperator == null || nextOperator.equals("+") || nextOperator.equals("-"))) {
+                                EvalInfo info = new EvalInfo();
+                                info.value = firstOperand;
+                                info.strLen = i + 1;
+                                return (info);
+                            }
                             operation = null;
                             secondOperand = null;
                         }
