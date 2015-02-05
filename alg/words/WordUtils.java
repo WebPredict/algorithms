@@ -380,6 +380,63 @@ public class WordUtils {
         }
     }
 
+
+    @InterestingAlgorithm
+    public static List<WordFrequency> getNGramFrequencies(String text, int n, int cutoff, boolean ignoreCapitalization, final boolean highestToLowest) {
+        if (text == null)
+            return (null);
+
+        HashMap<String, Integer> freqMap = new HashMap<String, Integer>();
+
+        StringTokenizer tok = new StringTokenizer(text, " ");
+        String[] words = text.replaceAll("[^a-zA-Z0-9 ]", "").toLowerCase().split("\\s+");
+
+        for (int i = 0; i < words.length; i++) {
+
+            StringBuilder builder = new StringBuilder();
+            for (int j = 0; j < n; j++) {
+                if (i + j < words.length) {
+                    builder.append(words [i + j]);
+                    if (j < n - 1)
+                        builder.append(" ");
+                }
+            }
+            String ngram = builder.toString();
+
+            if (ignoreCapitalization)
+                ngram = ngram.toLowerCase();
+
+            Integer freq = freqMap.get(ngram);
+            if (freq == null)
+                freqMap.put(ngram, 1);
+            else
+                freqMap.put(ngram, freq + 1);
+        }
+
+        List<WordFrequency> ret = new ArrayList<WordFrequency>();
+        for (String word : freqMap.keySet()) {
+            ret.add(new WordFrequency(word, freqMap.get(word)));
+        }
+
+        Collections.sort(ret, new Comparator<WordFrequency>() {
+
+            public int compare(WordFrequency first, WordFrequency second) {
+                if (first.frequency < second.frequency)
+                    return (highestToLowest ? 1 : -1);
+                else if (first.frequency == second.frequency)
+                    return (0);
+                else
+                    return (highestToLowest ? -1 : 1);
+            }
+        });
+
+        if (ret.size() > cutoff) {
+            ret = ret.subList(0, cutoff);
+        }
+        return (ret);
+    }
+
+
     @InterestingAlgorithm
     public static String    capitalizeAndJoin (String... words) {
         String ret = "";
