@@ -328,7 +328,7 @@ public class ArrayUtils {
 
         int []  subArr = new int[num.length - 1];
         System.arraycopy(num, 1, subArr, 0, num.length - 1);
-        List<List<Integer>>    subPermutations = listPermutations(subArr); // TODO fix to take an index to avoid this arrray copy
+        List<List<Integer>>    subPermutations = listPermutations(subArr); // TODO fix to take an index to avoid this array copy
         List<List<Integer>>    retPermutations = new ArrayList<List<Integer>>();
 
         for (int i = 0; i < subPermutations.size(); i++) {
@@ -349,6 +349,15 @@ public class ArrayUtils {
         return (retPermutations);
     }
 
+    public static List<Integer> getListOfBitsSet (BitSet bits) {
+        ArrayList<Integer> next = new ArrayList<Integer>();
+        for (int j = 0; j < bits.size(); j++) {
+            if (bits.get(j))
+                next.add(j + 1);
+        }
+        return (next);
+    }
+
     /**
      * List all combinations of k numbers from the set 1..n
      * @param n
@@ -358,44 +367,65 @@ public class ArrayUtils {
     @InterestingAlgorithm
     public static List<List<Integer>> listCombinations (int n, int k) {
 
-        // TODO: try using a bit set
+        List<List<Integer>> ret = new ArrayList<List<Integer>>();
+        int []              com = new int[k];
+        for (int i = 0; i < k; i++)
+            com[i] = i;
 
-//        if (num == null)
-//            return (null);
-//        else if (num.length == 0)
-//            return (new ArrayList<List<Integer>>());
-//        else if (num.length == 1) {
-//            List<List<Integer>> ret = new ArrayList<List<Integer>>();
-//            ArrayList<Integer> retArr = new ArrayList<Integer>();
-//            retArr.add(num [0]);
-//            ret.add(retArr);
-//            return (ret);
-//        }
-//
-//        int []  subArr = new int[num.length - 1];
-//        System.arraycopy(num, 1, subArr, 0, num.length - 1);
-//        List<List<Integer>>    subPermutations = listPermutations(subArr); // TODO fix to take an index to avoid this arrray copy
-//        List<List<Integer>>    retPermutations = new ArrayList<List<Integer>>();
-//
-//        for (int i = 0; i < subPermutations.size(); i++) {
-//            List<Integer> subPermutation = subPermutations.get(i);
-//            for (int j = 0; j < subPermutation.size(); j++) {
-//                ArrayList<Integer> curPerm = new ArrayList<Integer>();
-//                curPerm.addAll(subPermutation.subList(0, j));
-//                curPerm.add(num[0]);
-//                curPerm.addAll(subPermutation.subList(j, subPermutation.size()));
-//                retPermutations.add(curPerm);
-//            }
-//            ArrayList<Integer> lastPerm = new ArrayList<Integer>();
-//            lastPerm.addAll(subPermutation);
-//            lastPerm.add(num[0]);
-//            retPermutations.add(lastPerm);
-//        }
-//
-//        return (retPermutations);
-        return (null); // TODO
+        while (com[k - 1] < n) {
+
+            ArrayList<Integer> nextCombo = new ArrayList<Integer>();
+            for (int i = 0; i < k; i++)
+                nextCombo.add(com[i] + 1);
+
+            ret.add(nextCombo);
+
+            int     t = k - 1;
+            while (t != 0 && com[t] == n - k + t)
+                t--;
+
+            com[t]++;
+            for (int i = t + 1; i < k; i++)
+                com[i] = com[i - 1] + 1;
+        }
+
+        return (ret);
     }
 
+    /**
+     * List all combinations of k numbers from the given set of numbers
+     * @param nums set of numbers
+     * @param k
+     * @return
+     */
+    @InterestingAlgorithm
+    public static List<List<Integer>> listCombinations (int [] nums, int k) {
+
+        List<List<Integer>> ret = new ArrayList<List<Integer>>();
+        int []              com = new int[k];
+        for (int i = 0; i < k; i++)
+            com[i] = i;
+
+        int                 n = nums.length;
+        while (com[k - 1] < n) {
+
+            ArrayList<Integer> nextCombo = new ArrayList<Integer>();
+            for (int i = 0; i < k; i++)
+                nextCombo.add(nums[com[i]]);
+
+            ret.add(nextCombo);
+
+            int     t = k - 1;
+            while (t != 0 && com[t] == n - k + t)
+                t--;
+
+            com[t]++;
+            for (int i = t + 1; i < k; i++)
+                com[i] = com[i - 1] + 1;
+        }
+
+        return (ret);
+    }
 
     @InterestingAlgorithm
     public static int []    interleave (int [] array1, int [] array2) {

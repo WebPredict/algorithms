@@ -19,6 +19,28 @@ public class WordUtils {
 
     @InterestingAlgorithm
     public static boolean   rhymingEnglishWords (String s1, String s2) {
+
+        if (s1.equals(s2))
+            return (false);
+
+        String [] syllables1 = syllables(s1);
+        String [] syllables2 = syllables(s2);
+
+        if (syllables1.length > 0 && syllables2.length > 0) {
+
+            String lastS1 = syllables1[syllables1.length - 1];
+            String lastS2 = syllables2[syllables2.length - 1];
+
+            String soundex1 = soundex(lastS1);
+            String soundex2 = soundex(lastS2);
+
+            if (soundex1.substring(1).equals(soundex2.substring(1))) {
+                if (soundex1.charAt(0) != soundex2.charAt(0))
+                    return (true);
+                else if (syllables1.length > 1 && syllables2.length > 1)
+                    return (true);
+            }
+        }
         return (false);
     }
 
@@ -243,6 +265,8 @@ public class WordUtils {
                             // special cases: words ending with nce
                             if (previousConsonant == 'n' && c == 'c' && i < s.length() - 1 && s.charAt(i + 1) == 'e')
                                 syllableBreak = false;
+                            else if (i == s.length() - 2 && s.charAt(i + 1) == 'e')
+                                syllableBreak = false;
                             else
                                 syllableBreak = vowelsAhead;
                         }
@@ -254,10 +278,15 @@ public class WordUtils {
                         if (isVowel(s.charAt(i - 1)) && isVowel(s.charAt(i + 1))) {
                             // surrounded by vowels
 
-                            // Hard part: how to know if previous vowel is long or soft?
-                            syllableBreak = true;
-                            if (c == 'x')
-                                includeCurrentChar = true; // special case
+                            if (i == s.length() - 2 && s.charAt(i + 1) == 'e') {
+                                syllableBreak = false;
+                            }
+                            else {
+                                // Hard part: how to know if previous vowel is long or soft?
+                                syllableBreak = true;
+                                if (c == 'x')
+                                    includeCurrentChar = true; // special case
+                            }
                         }
                     }
                 }

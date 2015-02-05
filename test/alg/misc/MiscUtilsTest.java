@@ -8,6 +8,7 @@ import alg.math.MathUtils;
 import alg.math.finance.StockUtils;
 import alg.misc.MiscUtils;
 import alg.misc.StackWithMin;
+import alg.sequence.SequenceUtils;
 import alg.sort.SortUtils;
 import alg.strings.StringUtils;
 import alg.trees.TreeUtils;
@@ -27,6 +28,17 @@ import java.util.List;
 public class MiscUtilsTest {
 
     public static void main (String [] args) throws Exception {
+
+        ArrayUtils.generateCombinations(10, 3);
+
+        int distance = SequenceUtils.levenshteinDistance("this", "thing");
+
+        distance = SequenceUtils.levenshteinDistance("this", "this");
+
+        distance = SequenceUtils.levenshteinDistance("this", "kiss");
+
+        distance = SequenceUtils.levenshteinDistance("something", "");
+
 
         ImageMap map = new ImageMap(5, 5, 2);
         map.setColorAt(2, 2, 1);

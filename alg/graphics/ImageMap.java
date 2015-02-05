@@ -23,6 +23,14 @@ public class ImageMap {
         data = new int[rows][cols]; // TODO  more efficient storage based on maxColors
     }
 
+    public ImageMap (int [][] data) {
+        this.data = data;
+        if (data != null && data.length > 0) {
+            this.rows = data.length;
+            this.cols = data [0].length;
+        }
+    }
+
     public int getColorAt (int row, int col) {
         return (data [row][col]);
     }
@@ -34,14 +42,17 @@ public class ImageMap {
     }
 
     public String toString () {
-        StringBuilder buf = new StringBuilder();
+        StringBuilder buf = new StringBuilder("[");
         for (int i = 0; i < data.length; i++) {
+            buf.append("[");
             for (int j = 0; j < data [i].length; j++) {
                 buf.append(data[i][j]);
-                buf.append(" ");
+                if (j < data[i].length - 1)
+                    buf.append(", ");
             }
-            buf.append("\n");
+            buf.append("]\n");
         }
+        buf.append("]");
         return (buf.toString());
     }
 
@@ -139,42 +150,6 @@ public class ImageMap {
         for (int i = 0; i < k; i++)
             erode();
 
-//        System.out.println(this);
-//        convertToManhattanDistance();
-//        System.out.println(this);
-
-//        for (int i = 0; i < rows; i++) {
-//            for (int j = 0; j < cols; j++) {
-//                data[i][j] = (data [i][j] >= k ? 0 : 1);
-//            }
-//        }
-//
-//        for (int i = 0; i < rows; i++) {
-//            for (int j = 0; j < cols; j++) {
-//                int value = data [i][j];
-//                if (value == 0) {
-//                    if (i > 0 && data [i - 1][j] <= k)
-//                        data [i - 1][j] = TMP_SET_COLOR;
-//                    if (j > 0 && data [i][j - 1] <= k)
-//                        data [i][j - 1] = TMP_SET_COLOR;
-//                    if (i + 1 < rows && data [i + 1][j] != 0)
-//                        data [i + 1][j] = TMP_SET_COLOR;
-//                    if (j + 1 < cols && data [i][j + 1] != 0)
-//                        data [i][j + 1] = TMP_SET_COLOR;
-//                }
-//            }
-//        }
-//
-//        for (int i = 0; i < rows; i++) {
-//            for (int j = 0; j < cols; j++) {
-//                int value = data [i][j];
-//                if (value == TMP_SET_COLOR) {
-//                    data[i][j] = 0;
-//                }
-//            }
-//        }
-//
-//        return (this);
         return (this);
     }
 

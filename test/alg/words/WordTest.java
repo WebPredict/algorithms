@@ -22,6 +22,13 @@ public class WordTest {
 
         String soundex = WordUtils.soundex("Smith");
 
+        boolean rhymes = WordUtils.rhymingEnglishWords("thing", "wing");
+        rhymes = WordUtils.rhymingEnglishWords("thing", "work");
+        rhymes = WordUtils.rhymingEnglishWords("exam", "sam");
+        rhymes = WordUtils.rhymingEnglishWords("crazy", "hazy");
+        rhymes = WordUtils.rhymingEnglishWords("amaze", "phase");
+        rhymes = WordUtils.rhymingEnglishWords("bemaze", "maze");
+
         soundex  = WordUtils.soundex("Smythe");
         soundex  = WordUtils.soundex("Rubin");
         soundex  = WordUtils.soundex("Ashcraft");
