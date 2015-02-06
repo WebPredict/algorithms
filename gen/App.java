@@ -21,6 +21,8 @@ public class App {
     private String rootDir;
     private boolean generateCRUDByDefault = true;
     private boolean needsAddressModel = false;
+    private boolean needsUSAddressModel = false;
+    private boolean needsLocationModel = false;
     private String name;
     private ArrayList<Model> models = new ArrayList<Model>();
     private ArrayList<Model> topLevelModels = new ArrayList<Model>();
@@ -269,19 +271,50 @@ public class App {
 
         if (errors.isEmpty()) {
             if (needsAddressModel) {
-
-                // TODO: consider using value objects here like in: http://www.tweetegy.com/2011/07/using-value-objects-in-activerecord/
-
-                Model addressModel = Model.parseModel("address: adddressLine1, addressLine2, addressLine3, city, state, zip, country");
-                addressModel.setDependent(true);
+                Model addressModel = Model.parseModel("address: line1, line2, line3, city, state:fixed_list(" + getStateList() + "), zip, country:fixed_list(" + getCountryList() + ")");
+                //addressModel.setDependent(true);
+                addressModel.setEmbedded(true);
                 List<String> addressModelErrors =  addressModel.doPreprocessing(this);
                 if (addressModelErrors != null)
                     errors.addAll(addressModelErrors);
                 nameToModelMap.put(addressModel.getName(), addressModel);
                 models.add(addressModel);
             }
+            else if (needsUSAddressModel) {
+                Model addressModel = Model.parseModel("address: line1, line2, line3, city, state:fixed_list(" + getStateList() + "), zip");
+                //addressModel.setDependent(true);
+                addressModel.setEmbedded(true);
+                List<String> addressModelErrors =  addressModel.doPreprocessing(this);
+                if (addressModelErrors != null)
+                    errors.addAll(addressModelErrors);
+                nameToModelMap.put(addressModel.getName(), addressModel);
+                models.add(addressModel);
+            }
+
+            if (needsLocationModel) {
+                Model locationModel = Model.parseModel("location: name, line1, line2, line3, city, state:fixed_list(" + getStateList() + "), zip, country:fixed_list(" +
+                        getCountryList() + ")");
+                //addressModel.setDependent(true);
+                locationModel.setEmbedded(true);
+                List<String> locationModelErrors =  locationModel.doPreprocessing(this);
+                if (locationModelErrors != null)
+                    errors.addAll(locationModelErrors);
+                nameToModelMap.put(locationModel.getName(), locationModel);
+                models.add(locationModel);
+            }
+
         }
         return (errors);
+    }
+
+    private String getStateList () {
+        String list = "Alabama|Alaska|Arizona|Arkansas|California|Colorado|Connecticut|Delaware|District Of Columbia|Florida|Georgia|Hawaii|Idaho|Illinois|Indiana|Iowa|Kansas|Kentucky|Louisiana|Maine|Maryland|Massachusetts|Michigan|Minnesota|Mississippi|Missouri|Montana|Nebraska|Nevada|New Hampshire|New Jersey|New Mexico|New York|North Carolina|North Dakota|Ohio|Oklahoma|Oregon|PALAU|Pennsylvania|PUERTO RICO|Rhode Island|South Carolina|South Dakota|Tennessee|Texas|Utah|Vermont|Virginia|Washington|West Virginia|Wisconsin|Wyoming";
+	return (list);
+    }
+
+    private String getCountryList () {
+        String list = "Algeria|United States";
+        return (list);
     }
 
     public Model    getUserModel () {

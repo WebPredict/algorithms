@@ -27,6 +27,8 @@ public class Type {
     public static final Type EMAIL = new Type("email");
     public static final Type PHONE = new Type("phone");
     public static final Type ADDRESS = new Type("address");
+    public static final Type US_ADDRESS = new Type("usaddress");
+    public static final Type LOCATION = new Type("location"); // TODO support... should show on map with name?
     public static final Type IMAGE = new Type("image");
     public static final Type FILE = new Type("file");
     public static final Type URL = new Type("url");
@@ -39,11 +41,7 @@ public class Type {
     public static final Type CODE = new Type("code");
     public static final Type VIDEO = new Type("video");
     public static final Type DURATION = new Type("duration"); // TODO how to handle units?
-
     public static final Type COMPUTED = new Type("computed"); // means don't store in DB
-
-    public static final Type LOCATION = new Type("location"); // TODO support... should show on map with name?
-
 
     public boolean isPrimitive () {
         return (name.equals(Type.BOOLEAN.getName()) ||

@@ -941,6 +941,8 @@ public class RailsGen extends Generator {
         ArrayList<Model>  models = app.getModels();
         if (models != null) {
             for (Model model : models) {
+                if (model.isEmbedded())
+                    continue;
                 generateShowView(model);
                 generateListView(model);
                 generateEditView(model, true);
@@ -1007,6 +1009,15 @@ public class RailsGen extends Generator {
                 else if (fTypeName.equals(Type.IMAGE.getName())) {
                     generateReadOnlySection(bodyContent, "image_for(@" + nameFName + ")", fName);
                 }
+                else if (fTypeName.equals(Type.ADDRESS.getName())) {
+                    generateAddressSection(bodyContent, model, f);
+                }
+                else if (fTypeName.equals(Type.US_ADDRESS.getName())) {
+                    generateUSAddressSection(bodyContent, model, f);
+                }
+                else if (fTypeName.equals(Type.LOCATION.getName())) {
+                    generateLocationSection(bodyContent, model, f);
+                }
                 else if (fTypeName.equals(Type.DATETIME.getName())) {
                     generateReadOnlySection(bodyContent, "@" + nameFName + ".strftime(\"%m/%d/%Y %I:%M %P\") unless @" + nameFName + ".nil?", fName);
                 }
@@ -1020,10 +1031,10 @@ public class RailsGen extends Generator {
                 else if (fTypeName.equals(Type.CURRENCY.getName())) {
                     generateReadOnlySection(bodyContent, "number_to_currency(@" + nameFName + ", :unit => \"$\")", fName);
                 }
-                else if (fTypeName.equals(Type.ADDRESS.getName())) {
-
-                    generateReadOnlySection(bodyContent, "render_address(@" + nameFName + ") if @" + nameFName + "?", fName);
-                }
+//                else if (fTypeName.equals(Type.ADDRESS.getName())) {
+//
+//                    generateReadOnlySection(bodyContent, "render_address(@" + nameFName + ") if @" + nameFName + "?", fName);
+//                }
                 else if (fTypeName.equals(Type.URL.getName())) {
                     String content  = "        <a href=\"<%= render_website(@" + nameFName + ") %>\" target=\"_blank\"><%= @" + nameFName +" %></a>";
                     generateReadOnlySectionNoRuby(bodyContent, content, fName);
@@ -1150,6 +1161,42 @@ public class RailsGen extends Generator {
         StringUtils.addLine(bodyContent, "<dt>" + WordUtils.capitalizeAndSpace(fieldName) + "</dt><dd>");
         StringUtils.addLine(bodyContent, fieldDetails);
         StringUtils.addLine(bodyContent, "</dd>");
+    }
+
+    private void generateLocationSection (StringBuilder bodyContent, Model model, Field f) {
+        //Model addressModel = (Model)f.getTheType();
+
+        generateReadOnlySection(bodyContent, "@" + model.getName() + ".location_name", "location_name");
+        generateReadOnlySection(bodyContent, "@" + model.getName() + ".location_line1", "location_line1");
+        generateReadOnlySection(bodyContent, "@" + model.getName() + ".location_line2", "location_line2");
+        generateReadOnlySection(bodyContent, "@" + model.getName() + ".location_line3", "location_line3");
+        generateReadOnlySection(bodyContent, "@" + model.getName() + ".location_city", "location_city");
+        generateReadOnlySection(bodyContent, "@" + model.getName() + ".location_state", "location_state");
+        generateReadOnlySection(bodyContent, "@" + model.getName() + ".location_zip", "location_zip");
+        generateReadOnlySection(bodyContent, "@" + model.getName() + ".location_country", "location_country");
+    }
+
+    private void generateAddressSection (StringBuilder bodyContent, Model model, Field f) {
+        //Model addressModel = (Model)f.getTheType();
+
+        generateReadOnlySection(bodyContent, "@" + model.getName() + ".address_line1", "address_line1");
+        generateReadOnlySection(bodyContent, "@" + model.getName() + ".address_line2", "address_line2");
+        generateReadOnlySection(bodyContent, "@" + model.getName() + ".address_line3", "address_line3");
+        generateReadOnlySection(bodyContent, "@" + model.getName() + ".address_city", "address_city");
+        generateReadOnlySection(bodyContent, "@" + model.getName() + ".address_state", "address_state");
+        generateReadOnlySection(bodyContent, "@" + model.getName() + ".address_zip", "address_zip");
+        generateReadOnlySection(bodyContent, "@" + model.getName() + ".address_country", "address_country");
+    }
+
+    private void generateUSAddressSection (StringBuilder bodyContent, Model model, Field f) {
+        //Model addressModel = (Model)f.getTheType();
+
+        generateReadOnlySection(bodyContent, "@" + model.getName() + ".address_line1", "address_line1");
+        generateReadOnlySection(bodyContent, "@" + model.getName() + ".address_line2", "address_line2");
+        generateReadOnlySection(bodyContent, "@" + model.getName() + ".address_line3", "address_line3");
+        generateReadOnlySection(bodyContent, "@" + model.getName() + ".address_city", "address_city");
+        generateReadOnlySection(bodyContent, "@" + model.getName() + ".address_state", "address_state");
+        generateReadOnlySection(bodyContent, "@" + model.getName() + ".address_zip", "address_zip");
     }
 
     private void generateReadOnlyLinkSectionInForm (StringBuilder bodyContent, String fieldDisplayName, String fieldName, String linkPath, boolean addButton) {

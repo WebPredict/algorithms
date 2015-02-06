@@ -29,7 +29,7 @@ public class MiscUtilsTest {
 
     public static void main (String [] args) throws Exception {
 
-        ArrayUtils.generateCombinations(10, 3);
+        //ArrayUtils.generateCombinations(10, 3);
 
         int distance = SequenceUtils.levenshteinDistance("this", "thing");
 

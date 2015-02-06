@@ -28,14 +28,16 @@ public class DBGen extends RailsGenBase {
         ArrayList<Model> models = app.getModels();
         if (models != null) {
             for (Model model : models) {
-                String name = model.getName();
+                if (model.isEmbedded())
+                    continue;
+                String              name = model.getName();
                 ArrayList<Field>    fields = model.getFields();
                 ArrayList<Rel>      rels = model.getRelationships();
 
-                StringBuilder buf = new StringBuilder();
+                StringBuilder       buf = new StringBuilder();
 
-                String upperPluralName = WordUtils.pluralize(WordUtils.capitalize(name));
-                String className = "Create" + upperPluralName;
+                String              upperPluralName = WordUtils.pluralize(WordUtils.capitalize(name));
+                String              className = "Create" + upperPluralName;
                 StringUtils.addLine(buf, "class " + className + " < ActiveRecord::Migration");
 
                 tabbed(buf, "def change");
@@ -46,6 +48,17 @@ public class DBGen extends RailsGenBase {
                         if (field.isComputed() || field.getName().equals("created_at") || field.getName().equals("updated_at"))
                             continue;
 
+                        if (field.getTheType() instanceof Model) {
+                            Model mType = (Model)field.getTheType();
+                            if (mType.isEmbedded()) {
+
+                                ArrayList<Field> typeFields = mType.getFields();
+                                for (Field typeField : typeFields) {
+                                    tabbed(buf, "t." + getRailsType(typeField.getTheType()) + " :" + mType.getName() + "_" + field.getName(), 3);
+                                }
+                                continue;
+                            }
+                        }
                         tabbed(buf, "t." + getRailsType(field.getTheType()) + " :" + field.getName(), 3);
                     }
                 }

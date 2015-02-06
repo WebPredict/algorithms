@@ -21,24 +21,88 @@ public class ModelsGen extends RailsGenBase {
         super(app);
     }
 
+    public void generateEmbeddedModel (Model model) throws Exception {
+        ArrayList<Field>    fields = model.getFields();
+
+        StringBuilder buf = new StringBuilder();
+        String              capName = model.getCapName();
+        StringUtils.addLine(buf, "class " + capName);
+        String              attrs = "attr_reader ";
+        String              paramList = "";
+        String              atParamList = "";
+        String              otherLine = "";
+
+        ArrayList<Field> computedFields = new ArrayList<Field>();
+
+        if (fields != null) {
+            for (int i = 0; i < fields.size(); i++) {
+                Field f = fields.get(i);
+                attrs += ":" + f.getName();
+                paramList += f.getName();
+                atParamList += "@" + f.getName();
+                otherLine += f.getName() + " == other_" + model.getName() + "." + f.getName();
+
+                if (f.isComputed())
+                    computedFields.add(f);
+
+                if (i < fields.size() - 1) {
+                    attrs += ", ";
+                    paramList += ", ";
+                    atParamList += ", ";
+                    otherLine += " && ";
+                }
+            }
+        }
+
+        addMethod(buf, "initialize(" + paramList + ")", new String[] {atParamList + " = " + paramList});
+        addMethod(buf, "==(other_" + model.getName() + ")", new String[] {otherLine});
+    }
+
     public void generateModels () throws Exception {
         ArrayList<Model> models = app.getModels();
         if (models != null) {
             for (Model model : models) {
-                String name = model.getName();
+
+                if (model.isEmbedded()) {
+                    generateEmbeddedModel(model);
+                    continue;
+                }
+
+                String              name = model.getName();
                 String              capName = model.getCapName();
                 ArrayList<Field>    fields = model.getFields();
                 ArrayList<Rel>      rels = model.getRelationships();
 
-                StringBuilder buf = new StringBuilder();
+                StringBuilder       buf = new StringBuilder();
                 StringUtils.addLine(buf, "class " + capName + " < ActiveRecord::Base");
-                String attrs = "attr_accessible ";
+                String              attrs = "attr_accessible ";
 
+                //composed_of :address, :mapping => [%w(address_city city), %w(address_county county)]
+                ArrayList<String> composedOfs = new ArrayList<String>();
                 ArrayList<Field> computedFields = new ArrayList<Field>();
 
                 if (fields != null) {
                     for (int i = 0; i < fields.size(); i++) {
                         Field f = fields.get(i);
+
+                        if (f.getTheType() instanceof Model) {
+                            Model mType = (Model)f.getTheType();
+                            if (mType.isEmbedded()) {
+
+                                String composedOf = "composed_of :" + mType.getName() + ", mapping => [";
+
+                                ArrayList<Field> composedFields = mType.getFields();
+
+                                for (int j = 0; j < composedFields.size(); j++) {
+                                    Field composedF = composedFields.get(j);
+                                    composedOf += "%w(" + mType.getName() + "_" + composedF.getName() + " " + composedF.getName() + ")";
+                                    if (j < composedFields.size() - 1)
+                                        composedOf += ", ";
+                                }
+                                composedOf += "]";
+                                composedOfs.add(composedOf);
+                            }
+                        }
                         attrs += ":" + f.getName();
 
                         if (f.isComputed())
@@ -68,6 +132,10 @@ public class ModelsGen extends RailsGenBase {
                 if (model.isSecure()) {
                     tabbed(buf, "attr_accessor :remember_token");
                     tabbed(buf, "has_secure_password");
+                }
+
+                for (String composed : composedOfs) {
+                    tabbed(buf, composed);
                 }
 
                 if (rels != null) {

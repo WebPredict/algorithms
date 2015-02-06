@@ -23,8 +23,25 @@ public class Model extends Type {
     private boolean email;
     private boolean URL;
     private boolean dependent;
+    private boolean embedded;
     private String  userIndentifierFieldName = "name";
     private Model parentModel;
+
+    public boolean isEmail() {
+        return email;
+    }
+
+    public void setEmail(boolean email) {
+        this.email = email;
+    }
+
+    public boolean isEmbedded() {
+        return embedded;
+    }
+
+    public void setEmbedded(boolean embedded) {
+        this.embedded = embedded;
+    }
 
     public Model getParentModel() {
         return parentModel;
