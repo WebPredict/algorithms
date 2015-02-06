@@ -124,7 +124,6 @@ public class RailsGen extends Generator {
     	StringUtils.addLine (buf, "end");
 
         FileUtils.write(buf, app.getWebAppDir() + "/app/mailers/" + userModelName + "_mailer.html.erb", true);
-
     }
 
     public void generateImageUploaders () throws Exception {
@@ -143,19 +142,6 @@ public class RailsGen extends Generator {
     }
 
     public void generateSharedPages () throws Exception {
-        /**
-         * <% if @user.errors.any? %>
-         <div id="error_explanation">
-         <div class="alert alert-danger">
-         The form contains <%= pluralize(@user.errors.count, "error") %>.
-         </div>
-         <ul                                                      <% @user.errors.full_messages.each do |msg| %>
-         <li><%= msg %></li>
-         <% end %>
-         </ul>
-         </div>
-         <% end %>
-         */
         StringBuilder buf = new StringBuilder();
         HTMLUtils.addRuby(buf, "if object.errors.any?");
         HTMLUtils.addDivId(buf, "error_explanation");
@@ -345,17 +331,6 @@ public class RailsGen extends Generator {
             //HTMLUtils.addH3(buf, userModel.getCapName() + " Dashboard for <%= current_" +userModel.getName() + "." + userModel.getUserIndentifierFieldName() +" %>");
 
             boolean topLevelModelsInTabs = true; // TODO
-            
-            // Not sure about this approach:
-//            if (topLevelModelsInTabs) {
-//            	HTMLUtils.addRubyOutput(buf, "tabs_tag do |tab|");
-//            	for (Model model : app.getTopLevelModels()) {
-//            		HTMLUtils.addRubyOutput(buf, "tab." + model.getName() + "' " +
-//            				model.getCapName() + "', " + model.getPluralName() + "_path");
-//            	}
-//            	HTMLUtils.addRuby(buf, "end");
-//            }
-
 
             if (topLevelModelsInTabs) {
                 div(buf, "container");
@@ -404,63 +379,7 @@ public class RailsGen extends Generator {
                  */
                 closeDiv(buf);
             }
-            
-            
-            
-            /**
-             * <div class="container">
 
-             <!-- Nav tabs -->
-             <ul class="nav nav-tabs" role="tablist">
-             <li class="active">
-             <a href="#home" role="tab" data-toggle="tab"><icon class="fa fa-home"></icon> Home</a>
-             </li>
-             <li><a href="#profile" role="tab" data-toggle="tab">
-             <i class="fa fa-user"></i> Profile
-             </a>
-             </li>
-             <li>
-             <a href="#messages" role="tab" data-toggle="tab">
-             <i class="fa fa-envelope"></i> Messages
-             </a>
-             </li>
-             <li>
-             <a href="#settings" role="tab" data-toggle="tab">
-             <i class="fa fa-cog"></i> Settings
-             </a>
-             </li>
-             </ul>
-
-             <!-- Tab panes -->
-             <div class="tab-content">
-             <div class="tab-pane fade active in" id="home">
-             <h3>User Dashboard for <%= current_user.username %></h3>
-             <img src="http://lorempixel.com/400/400/cats/1" alt="Cats"/>
-             </div>
-             <div class="tab-pane fade" id="profile">
-             <h2>Profile Content Goes Here</h2>
-             <img src="http://lorempixel.com/400/400/cats/2" alt="Cats"/>
-             </div>
-             <div class="tab-pane fade" id="messages">
-             <h2>Messages Content Goes Here</h2>
-             <img src="http://lorempixel.com/400/400/cats/3" alt="Cats"/>
-             </div>
-             <div class="tab-pane fade" id="settings">
-             <h2>Settings Content Goes Here</h2>
-             <img src="http://lorempixel.com/400/400/cats/4" alt="Cats"/>
-             </div>
-             </div>
-
-             </div>
-
-             */
-            /**
-             * <%= tabs_tag do |tab| %>
-  <%= tab.home      'Homepage', root_path %>
-  <%= tab.dashboard 'Dashboard', dashboard_path %>
-  <%= tab.account   'Account', account_path %>
-<% end %>
-             */
             // TODO: generate default logged in view here
             // if it's a user, display all user properties I guess
             // display all top level models in the side menu, and/or the top menu in the header
@@ -628,7 +547,6 @@ public class RailsGen extends Generator {
             StringUtils.addLine(buf, "</td>");
             HTMLUtils.addRuby(buf, "end");
             StringUtils.addLine(buf, "</tr>");
-
         }
     }
 
@@ -697,18 +615,6 @@ public class RailsGen extends Generator {
     }
 
     private void generateDateField (StringBuilder buf, String fieldName, String modelName) {
-        /**
-         * <div class="col-sm-8">
-         <%= f.text_field(:dob, value: (@user.dob.blank? ? '' : @user.dob.strftime('%m/%d/%Y')), class: "form-control datepicker")  %>
-         </div>
-         <script type="text/javascript">
-         $(document).ready(function() {
-         $('.datepicker').datepicker({format: 'mm/dd/yyyy'});
-         });
-         </script>
-
-         */
-
         div(buf, "form-group");
 
         int width = 8; // TODO get rid of this
@@ -886,10 +792,7 @@ public class RailsGen extends Generator {
         }
 
         insertTabbedIfNotThere(routeLines, "resources :sessions, only: [:new, :create, :destroy]", index++);
-
-        //StringUtils.addLineBreak(buf);
         insertTabbedIfNotThere(routeLines, "root to: 'static_pages#home'", index++);
-        //StringUtils.addLineBreak(buf);
 
         for (StaticPage page : app.getStaticPages()) {
             String pageName = page.getName();
@@ -956,6 +859,55 @@ public class RailsGen extends Generator {
             overrideStyles(varToColorMap);
 
         }
+        else if (app.getMapColorScheme() != null) {
+            MapColorScheme scheme = app.getMapColorScheme();
+
+            HashMap<String, String> itemsToColorMap = scheme.getItemsToColorsMap();
+            HashMap<String, String> varToColorMap = new HashMap<String, String>();
+
+            String jumbo = itemsToColorMap.get("jumbo");
+            String bodybg = itemsToColorMap.get("bodyby");
+            String textcolor = itemsToColorMap.get("text");
+            String linkcolor = itemsToColorMap.get("link");
+            String btnbg = itemsToColorMap.get("btnbg");
+            String btnfg = itemsToColorMap.get("btnfg");
+            String brand = itemsToColorMap.get("brand");
+            String nav = itemsToColorMap.get("nav");
+            String header = itemsToColorMap.get("header");
+            String footer = itemsToColorMap.get("footer");
+
+            if (jumbo != null)
+                varToColorMap.put("jumbotron-color", jumbo);
+
+            if (jumbo != null)
+                varToColorMap.put("jumbotron-heading-color", jumbo);
+
+            if (bodybg != null)
+                varToColorMap.put("body-bg", bodybg);
+
+            if (textcolor != null)
+                varToColorMap.put("text-color", textcolor);
+
+            if (linkcolor != null)
+                varToColorMap.put("link-color", linkcolor);
+
+            if (btnbg != null)
+                varToColorMap.put("btn-default-bg", btnbg);
+
+            if (btnfg == null || !btnbg.equals("FFFFFF"))
+                varToColorMap.put("btn-default-color", "FFFFFF"); // TODO better logic here for contrasting button text color
+
+            if (brand != null) {
+                varToColorMap.put("brand-primary", brand);
+                varToColorMap.put("brand-info", brand);
+            }
+
+            if (nav != null)
+                varToColorMap.put("navbar-inverse-bg", nav);
+
+            // TODO: buttons, tables, forms, header, footer
+            overrideStyles(varToColorMap);
+        }
         // TODO: not sure we need to do this if running with --without production:
         //String 	railsCmd = app.isWindows() ? "C:/RailsInstaller/Ruby2.1.0/bin/rake.bat" : "rake";
 
@@ -963,12 +915,10 @@ public class RailsGen extends Generator {
     }
 
     public void addStyle (String [] styleInfo) throws Exception {
-        //FileUtils.append(app.getWebAppDir() + "/app/assets/stylesheets/bootstrap_and_overrides.css.less", styleInfo);
         FileUtils.insertInFileIfNotExists(app.getWebAppDir() + "/app/assets/stylesheets/custom.css.scss", styleInfo);
     }
 
     public void overrideStyles (HashMap<String, String> varToColorMap) throws Exception {
-        //FileUtils.append(app.getWebAppDir() + "/app/assets/stylesheets/bootstrap_and_overrides.css.less", styleInfo);
         String [] lines = new String[varToColorMap.size()];
         int index = 0;
         Set<String> keys = varToColorMap.keySet();
@@ -1054,18 +1004,13 @@ public class RailsGen extends Generator {
                         generateSublistViewReadonly(bodyContent, name, fName);
                     }
                 }
-//                else if (fName.equals("name")) {
-//                    HTMLUtils.addH3(bodyContent, "<%= @" + nameFName + " %>");
-//                }
                 else if (fTypeName.equals(Type.IMAGE.getName())) {
                     generateReadOnlySection(bodyContent, "image_for(@" + nameFName + ")", fName);
                 }
                 else if (fTypeName.equals(Type.DATETIME.getName())) {
-                    //  @user.dob.strftime("%m/%d/%Y") unless @user.dob.nil?
                     generateReadOnlySection(bodyContent, "@" + nameFName + ".strftime(\"%m/%d/%Y %I:%M %P\") unless @" + nameFName + ".nil?", fName);
                 }
                 else if (fTypeName.equals(Type.DATE.getName())) {
-                    //  @user.dob.strftime("%m/%d/%Y") unless @user.dob.nil?
                     generateReadOnlySection(bodyContent, "@" + nameFName + ".strftime(\"%m/%d/%Y\") unless @" + nameFName + ".nil?", fName);
                 }
                 else if (fTypeName.equals(Type.CODE.getName())) {
@@ -1080,10 +1025,8 @@ public class RailsGen extends Generator {
                     generateReadOnlySection(bodyContent, "render_address(@" + nameFName + ") if @" + nameFName + "?", fName);
                 }
                 else if (fTypeName.equals(Type.URL.getName())) {
-                    //StringUtils.addLine(bodyContent, "<% if @" + nameFName + "!= nil %>");
                     String content  = "        <a href=\"<%= render_website(@" + nameFName + ") %>\" target=\"_blank\"><%= @" + nameFName +" %></a>";
                     generateReadOnlySectionNoRuby(bodyContent, content, fName);
-                    //StringUtils.addLine(bodyContent, "<% end %>");
                 }
                 else if (fTypeName.equals(Type.BOOLEAN.getName())) {
                     generateReadOnlySection(bodyContent, "yesno(@" + nameFName + ")", fName);
@@ -1114,16 +1057,6 @@ public class RailsGen extends Generator {
                 String relNameDisplayName = nameFName + "." + rel.getModel().getUserIndentifierFieldName();
                 switch (rt) {
                     case ONE_TO_ONE:
-                        //generateReadOnlySection(bodyContent, "@" + nameFName, fName);
-                        //fieldDisplayName, String fieldName, String linkPath
-                        /**
-                         * <% if @blog.user != nil %>
-                         <%= link_to @blog.user.username, user_path(@blog.user) %>
-                         <% else %>
-                         None
-                         <% end %>
-
-                         */
                         generateReadOnlyLinkSection(bodyContent, WordUtils.capitalizeAndSpace(rel.getModel().getName()), relNameDisplayName, nameFName, fName + "_path");
                         break;
 
@@ -1238,22 +1171,12 @@ public class RailsGen extends Generator {
 
     private void generateReadOnlyLinkSection (StringBuilder bodyContent, String fieldDisplayValue, String fieldDisplayName, String fieldName, String linkPath) {
         StringUtils.addLine(bodyContent, "<dt>" + fieldDisplayValue + "</dt><dd>");
-        /**
-         * <% if @blog.user != nil %>
-         <%= link_to @blog.user.username, user_path(@blog.user) %>
-         <% else %>
-         None
-         <% end %>
-
-         */
         HTMLUtils.addRuby(bodyContent, "if @" + fieldName + " != nil");
-        //"Breeder Profile", breeder_path(@listing.breeder),
         StringUtils.addLine(bodyContent, "<%= link_to @" + fieldDisplayName + ", " + linkPath + "(@" + fieldName + ") %>");
         HTMLUtils.addRuby(bodyContent, "else");
         StringUtils.addLine(bodyContent, "None");
         HTMLUtils.addRuby(bodyContent, "end");
         StringUtils.addLine(bodyContent, "</dd>");
-        //StringUtils.addLine(bodyContent, "</dd>");
     }
 
     private void generateSublistViewReadonly (StringBuilder builder, String modelName, String collectionName) throws Exception {
@@ -1278,7 +1201,6 @@ public class RailsGen extends Generator {
         StringUtils.addLine(builder, "</dd>");
     }
 
-    //generateTableFor(builder, relModel, fullCollectionName, false, true);
 
     private void generateSublistView (StringBuilder builder, String modelName, String collectionName, boolean addAddBtn, String additionalParams, Model relModel) throws Exception {
         String pluralColName = WordUtils.pluralize(collectionName);
@@ -1286,8 +1208,6 @@ public class RailsGen extends Generator {
         div(builder, "col-sm-8");
         String fullCollectionName = modelName + "." + pluralColName;
         //StringUtils.addLine(builder, "<% if @" + collectionName + ".any? %>");
-
-        //tabbed(builder, "<%= render @" + modelName + "." + pluralColName + " %>");
 
         generateTableFor(builder, relModel, fullCollectionName, false, true, true);
 
@@ -1432,7 +1352,6 @@ public class RailsGen extends Generator {
                      div(bodyContent, "col-sm-8");
                      rubyout(bodyContent, "image_for(@" + name + "." + fName + ")");
                      div(bodyContent, "fileUpload btn");
-                     //aline(bodyContent, "<span>Change Image</span>");
                      rubyout(bodyContent, "f.file_field :" + fName + ", :class => \"upload\"");
                      closeDiv(bodyContent);
                      closeDiv(bodyContent);
@@ -1451,7 +1370,7 @@ public class RailsGen extends Generator {
                      generateRangeFields(bodyContent, fName, fType.getSubtype());
                  }
                  else if (fType.equals(Type.CURRENCY)) {
-                     generateCurrencyField(bodyContent, fName);   // TODO: currency symbol?
+                     generateCurrencyField(bodyContent, fName);
                  }
                  else if (fType instanceof FixedList) {
 
@@ -1462,11 +1381,7 @@ public class RailsGen extends Generator {
                      HTMLUtils.addRubyOutput(bodyContent, "f.label(:" + fName + ", class: \"col-sm-2 control-label\") ");
                      div(bodyContent, "col-sm-8");
 
-                     // <%= f.select(:gender, ["male", "female"], class: "form-control") %>
-                     //StringUtils.addLine(bodyContent, "<select name=\"" + name + "[" + fName + "]\" id=\"" + name + "_" + fName + "\" class=\"form-control\">");
                      StringUtils.addLine(bodyContent, "<%= f.select :" + fName + ", [");
-//                     StringUtils.addLine(bodyContent, "<select name=\"" + name + "[" + fName + "]\" id=\"" + name + "_" + fName + "\" class=\"form-control\">");
-//                     StringUtils.addLine(bodyContent, "<%= options_for_select ([");
 
                      if (values != null) {
                          for (int i = 0; i < values.length; i++) {
@@ -1474,8 +1389,6 @@ public class RailsGen extends Generator {
                          }
                      }
                      StringUtils.addLine(bodyContent, "], :class => \"form-control\" %>");
-                     //StringUtils.addLine(bodyContent, "]) %>"); //  TODO: fix this , selected: @" + name + "." + fName + ") %>");
-                     //HTMLUtils.close(bodyContent, "select");
                      closeDiv(bodyContent);
                      closeDiv(bodyContent);
                  }
@@ -1782,20 +1695,7 @@ public class RailsGen extends Generator {
         // Heroku stuff:
         addGemToGroup(gemfileLines, "production", "pg", "0.17.1", false);
         addGemToGroup(gemfileLines, "production", "rails_12factor", "0.0.2", false);
-        //addGemToGroup(gemfileLines, "assets", "bootstrap-datepicker-rails", null, false);
         addGemToGroup(gemfileLines, "assets", "jquery-ui-rails", "4.2.1", false);
-
-        /**
-         * group :assets do
-         gem 'jquery-ui-rails'
-         end
-         */
-//         FileUtils.insertAfterOrAtEnd(gemfileLines, new String[] {"group :production do"},
-//                new String[] {"gem 'pg',     '0.17.1'", "gem 'rails_12factor',      '0.0.2'"}, true, true);
-
-
-//        boolean didIt = FileUtils.insertAfter(gemfileLines, new String[] {"group :assets do"},
-//                new String[] {"  gem 'sass-rails', '~> 3.2.3'"}, true, true);
 
         // if using AWS for images:
         if (app.hasImages()) {
@@ -1822,9 +1722,6 @@ public class RailsGen extends Generator {
         String 	railsCmd = app.isWindows() ? "C:/RailsInstaller/Ruby2.1.0/bin/bundle.bat" : "bundle";
 
         runCommandInApp(railsCmd + " install --without production");
-        
-        //String result = runCommand(app.getRootDir(), "bundle", "install", "-without", "production");
-    	//System.out.println(result);
     }
 
     private String  getRailsCommand () {
@@ -1839,7 +1736,6 @@ public class RailsGen extends Generator {
     	
     	System.out.println(result);
     }
-
 
     public void generateDeploymentScript () throws Exception {
     	

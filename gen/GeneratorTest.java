@@ -136,8 +136,10 @@ public class GeneratorTest {
         app.setNeedsAuth(true);
 
         app.setModels(models);
-        app.getAppConfig().setColor1("blue");
-        app.getAppConfig().setColor2("white");
+//        app.getAppConfig().setColor1("blue");
+//        app.getAppConfig().setColor2("white");
+//
+        app.parseColorScheme("menu: black, jumbo: grey, buttons: grey, links: blue, bodybg: white, header: grey");
         app.setJumbotronImage("http://daryndajones.com/wp-content/uploads/2012/02/to-do-list.jpg");
 
         app.setTopLevelModels("todo");

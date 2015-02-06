@@ -5,6 +5,7 @@ import alg.words.WordUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.StringTokenizer;
 
 /**
  * Created with IntelliJ IDEA.
@@ -46,6 +47,15 @@ public class App {
     private boolean fullWidthJumbotron = true;
 
     private ColorScheme colorScheme;
+    private MapColorScheme mapColorScheme;
+
+    public MapColorScheme getMapColorScheme() {
+        return mapColorScheme;
+    }
+
+    public void setMapColorScheme(MapColorScheme mapColorScheme) {
+        this.mapColorScheme = mapColorScheme;
+    }
 
     public boolean isFullWidthJumbotron() {
         return fullWidthJumbotron;
@@ -115,6 +125,16 @@ public class App {
 
     public String getJumbotronImage() {
         return jumbotronImage;
+    }
+
+    public void parseColorScheme (String scheme) {
+        String [] maps = scheme.split(",");
+        HashMap<String, String> itemsToColorsMap = new HashMap<String, String>();
+        for (String map : maps) {
+            String [] mapElements = map.split(":");
+            itemsToColorsMap.put(mapElements [0].trim(), mapElements[1].trim());
+        }
+        mapColorScheme = new MapColorScheme(itemsToColorsMap);
     }
 
     public void setJumbotronImage(String jumbotronImage) {
