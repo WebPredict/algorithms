@@ -181,7 +181,7 @@ public class GeneratorTest {
                 "user: dob date, work_hours range(time), username required, email required, password, tagline string, employed duration, premium boolean, " +
                         "has_many items, has_one home, owns_many blogs, avatar image, phone, address, website url, gender fixed_list(male|female), likes set(string)",
                 "item: name required, description long_string, value currency, file file",
-                "home: name required, address, age int, acreage float, home_phone phone, volume computed",
+                "home: name required, location, age int, acreage float, home_phone phone, volume computed",
                 "blog: name required, video video, code_area code, theme list"});
 
         app.setSearch(true);

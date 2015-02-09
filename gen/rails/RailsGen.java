@@ -989,8 +989,8 @@ public class RailsGen extends Generator {
                 if (fName.startsWith("password") || f.isAdminOnly())
                     continue;
 
-                if (model.isDependent()) {
-                    if (fName.equals("updated_by") || fName.equals("created_by") || fName.equals("updated_at") || fName.equals("created_at"))
+                if (model.isDependent() || model.isEmbedded()) {
+                    if (f.isAuditField())
                         continue;
                 }
                 // TODO: range generation

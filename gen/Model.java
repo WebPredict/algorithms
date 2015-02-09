@@ -135,6 +135,12 @@ public class Model extends Type {
             else if (f.getTheType().getName().equals("address")) {
                 app.setNeedsAddressModel(true);
             }
+            else if (f.getTheType().getName().equals("usaddress")) {
+                app.setNeedsUSAddressModel(true);
+            }
+            else if (f.getTheType().getName().equals("location")) {
+                app.setNeedsLocationModel(true);
+            }
         }
         if (secure && !sawPWConf) {
              fields.add(new Field("password_confirmation", Type.PASSWORD));
@@ -142,11 +148,11 @@ public class Model extends Type {
         if (secure && !sawAdmin) {
             fields.add(new Field("admin", Type.BOOLEAN, false, true));
         }
-        if (!sawDisabled) {
+        if (!sawDisabled && !embedded) {
             fields.add(new Field("disabled", Type.BOOLEAN, false, true));
         }
 
-        if (app.getAppConfig().isIncludeCreatedUpdatedBy()) {
+        if (!embedded && app.getAppConfig().isIncludeCreatedUpdatedBy()) {
             fields.add(new Field("created_by", Type.SHORT_STRING, true, false));
             fields.add(new Field("created_at", Type.DATETIME, true, false));
             fields.add(new Field("updated_by", Type.SHORT_STRING, true, false));
@@ -159,6 +165,19 @@ public class Model extends Type {
 
     public List<String> resolveReferences (App app) {
 
+        if (fields != null) {
+            for (Field f : fields) {
+                if (f.getTheType().getName().equals("address")) {
+                    f.setTheType(app.getAddressType());
+                }
+                else if (f.getTheType().getName().equals("usaddress")) {
+                    f.setTheType(app.getUsAddressType());
+                }
+                else if (f.getTheType().getName().equals("location")) {
+                    f.setTheType(app.getLocationType());
+                }
+            }
+        }
         // TODO: the relationships need to become fields
         ArrayList<String> errors = new ArrayList<String>();
         if (relationships != null) {

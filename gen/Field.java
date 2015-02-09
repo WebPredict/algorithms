@@ -19,6 +19,10 @@ public class Field {
     private boolean readOnly;
     private boolean adminOnly;
 
+    public boolean isAuditField () {
+        return (name.equals("created_at") || name.equals("updated_at") || name.equals("created_by") || name.equals("updated_by"));
+    }
+
     public boolean isComputed() {
         return theType.isComputed();
     }

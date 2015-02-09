@@ -54,8 +54,11 @@ public class ModelsGen extends RailsGenBase {
             }
         }
 
+        tabbed(buf, attrs);
         addMethod(buf, "initialize(" + paramList + ")", new String[] {atParamList + " = " + paramList});
         addMethod(buf, "==(other_" + model.getName() + ")", new String[] {otherLine});
+        StringUtils.addLine(buf, "end");
+        FileUtils.write(buf, app.getWebAppDir() + "/app/models/" + capName + ".rb", true);
     }
 
     public void generateModels () throws Exception {
@@ -93,11 +96,19 @@ public class ModelsGen extends RailsGenBase {
 
                                 ArrayList<Field> composedFields = mType.getFields();
 
+                                boolean started = false;
                                 for (int j = 0; j < composedFields.size(); j++) {
                                     Field composedF = composedFields.get(j);
-                                    composedOf += "%w(" + mType.getName() + "_" + composedF.getName() + " " + composedF.getName() + ")";
-                                    if (j < composedFields.size() - 1)
+                                    if (composedF.isAuditField())
+                                        continue;
+                                    if (started)
                                         composedOf += ", ";
+                                    else
+                                        started = true;
+                                    // Need to avoid other potential field name clashes here:
+                                    String thisName = composedF.getName().equals("name") ? mType.getName() + "_" + composedF.getName() : composedF.getName();
+                                    composedOf += "%w(" + mType.getName() + "_" + composedF.getName() + " " + thisName + ")";
+
                                 }
                                 composedOf += "]";
                                 composedOfs.add(composedOf);

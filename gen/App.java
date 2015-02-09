@@ -23,6 +23,9 @@ public class App {
     private boolean needsAddressModel = false;
     private boolean needsUSAddressModel = false;
     private boolean needsLocationModel = false;
+    private Model addressType;
+    private Model locationType;
+    private Model usAddressType;
     private String name;
     private ArrayList<Model> models = new ArrayList<Model>();
     private ArrayList<Model> topLevelModels = new ArrayList<Model>();
@@ -50,6 +53,30 @@ public class App {
 
     private ColorScheme colorScheme;
     private MapColorScheme mapColorScheme;
+
+    public Model getAddressType() {
+        return addressType;
+    }
+
+    public void setAddressType(Model addressType) {
+        this.addressType = addressType;
+    }
+
+    public Model getLocationType() {
+        return locationType;
+    }
+
+    public void setLocationType(Model locationType) {
+        this.locationType = locationType;
+    }
+
+    public Model getUsAddressType() {
+        return usAddressType;
+    }
+
+    public void setUsAddressType(Model usAddressType) {
+        this.usAddressType = usAddressType;
+    }
 
     public MapColorScheme getMapColorScheme() {
         return mapColorScheme;
@@ -183,6 +210,22 @@ public class App {
         this.generatePlaceholderText = generatePlaceholderText;
     }
 
+    public boolean isNeedsUSAddressModel() {
+        return needsUSAddressModel;
+    }
+
+    public void setNeedsUSAddressModel(boolean needsUSAddressModel) {
+        this.needsUSAddressModel = needsUSAddressModel;
+    }
+
+    public boolean isNeedsLocationModel() {
+        return needsLocationModel;
+    }
+
+    public void setNeedsLocationModel(boolean needsLocationModel) {
+        this.needsLocationModel = needsLocationModel;
+    }
+
     public boolean isNeedsAddressModel() {
         return needsAddressModel;
     }
@@ -263,57 +306,61 @@ public class App {
                 errors.addAll(modelErrors);
         }
 
-        for (Model model : models) {
-            List<String> modelErrors = model.resolveReferences(this);
-            if (modelErrors != null)
-                errors.addAll(modelErrors);
-        }
-
         if (errors.isEmpty()) {
             if (needsAddressModel) {
-                Model addressModel = Model.parseModel("address: line1, line2, line3, city, state:fixed_list(" + getStateList() + "), zip, country:fixed_list(" + getCountryList() + ")");
+                Model addressModel = Model.parseModel("address: line1, line2, line3, city, state fixed_list(" + getStateList() + "), zip, country fixed_list(" + getCountryList() + ")");
                 //addressModel.setDependent(true);
                 addressModel.setEmbedded(true);
                 List<String> addressModelErrors =  addressModel.doPreprocessing(this);
                 if (addressModelErrors != null)
                     errors.addAll(addressModelErrors);
+                setAddressType(addressModel);
                 nameToModelMap.put(addressModel.getName(), addressModel);
                 models.add(addressModel);
             }
             else if (needsUSAddressModel) {
-                Model addressModel = Model.parseModel("address: line1, line2, line3, city, state:fixed_list(" + getStateList() + "), zip");
+                Model addressModel = Model.parseModel("address: line1, line2, line3, city, state fixed_list(" + getStateList() + "), zip");
                 //addressModel.setDependent(true);
                 addressModel.setEmbedded(true);
                 List<String> addressModelErrors =  addressModel.doPreprocessing(this);
                 if (addressModelErrors != null)
                     errors.addAll(addressModelErrors);
+                setUsAddressType(addressModel);
                 nameToModelMap.put(addressModel.getName(), addressModel);
                 models.add(addressModel);
             }
 
             if (needsLocationModel) {
-                Model locationModel = Model.parseModel("location: name, line1, line2, line3, city, state:fixed_list(" + getStateList() + "), zip, country:fixed_list(" +
+                Model locationModel = Model.parseModel("location: name, line1, line2, line3, city, state fixed_list(" + getStateList() + "), zip, country fixed_list(" +
                         getCountryList() + ")");
                 //addressModel.setDependent(true);
                 locationModel.setEmbedded(true);
                 List<String> locationModelErrors =  locationModel.doPreprocessing(this);
                 if (locationModelErrors != null)
                     errors.addAll(locationModelErrors);
+                setLocationType(locationModel);
                 nameToModelMap.put(locationModel.getName(), locationModel);
                 models.add(locationModel);
             }
 
         }
+
+        for (Model model : models) {
+            List<String> modelErrors = model.resolveReferences(this);
+            if (modelErrors != null)
+                errors.addAll(modelErrors);
+        }
+
         return (errors);
     }
 
     private String getStateList () {
-        String list = "Alabama|Alaska|Arizona|Arkansas|California|Colorado|Connecticut|Delaware|District Of Columbia|Florida|Georgia|Hawaii|Idaho|Illinois|Indiana|Iowa|Kansas|Kentucky|Louisiana|Maine|Maryland|Massachusetts|Michigan|Minnesota|Mississippi|Missouri|Montana|Nebraska|Nevada|New Hampshire|New Jersey|New Mexico|New York|North Carolina|North Dakota|Ohio|Oklahoma|Oregon|PALAU|Pennsylvania|PUERTO RICO|Rhode Island|South Carolina|South Dakota|Tennessee|Texas|Utah|Vermont|Virginia|Washington|West Virginia|Wisconsin|Wyoming";
+        String list = "Alabama|Alaska|Arizona|Arkansas|California|Colorado|Connecticut|Delaware|DistrictOfColumbia|Florida|Georgia|Hawaii|Idaho|Illinois|Indiana|Iowa|Kansas|Kentucky|Louisiana|Maine|Maryland|Massachusetts|Michigan|Minnesota|Mississippi|Missouri|Montana|Nebraska|Nevada|NewHampshire|NewJersey|NewMexico|NewYork|NorthCarolina|NorthDakota|Ohio|Oklahoma|Oregon|Palau|Pennsylvania|PuertoRico|RhodeIsland|SouthCarolina|SouthDakota|Tennessee|Texas|Utah|Vermont|Virginia|Washington|WestVirginia|Wisconsin|Wyoming";
 	return (list);
     }
 
     private String getCountryList () {
-        String list = "Algeria|United States";
+        String list = "Algeria|UnitedStates";
         return (list);
     }
 
