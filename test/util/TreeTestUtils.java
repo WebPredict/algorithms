@@ -13,14 +13,14 @@ import java.util.Random;
  */
 public class TreeTestUtils {
 
-    public BinaryNode<Integer> createRandomIntTree (int depth, int start, int end) {
+    public static BinaryNode<Integer> createRandomBinaryIntTree (int depth, int start, int end) {
         if (depth == 0)
             return (null);
         int data = start + new Random().nextInt(end - start);
         BinaryNode<Integer> root = new BinaryNode<Integer>(data);
 
-        root.setLeft(createRandomIntTree(depth -1, 0, data));
-        root.setRight(createRandomIntTree(depth -1, data, end));
+        root.setLeft(createRandomBinaryIntTree(depth -1, start, data));
+        root.setRight(createRandomBinaryIntTree(depth -1, data, end));
         return (root);
     }
 }

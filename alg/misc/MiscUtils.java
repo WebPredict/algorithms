@@ -208,6 +208,43 @@ public class MiscUtils {
         return (first);
     }
 
+    public static LinkNode  mergeTwoSortedLists (LinkNode l1, LinkNode l2) {
+        if (l1 == null)
+            return (l2);
+        else if (l2 == null)
+            return (l1);
+
+        LinkNode nextL1 = l1;
+        LinkNode nextL2 = l2;
+
+        LinkNode ret;
+        if (l1.getValue().compareTo(l2.getValue()) <= 0) {
+            ret = l1;
+            nextL1 = l1.getNext();
+        }
+        else {
+            ret = l2;
+            nextL2 = l2.getNext();
+        }
+
+        LinkNode cur = ret;
+        while (nextL1 != null || nextL2 != null) {
+            if (nextL1 != null && (nextL2 == null || nextL1.getValue().compareTo(nextL2.getValue()) <= 0)) {
+                cur.setNext(nextL1);
+                nextL1 = nextL1.getNext();
+            }
+            else {
+                cur.setNext(nextL2);
+                if (nextL2 != null)
+                    nextL2 = nextL2.getNext();
+            }
+            cur = cur.getNext();
+        }
+
+        return (ret);
+    }
+
+
     /**
      * Returns length of list
      * @param root

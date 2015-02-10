@@ -42,7 +42,7 @@ public class BinaryNode<T extends Comparable> {
     }
 
     public String toString () {
-        return ("Left: " + left + " Right: " + right + " data: " + data);
+        return (data + " left->" + left + " right->" + right);
     }
 
     public void insert (BinaryNode<T> newNode) {

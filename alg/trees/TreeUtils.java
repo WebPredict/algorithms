@@ -313,10 +313,15 @@ public class TreeUtils {
     }
 
     @InterestingAlgorithm
-    public static void printTreeLineByLine (BinaryNode root, StringBuilder buf) {
+    public static List<List> levelOrder (BinaryNode root) {
+        if (root == null)
+            return (new ArrayList<List>());
 
         LinkedList<BinaryNode> currentLine = new LinkedList<BinaryNode>();
         currentLine.add(root);
+
+        List<List> ret = new ArrayList<List>();
+        ArrayList  currentRow = new ArrayList();
 
         LinkedList<BinaryNode> nextLine = new LinkedList<BinaryNode>();
         while (!currentLine.isEmpty()) {
@@ -331,14 +336,16 @@ public class TreeUtils {
                 if (next.getRight() != null)
                     nextLine.add(next.getRight());
 
-                buf.append(next.getData().toString());
+                currentRow.add(next.getData());
             }
-            buf.append("\n");
+            ret.add(currentRow);
+            currentRow = new ArrayList();
 
             currentLine = nextLine;
-
             nextLine = new LinkedList<BinaryNode>();
         }
+
+        return (ret);
     }
 
     public static void printTreeRec(TreeMap<Integer, TreeMap<Integer, String>> output, BinaryNode tree, int level, int pathOffset) {

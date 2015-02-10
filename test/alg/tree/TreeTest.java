@@ -1,7 +1,12 @@
 package test.alg.tree;
 
+import alg.misc.MiscUtils;
 import alg.trees.TreeUtils;
 import alg.util.BinaryNode;
+import alg.util.LinkNode;
+import test.util.TreeTestUtils;
+
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -13,6 +18,18 @@ import alg.util.BinaryNode;
 public class TreeTest {
 
     public static void main (String [] args) {
+
+        LinkNode first = new LinkNode<Integer>();
+        first.setValue(2);
+        LinkNode second = new LinkNode<Integer>();
+        second.setValue(1);
+
+        LinkNode merged = MiscUtils.mergeTwoSortedLists(first, second);
+
+        BinaryNode<Integer> integerBinaryNode = TreeTestUtils.createRandomBinaryIntTree(4, 0, 1000);
+
+        List<List> levelOrder = TreeUtils.levelOrder(new BinaryNode<Integer>(null));
+
 
         BinaryNode root = new BinaryNode(1);
 
