@@ -368,9 +368,9 @@ public class MathUtils {
      */
     @InterestingAlgorithm
     public static double [] quadraticSolve (double a, double b, double y) {
-        double first = -b + Math.sqrt(b * b - 4 * a * y) / 2d * a;
-        double second = -b - Math.sqrt(b * b - 4 * a * y) / 2d * a;
-        return (new double[] {a, b});
+        double first = (-b + Math.sqrt(b * b - 4 * a * y)) / (2d * a);
+        double second = (-b - Math.sqrt(b * b - 4 * a * y)) / (2d * a);
+        return (new double[] {first, second});
     }
 
     @InterestingAlgorithm
@@ -805,7 +805,7 @@ public class MathUtils {
         boolean negate = false;
         if (num < 0) {
             negate = true;
-            num =- num;
+            num = -num;
         }
         String ret = "";
         while (num > 0) {

@@ -95,7 +95,7 @@ public class SortUtils {
             left.addAll(list.subList(0, halfSize));
             mergeSort(left);
             List<T> right = new ArrayList<T>();
-            right.addAll(list.subList(halfSize, size - 1));
+            right.addAll(list.subList(halfSize, size));
             mergeSort(right);
 
             mergeSortedListsWithStorage(left, right, list);

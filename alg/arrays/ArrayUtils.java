@@ -102,11 +102,9 @@ public class ArrayUtils {
     public static void swapCols (int [][] grid, int fromIdx, int toIdx) {
 
         for (int i = 0; i < grid.length; i++) {
-            for (int j = 0; j < grid [0].length; j++) {
-                int tmp = grid [i][fromIdx];
-                grid[i][fromIdx] = grid[i][toIdx];
-                grid[i][toIdx] = tmp;
-            }
+            int tmp = grid [i][fromIdx];
+            grid[i][fromIdx] = grid[i][toIdx];
+            grid[i][toIdx] = tmp;
         }
     }
 
@@ -264,13 +262,19 @@ public class ArrayUtils {
         int array1Idx = 0;
         int array2Idx = 0;
         for (int i = 0; i < array1.length + array2.length; i++) {
-            if (array1Idx < array1.length) {
+            if (array1Idx < array1.length && array2Idx < array2.length) {
                 if (array1 [array1Idx].compareTo(array2 [array2Idx]) <= 0) {
                      ret [i] = array1[array1Idx++];
                 }
                 else {
                     ret [i] = array2[array2Idx++];
                 }
+            }
+            else if (array1Idx < array1.length) {
+                ret [i] = array1[array1Idx++];
+            }
+            else {
+                ret [i] = array2[array2Idx++];
             }
         }
         return (ret);

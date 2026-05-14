@@ -23,8 +23,8 @@ public class StringUtils {
         if (s == null)
             return (true);
 
-        for (int i = 0; i <= s.length() / 2; i++) {
-            if (s.charAt(i) != s.charAt(s.length() - i))
+        for (int i = 0; i < s.length() / 2; i++) {
+            if (s.charAt(i) != s.charAt(s.length() - 1 - i))
                 return (false);
         }
         return (true);
@@ -310,7 +310,7 @@ public class StringUtils {
         if (m == 0 || n == 0)
             return "";
 
-        else if (s1.charAt(m) == s2.charAt(m)) {
+        else if (s1.charAt(m) == s2.charAt(n)) {
             return (backtrack(longest, s1, s2, m - 1, n -1) + s1.charAt(m));
         }
         else {

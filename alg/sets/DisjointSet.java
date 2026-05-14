@@ -68,7 +68,7 @@ public class DisjointSet<T extends Comparable> {
 
         first.addAll(second);
         sets.remove(secondIdx);
-        return (false);
+        return (true);
     }
 
 }

@@ -86,11 +86,16 @@ public class Trie {
         Set<String> set = new HashSet<String>();
         if (prefix == null || prefix.length() == 0) {
 
+            if (charToChildrenMap.isEmpty()) {
+                set.add("");
+                return (set);
+            }
+
             Set<Character> keys = charToChildrenMap.keySet();
 
             for (Character key : keys) {
 
-                Set<String> moreWords = charToChildrenMap.get(key).wordsStartingWith(prefix.substring(1));
+                Set<String> moreWords = charToChildrenMap.get(key).wordsStartingWith("");
 
                 if (moreWords != null) {
                     for (String word : moreWords) {
@@ -98,7 +103,19 @@ public class Trie {
                     }
                 }
             }
-            return (null);
+            return (set);
+        }
+
+        char c = prefix.charAt(0);
+        Trie subtrie = charToChildrenMap.get(c);
+        if (subtrie == null)
+            return (set);
+
+        Set<String> moreWords = subtrie.wordsStartingWith(prefix.substring(1));
+        if (moreWords != null) {
+            for (String word : moreWords) {
+                set.add(c + word);
+            }
         }
 
         wordsStartingWithCache.put(prefix, set);

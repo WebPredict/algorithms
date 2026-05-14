@@ -477,13 +477,13 @@ public class TreeUtils {
             if (node.getLeft() != null) {
                 isValid = isValidBinarySearchTree(node.getLeft());
                 if (isValid)
-                    isValid = node.getData().compareTo(node.getLeft().getData()) < 0;
+                    isValid = node.getData().compareTo(node.getLeft().getData()) > 0;
             }
 
             if (isValid && node.getRight() != null) {
                 isValid = isValidBinarySearchTree(node.getRight());
                 if (isValid)
-                    isValid = node.getData().compareTo(node.getLeft().getData()) > 0;
+                    isValid = node.getData().compareTo(node.getRight().getData()) < 0;
             }
         }
 
