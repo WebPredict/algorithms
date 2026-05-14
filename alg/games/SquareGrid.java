@@ -21,7 +21,7 @@ public class SquareGrid {
         }
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n^2)", spaceComplexity = "O(1)")
     public void rotate (int times, boolean clockwise) {
 
         int actualTimes = times % 4;

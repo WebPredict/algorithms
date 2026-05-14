@@ -18,7 +18,7 @@ public class StringUtils {
      * @param s
      * @return
      */
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(1)")
     public static boolean isPalindrome (String s) {
         if (s == null)
             return (true);
@@ -34,7 +34,7 @@ public class StringUtils {
         return ((c >= 'a' && c <= 'z') || (c >= '0' && c <= '9'));
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(1)")
     public static boolean isPalindromeOnlyAlphanumeric (String s) {
         if (s == null)
             return (true);
@@ -63,7 +63,7 @@ public class StringUtils {
         return (true);
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(n/k)")
     public static String [] chunk (String s, int size) {
     	if (s == null)
     		return (null);
@@ -82,7 +82,7 @@ public class StringUtils {
     	return (ret);
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(n)")
     public static String repeat (char c, int num) {
         if (num == 0)
             return ("");
@@ -94,7 +94,7 @@ public class StringUtils {
         return (new String(repeated));
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(n)")
     public static String join (String [] lines) {
         StringBuilder builder = new StringBuilder();
 
@@ -107,7 +107,7 @@ public class StringUtils {
         return (builder.toString());
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(1)")
     public static void reverseInPlace (char [] chars, int startIdx, int endIdxExclusive) {
         for (int i = 0; i < (endIdxExclusive - startIdx) / 2; i++) {
             char tmp = chars [i + startIdx];
@@ -130,7 +130,7 @@ public class StringUtils {
 
     public static int DPMaxMatrixSize = 1000 * 1000;
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(m * n)", spaceComplexity = "O(m * n)")
     public static String longestCommonSubstring (String s1, String s2) {
         if (s1 == null || s2 == null)
             return (null);
@@ -173,7 +173,7 @@ public class StringUtils {
         return (ret);
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(n)")
     public static boolean areAnagrams (String s1, String s2) {
         if (s1 == null)
             return (s2 == null);
@@ -205,7 +205,7 @@ public class StringUtils {
        return (charToIntCount.size() == 0);
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n! * n)", spaceComplexity = "O(n! * n)")
     public static List<String> listAnagrams (String s) {
         if (s == null)
             return (null);
@@ -233,7 +233,7 @@ public class StringUtils {
      * @param strs
      * @return
      */
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n * k log k)", spaceComplexity = "O(n * k)")
     public static List<String> listAnagrams (String [] strs) {
         if (strs == null)
             return (null);
@@ -265,7 +265,7 @@ public class StringUtils {
         return (all);
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(2^n)", spaceComplexity = "O(n)")
     public static List<List<String>>    allPossiblePalindromePartitions (String s) {
         return (null); // TODO
     }
@@ -274,7 +274,7 @@ public class StringUtils {
         return ((s == null ? "" : s) + repeat(padding, amount));
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(m * n)", spaceComplexity = "O(m * n)")
     public static String        longestCommonSubsequence (String s1, String s2) {
         if (s1 == null || s2 == null)
             return (null);
@@ -334,7 +334,7 @@ public class StringUtils {
      * @param i
      * @param j
      */
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(m * n)", spaceComplexity = "O(m * n)")
     public static void printDiff (StringBuilder buf, int [][] longest, String s1, String s2, int i, int j) {
         if (i > 0 && j > 0 && s1.charAt(i) == s2.charAt(j)) {
             printDiff(buf, longest, s1, s2, i - 1, j - 1);
@@ -380,7 +380,7 @@ public class StringUtils {
         buf.append(text + "\n");
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(1)")
     public static Integer extractIntegerFrom (String s) {
         int started = -1;
         int ended = -1;
@@ -412,17 +412,17 @@ public class StringUtils {
      * @param s
      * @return if s == "aaaabbbccccd" return "a4b3c4d" or original string if compressed will be longer
      */
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(n)")
     public static String	basicCompression (String s) {
     	return (s); // TODO
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(1)")
     public static int		shortestDistanceBetweenWords (String text, String word1, String word2) {
     	return (0); // TODO
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n * m)", spaceComplexity = "O(1)")
     public static String longestCommonPrefix (String[] strs) {
         if (strs == null)
             return (null);

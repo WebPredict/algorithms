@@ -1,7 +1,7 @@
 package alg.trees;
 
 import alg.misc.InterestingAlgorithm;
-import alg.misc.MiscUtils;
+import alg.linkedlist.LinkedListUtils;
 import alg.util.BinaryNode;
 import alg.util.LinkNode;
 import alg.util.NodeVisitor;
@@ -39,7 +39,7 @@ public class TreeUtils {
         }
     }
 
-   @InterestingAlgorithm
+   @InterestingAlgorithm(timeComplexity = "O(log n) average, O(n) worst", spaceComplexity = "O(log n)")
     public static BinaryNode    find (BinaryNode<? extends Comparable> tree, Comparable value) {
         if (tree == null)
             return (null);
@@ -57,7 +57,7 @@ public class TreeUtils {
         }
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(h)")
     public static void preorderTraversal (BinaryNode tree, NodeVisitor visitor) {
         visitor.visit(tree);
         if (tree.getLeft() != null)
@@ -66,7 +66,7 @@ public class TreeUtils {
             preorderTraversal(tree.getRight(), visitor);
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(h)")
     public static void postorderTraversal (BinaryNode tree, NodeVisitor visitor) {
         if (tree.getLeft() != null)
             postorderTraversal(tree.getLeft(), visitor);
@@ -75,7 +75,7 @@ public class TreeUtils {
         visitor.visit(tree);
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(h)")
     public static void preorderTraversalIterative (BinaryNode node, NodeVisitor visitor) {
         Stack<BinaryNode> nodes = new Stack<BinaryNode>();
 
@@ -91,7 +91,7 @@ public class TreeUtils {
         }
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(h)")
     public static void inorderTraversalIterative (BinaryNode node, NodeVisitor visitor) {
         Stack<BinaryNode> nodes = new Stack<BinaryNode>();
 
@@ -108,7 +108,7 @@ public class TreeUtils {
         }
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(h)")
     public static void postorderTraversalIterative (BinaryNode node, NodeVisitor visitor) {
         Stack<BinaryNode> nodes = new Stack<BinaryNode>();
         BinaryNode previous = null;
@@ -146,7 +146,7 @@ public class TreeUtils {
         return (new BinaryNode[] {treeRoot.getLeft(), treeRoot.getRight()});
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(h)", spaceComplexity = "O(1)")
     public static BinaryNode    min (BinaryNode root) {
         if (root == null)
             return (null);
@@ -209,7 +209,7 @@ public class TreeUtils {
         return (right);
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n log n)", spaceComplexity = "O(n)")
     public static void  balance (BinaryNode treeRoot) {
         // TODO
         // One easy to follow approach: find and sort all nodes, then recreate tree from sorted array
@@ -219,7 +219,7 @@ public class TreeUtils {
          return (maxHeight(treeRoot));
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(h)")
     public static int   minHeight (BinaryNode treeRoot) {
        if (treeRoot == null)
            return (0);
@@ -230,7 +230,7 @@ public class TreeUtils {
         return (1 + Math.min(minHeight(left), minHeight(right)));
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(h)")
     public static int   maxHeight (BinaryNode treeRoot) {
         if (treeRoot == null)
             return (0);
@@ -241,7 +241,7 @@ public class TreeUtils {
         return (1 + Math.max(maxHeight(left), maxHeight(right)));
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n log n)", spaceComplexity = "O(h)")
     public static boolean isBalanced (BinaryNode root) {
         if (root == null)
             return (true);
@@ -256,9 +256,9 @@ public class TreeUtils {
      * @param head  sorted linked list
      * @return
      */
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n log n)", spaceComplexity = "O(log n)")
     public static BinaryNode sortedListToBST(LinkNode head) {
-        int length = MiscUtils.length(head);
+        int length = LinkedListUtils.length(head);
         int middle = length / 2;
 
         LinkNode nodeToUse = middle == 0 ? head : advance(head, middle);
@@ -293,7 +293,7 @@ public class TreeUtils {
         return (head);
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(n)")
     public static void printTree (BinaryNode tree) {
 
         // simple row-by-row or nicely printed tree?
@@ -312,7 +312,7 @@ public class TreeUtils {
 
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(n)")
     public static List<List> levelOrder (BinaryNode root) {
         if (root == null)
             return (new ArrayList<List>());
@@ -365,7 +365,7 @@ public class TreeUtils {
         }
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n + m)", spaceComplexity = "O(h)")
     public static BinaryNode<Comparable> mergeSecondIntoFirst(BinaryNode<Comparable> tree1, BinaryNode<Comparable> tree2) {
         if (tree2 == null)
             return (null);         // Nothing to do
@@ -392,7 +392,7 @@ public class TreeUtils {
         return (null);
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(h)")
     public static int compareTrees (BinaryNode tree1, BinaryNode tree2) {
         if (tree1 == null)
             return (tree2 == null ? 0 : -1);
@@ -408,7 +408,7 @@ public class TreeUtils {
         return (compareTrees(tree1.getRight(), tree2.getRight()));
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(h)")
     public static boolean isSymmetric (BinaryNode tree) {
         if (tree == null)
             return (true);
@@ -447,12 +447,12 @@ public class TreeUtils {
         return (left == null ? right == null : right != null);
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(h)")
     public static BinaryNode firstCommonAncestor (BinaryNode node1, BinaryNode node2) {
     	return (null); // TODO
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(h)", spaceComplexity = "O(1)")
     public static BinaryNode findPreviousInOrder (BinaryNode node) {
         if (node == null)
             return (null);
@@ -469,7 +469,7 @@ public class TreeUtils {
     	return (current);
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(h)")
     public static boolean	isValidBinarySearchTree (BinaryNode node) {
 
         boolean isValid = true;
@@ -490,7 +490,7 @@ public class TreeUtils {
         return (isValid);
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n log n)", spaceComplexity = "O(n)")
     public static BinaryNode	createBinarySearchTreeWithMinHeight (int [] values) {
         if (values == null)
             return (null);

@@ -45,7 +45,22 @@ public class BinaryNode<T extends Comparable> {
         return (data + " left->" + left + " right->" + right);
     }
 
+    @SuppressWarnings("unchecked")
     public void insert (BinaryNode<T> newNode) {
-        // TODO
+        if (newNode == null)
+            return;
+
+        if (newNode.data.compareTo(this.data) <= 0) {
+            if (left == null)
+                left = newNode;
+            else
+                left.insert(newNode);
+        }
+        else {
+            if (right == null)
+                right = newNode;
+            else
+                right.insert(newNode);
+        }
     }
 }

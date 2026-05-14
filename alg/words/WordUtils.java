@@ -17,7 +17,7 @@ public class WordUtils {
 
     public static String []     commonWords; // TODO fill
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(n)")
     public static boolean   rhymingEnglishWords (String s1, String s2) {
 
         if (s1.equals(s2))
@@ -44,7 +44,7 @@ public class WordUtils {
         return (false);
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(n)")
     public static String    soundex (String s) {
 
         if (s == null)
@@ -106,7 +106,7 @@ public class WordUtils {
             return (-1);
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(n)")
     public static String [] doubleMetaphone (String s) {
         return (null); // TODO
     }
@@ -123,7 +123,7 @@ public class WordUtils {
      * @param pastSuggestionsToCorrectionsMap
      * @return
      */
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n * m)", spaceComplexity = "O(n)")
     public static String    autocorrect (String s, Map<String, Float> wordToGeneralFrequencyMap, Map<String, String> pastSuggestionsToCorrectionsMap) {
         if (wordToGeneralFrequencyMap == null)
             return (s); // can't do anything
@@ -183,7 +183,7 @@ public class WordUtils {
         return (c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u' || c == 'y');
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(n)")
     public static String []     syllables (String input) {
 
         /**
@@ -324,7 +324,7 @@ public class WordUtils {
         return (false);
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n log n)", spaceComplexity = "O(n)")
     public static List<WordFrequency> getWordFrequencies(String text, int cutoff, boolean ignoreCapitalization, final boolean highestToLowest) {
         if (text == null)
             return (null);
@@ -381,7 +381,7 @@ public class WordUtils {
     }
 
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n log n)", spaceComplexity = "O(n)")
     public static List<WordFrequency> getNGramFrequencies(String text, int n, int cutoff, boolean ignoreCapitalization, final boolean highestToLowest) {
         if (text == null)
             return (null);
@@ -437,7 +437,7 @@ public class WordUtils {
     }
 
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(n)")
     public static String    capitalizeAndJoin (String... words) {
         String ret = "";
 
@@ -452,7 +452,7 @@ public class WordUtils {
      * @param camelOrUnderscore
      * @return
      */
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(n)")
     public static String    capitalizeAndSpace (String camelOrUnderscore) {
         ArrayList<Character> chars = new ArrayList<Character>();
         boolean sawLower = false;
@@ -491,7 +491,7 @@ public class WordUtils {
         return (Character.toUpperCase(word.charAt(0)) + word.substring(1));
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(n)")
     public static String    reverseWords (String s) {
         // reverse order of words, not letters in words - do the double reverse:
         if (s == null)
@@ -525,7 +525,7 @@ public class WordUtils {
      * @param chars
      * @return
      */
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(n)")
     public static String removeExcessSpaces (char [] chars) {
         char [] tmpArr = new char[chars.length];
         boolean seenWord = false;
@@ -584,7 +584,7 @@ public class WordUtils {
             return (s); // hmm
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(n)")
     public static List<String>  leftRightTextJustification (String words, int lineLength) {
         if (words == null)
             return (null);
@@ -598,7 +598,7 @@ public class WordUtils {
         return (leftRightTextJustification(allWords, lineLength));
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(n)")
     public static List<String>  leftRightTextJustificationParagraphs (List<String> paragraphs, int lineLength) {
         if (paragraphs == null)
             return (null);
@@ -622,7 +622,7 @@ public class WordUtils {
         return (leftRightTextJustification(allWords, lineLength));
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(n)")
     public static List<String>  leftRightTextJustification (List<String> words, int lineLength) {
         if (words == null)
             return (null);
@@ -850,7 +850,7 @@ public class WordUtils {
         }
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n * m)", spaceComplexity = "O(1)")
     public static boolean isMatch (String s, String pattern) {
         // ? matches any character
         // * matches any sequence of characters including empty
@@ -861,7 +861,7 @@ public class WordUtils {
     	return (null); // TODO
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(1)")
     public static int       numWords (String s) {
         if (s == null)
             return (0);
@@ -897,7 +897,7 @@ public class WordUtils {
      * @param dictionary
      * @return
      */
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n * m)", spaceComplexity = "O(n)")
     public static List<String>  minWordLadder (String start, String end, List<String> dictionary) {
         List<String> ret = null;
 
@@ -913,7 +913,7 @@ public class WordUtils {
      * @param value
      * @return
      */
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(1)", spaceComplexity = "O(1)")
     public static String toRomanNumeral (int value) {
         /**
          * M = 1000
@@ -985,7 +985,7 @@ public class WordUtils {
      * @param numeral
      * @return
      */
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(1)")
     public static int fromRomanNumeral (String numeral) {
         if (numeral == null)
             return (0);
@@ -1063,7 +1063,7 @@ public class WordUtils {
      * @param value
      * @return
      */
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(1)", spaceComplexity = "O(1)")
     public static String spelledOutInEnglish (int value) {
         if (value < 20)
             return (NUM_WORDS[value]);

@@ -53,7 +53,7 @@ public class StatUtils {
         return (ret);
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(n)")
     public static double modeSkewness (int [] values) {
         double mean = average(values);
         Integer mode = mode(values);
@@ -64,7 +64,7 @@ public class StatUtils {
         return ((mean - (double)mode) / stddev(values));
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(n)")
     public static Integer mode (int [] values) {
         Integer ret = null;
 
@@ -90,7 +90,7 @@ public class StatUtils {
         return (ret);
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n log n)", spaceComplexity = "O(n)")
     public static double median (int [] values) {
         if (values == null || values.length == 0)
             return (Double.NaN);
@@ -106,7 +106,7 @@ public class StatUtils {
             return ((double)sorted [sorted.length / 2]);
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(1)")
     public static double variance (int [] values) {
         if (values == null || values.length == 0)
             return (Double.NaN);
@@ -125,7 +125,7 @@ public class StatUtils {
     }
 
     // runtime should be O(log(m + n)):
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(log(m + n))", spaceComplexity = "O(1)")
     public static double findMedianSortedArrays (int [] a1, int [] a2) {
          return (Double.NaN); // TODO
     }

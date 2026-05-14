@@ -43,7 +43,7 @@ public class Trie {
         }
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(m)", spaceComplexity = "O(m)")
     public void insertWord (String word) {
     	if (word == null || word.length() == 0)
             return;
@@ -60,7 +60,7 @@ public class Trie {
         wordsStartingWithCache.remove(word);
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(m)", spaceComplexity = "O(1)")
     public boolean wordExists (String word) {
         if (word == null || word.length() == 0)
             return (true);
@@ -76,7 +76,7 @@ public class Trie {
 
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(m + k)", spaceComplexity = "O(k)")
     public Set<String> wordsStartingWith (String prefix) {
 
         if (wordsStartingWithCache.containsKey(prefix)) {

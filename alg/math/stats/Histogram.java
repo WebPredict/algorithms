@@ -13,7 +13,7 @@ public class Histogram {
 
     private double [] bins;
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(numBins)")
     public Histogram (double [] data, int numBins, boolean normalize) {
 
         bins = new double[numBins];

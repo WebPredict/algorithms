@@ -22,7 +22,7 @@ public class ArrayUtils {
      * @param B
      * @param n
      */
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(m * n)", spaceComplexity = "O(1)")
     public static void merge(int A[], int m, int B[], int n) {
 
         for (int i = 0; i < n; i++) {
@@ -71,7 +71,7 @@ public class ArrayUtils {
         return (ret);
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(n)")
     public static Comparable [] removeDuplicates (Comparable [] inArray) {
         if (inArray == null)
             return (null);
@@ -91,14 +91,14 @@ public class ArrayUtils {
         return (ret);
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(1)", spaceComplexity = "O(1)")
     public static void swapRows (int [][] grid, int fromIdx, int toIdx) {
         int [] tmp = grid [fromIdx];
         grid [fromIdx] = grid [toIdx];
         grid [toIdx] = tmp;
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(1)")
     public static void swapCols (int [][] grid, int fromIdx, int toIdx) {
 
         for (int i = 0; i < grid.length; i++) {
@@ -108,7 +108,7 @@ public class ArrayUtils {
         }
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(m * n)", spaceComplexity = "O(m * n)")
     public static List<Integer> spiralOrder (int [][] matrix) {
         if (matrix == null)
             return (null);
@@ -177,7 +177,7 @@ public class ArrayUtils {
         return (numbers);
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n^2)", spaceComplexity = "O(n^2)")
     public static int [][] generateSpiralMatrix (int n) {
         if (n == 0)
             return (new int[0][0]);
@@ -250,7 +250,7 @@ public class ArrayUtils {
      * @param array2
      * @return  Sorted array of array1 + array2's contents
      */
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(m + n)", spaceComplexity = "O(m + n)")
     public static Comparable [] mergeSortedArrays (Comparable [] array1, Comparable [] array2) {
         if (array1 == null)
             return (array2);
@@ -280,7 +280,7 @@ public class ArrayUtils {
         return (ret);
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(n)")
     public int []           equilibriumIndices (int [] array) {
         if (array == null)
             return (null);
@@ -316,7 +316,7 @@ public class ArrayUtils {
         return (ret);
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n! * n)", spaceComplexity = "O(n! * n)")
     public static List<List<Integer>> listPermutations (int [] num) {
         if (num == null)
             return (null);
@@ -368,7 +368,7 @@ public class ArrayUtils {
      * @param k
      * @return
      */
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(C(n,k) * k)", spaceComplexity = "O(C(n,k) * k)")
     public static List<List<Integer>> listCombinations (int n, int k) {
 
         List<List<Integer>> ret = new ArrayList<List<Integer>>();
@@ -402,7 +402,7 @@ public class ArrayUtils {
      * @param k
      * @return
      */
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(C(n,k) * k)", spaceComplexity = "O(C(n,k) * k)")
     public static List<List<Integer>> listCombinations (int [] nums, int k) {
 
         List<List<Integer>> ret = new ArrayList<List<Integer>>();
@@ -431,7 +431,7 @@ public class ArrayUtils {
         return (ret);
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(m + n)", spaceComplexity = "O(m + n)")
     public static int []    interleave (int [] array1, int [] array2) {
         if (array1 == null)
             return (array2);
@@ -464,7 +464,7 @@ public class ArrayUtils {
     /**
      * Merges overlapping intervals, from input text of the form: "[1 2],[2 6]..."
      */
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n log n)", spaceComplexity = "O(n)")
     public static List<Interval>    merge(String intervalText) {
 
         StringTokenizer tok = new StringTokenizer(intervalText, ",");
@@ -481,7 +481,7 @@ public class ArrayUtils {
      * @param intervals
      * @return
      */
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n log n)", spaceComplexity = "O(n)")
     public static List<Interval>    insert(List<Interval> intervals, Interval newInterval) {
         intervals.add(newInterval);
         return (merge(intervals));
@@ -492,7 +492,7 @@ public class ArrayUtils {
      * @param intervalList
      * @return
      */
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n log n)", spaceComplexity = "O(n)")
     public static List<Interval>    merge(List<Interval> intervalList) {
         if (intervalList == null)
             return (null);
@@ -560,7 +560,7 @@ public class ArrayUtils {
      * @param numbers
      * @return
      */
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(n)")
     public static Integer majorityElement (int [] numbers) {
         if (numbers != null) {
             int     threshhold = numbers.length / 2 + 1;
@@ -589,7 +589,7 @@ public class ArrayUtils {
      * @param end
      * @return
      */
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(log n)")
     public static int medianOfMediansIdx (List<Integer> list, int start, int end) {
         int numMedians = (int)Math.ceil(((double)(end - start)) / 5d);
 
@@ -607,7 +607,7 @@ public class ArrayUtils {
         return (selectIdx(list, start, end + numMedians - 1, numMedians / 2));
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n) average", spaceComplexity = "O(log n)")
     public static int selectKthLargest (List<Integer> list, int k) {
         if (list == null || list.size() < k)
             throw new RuntimeException("Invalid list for select kth largest: " + list + " k: " + k);
@@ -628,7 +628,7 @@ public class ArrayUtils {
         return (list.get(idx));
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n) average", spaceComplexity = "O(log n)")
     public static int selectIdx (List<Integer> list, int left, int right, int n) {
         if (left == right)
             return (left);
@@ -656,7 +656,7 @@ public class ArrayUtils {
      * @param pivotIndex
      * @return
      */
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(1)")
     public static int partition(List<Integer> list, int left, int right, int pivotIndex) {
         int pivotValue = list.get(pivotIndex);
         MiscUtils.swap(list, pivotIndex, right);
@@ -709,7 +709,7 @@ public class ArrayUtils {
      * @param num
      * @return
      */
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n * k)", spaceComplexity = "O(n)")
     public static int [] findTwoNumbersThatAddTo (int [] values, int num) {
         if (values == null)
             return (null);
@@ -734,7 +734,7 @@ public class ArrayUtils {
      * @param values
      * @return
      */
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(1)")
     public static int   removeDuplicatesFromSortedArray (int [] values) {
         if (values == null)
             return (0);
@@ -759,7 +759,7 @@ public class ArrayUtils {
      * @param values
      * @return
      */
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(1)")
     public static int   removeElement (int [] values, int elem) {
         if (values == null)
             return (0);

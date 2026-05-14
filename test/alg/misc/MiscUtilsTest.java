@@ -6,6 +6,7 @@ import alg.graphics.ImageMap;
 import alg.graphics.ImageUtils;
 import alg.math.MathUtils;
 import alg.math.finance.StockUtils;
+import alg.linkedlist.LinkedListUtils;
 import alg.misc.MiscUtils;
 import alg.misc.StackWithMin;
 import alg.sequence.SequenceUtils;
@@ -194,8 +195,8 @@ public class MiscUtilsTest {
         five.setValue(5);
         threeFive.setNext(five);
 
-        LinkNode<Integer>   partialReversed = MiscUtils.reverseLinkedListBetween(threeFive, 1, 2);
-        LinkNode<Integer>   reversed = MiscUtils.reverseLinkedList(links);
+        LinkNode<Integer>   partialReversed = LinkedListUtils.reverseLinkedListBetween(threeFive, 1, 2);
+        LinkNode<Integer>   reversed = LinkedListUtils.reverseLinkedList(links);
 
         System.out.println(reversed);
 

@@ -1,74 +1,62 @@
 package alg.sets;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import alg.misc.InterestingAlgorithm;
 
-/**
- * Created with IntelliJ IDEA.
- * User: jsanchez
- * Date: 1/14/15
- * Time: 11:21 AM
- * To change this template use File | Settings | File Templates.
- */
-public class DisjointSet<T extends Comparable> {
+public class DisjointSet {
 
-    private List<Set<T>> sets;
+    private int [] parent;
+    private int [] rank;
+    private int componentCount;
 
-    public DisjointSet (List<Set<T>> initialDisjointSets) {
-        // TODO: verify they're disjoint?
-        this.sets = initialDisjointSets;
-    }
+    public DisjointSet (int size) {
+        parent = new int [size];
+        rank = new int [size];
+        componentCount = size;
 
-    public List<Set<T>>    getSets () {
-        return (sets);
-    }
-
-    public Set  find (T value) {
-        // TODO improve
-
-        if (sets != null) {
-            for (Set<T> set : sets) {
-                if (set.contains(value))
-                    return (set);
-            }
+        for (int i = 0; i < size; i++) {
+            parent [i] = i;
+            rank [i] = 0;
         }
-
-        return (null);
     }
 
-    public int  findIdx (T value) {
-        // TODO improve
-
-        if (sets != null) {
-            for (int i = 0; i < sets.size(); i++) {
-                if (sets.get(i).contains(value))
-                    return (i);
-            }
+    @InterestingAlgorithm(timeComplexity = "O(alpha(n))", spaceComplexity = "O(1)")
+    public int find (int x) {
+        if (parent [x] != x) {
+            parent [x] = find(parent [x]);
         }
-
-        return (-1);
+        return (parent [x]);
     }
 
-    public Set  makeSetAndAdd (T value) {
-        Set<T> set = new HashSet<T>();
-        set.add(value);
-        sets.add(set);
-        return (set);
-    }
+    @InterestingAlgorithm(timeComplexity = "O(alpha(n))", spaceComplexity = "O(1)")
+    public boolean union (int x, int y) {
+        int rootX = find(x);
+        int rootY = find(y);
 
-    public boolean union (T repValue1, T repValue2) {
-        int firstIdx = findIdx(repValue1);
-        int secondIdx = findIdx(repValue2);
-        if (firstIdx == -1 || secondIdx == -1)
+        if (rootX == rootY)
             return (false);
 
-        Set first = sets.get(firstIdx);
-        Set second = sets.get(secondIdx);
+        if (rank [rootX] < rank [rootY]) {
+            parent [rootX] = rootY;
+        }
+        else if (rank [rootX] > rank [rootY]) {
+            parent [rootY] = rootX;
+        }
+        else {
+            parent [rootY] = rootX;
+            rank [rootX]++;
+        }
 
-        first.addAll(second);
-        sets.remove(secondIdx);
+        componentCount--;
         return (true);
     }
 
+    @InterestingAlgorithm(timeComplexity = "O(alpha(n))", spaceComplexity = "O(1)")
+    public boolean connected (int x, int y) {
+        return (find(x) == find(y));
+    }
+
+    @InterestingAlgorithm(timeComplexity = "O(1)", spaceComplexity = "O(1)")
+    public int getComponentCount () {
+        return (componentCount);
+    }
 }

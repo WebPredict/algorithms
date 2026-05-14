@@ -24,7 +24,7 @@ public class GraphicsUtils {
      * @param fillColorVal
      * @param paintableColorVal
      */
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(rows * cols)", spaceComplexity = "O(rows * cols)")
     public static void paintfill (ImageMap image, int row, int col, int fillColorVal, int paintableColorVal) {
 
         int rows = image.getRows();
@@ -73,7 +73,7 @@ public class GraphicsUtils {
      * @param rects
      * @return
      */
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n^2)", spaceComplexity = "O(n)")
     public double   totalArea (Rectangle [] rects) {
         if (rects == null)
             return (Double.NaN);
@@ -190,7 +190,7 @@ public class GraphicsUtils {
      * @param rects
      * @return
      */
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n^2)", spaceComplexity = "O(n)")
     public double   totalPerimeter (Rectangle [] rects) {
         return (0);   // TODO
     }
@@ -200,12 +200,12 @@ public class GraphicsUtils {
      * @param rects
      * @return
      */
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n^2)", spaceComplexity = "O(n)")
     public int   maxNumIntersectingRectangles (Rectangle [] rects) {
         return (0);  // TODO
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n^2)", spaceComplexity = "O(n)")
     public int maxPointsOnLine (Point2D [] points) {
         return (0); // TODO
     }
@@ -248,7 +248,7 @@ public class GraphicsUtils {
         return (Math.sqrt(xDiff * xDiff + yDiff * yDiff));
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(1)", spaceComplexity = "O(1)")
     public static double lineSegmentPointDist(LineSegment2D segment, Point2D point){
 
         double dot1 = MathUtils.dotProduct(segment.getEnd(), point, segment.getStart(), segment.getEnd()); //(C-B)*(B-A)
@@ -268,7 +268,7 @@ public class GraphicsUtils {
      * @param points
      * @return
      */
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(1)")
     public double   simplePolygonArea (Point2D [] points) {
         double area = 0;
 
@@ -304,7 +304,7 @@ public class GraphicsUtils {
      * @param points
      * @return
      */
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n^2)", spaceComplexity = "O(n)")
     public static Polygon   computeConvexHull (Point2D [] points) {
         if (points == null)
             return (null);
@@ -370,7 +370,7 @@ public class GraphicsUtils {
      * @param points
      * @return
      */
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n log n)", spaceComplexity = "O(n)")
     public Point2D [] closestPair (Point2D [] points) {
         return (null); // TODO
     }
@@ -388,7 +388,7 @@ public class GraphicsUtils {
      * @param epsilon
      * @return
      */
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n log n)", spaceComplexity = "O(n)")
     public List<Point2D> smooth (Point2D [] line, int startIdx, int endIdx, double epsilon) {
         // Ramer-Douglas-Peucker
 
@@ -426,7 +426,7 @@ public class GraphicsUtils {
      * @param values
      * @return
      */
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(n)")
     public List<Integer>    movingAverage (int [] values, int size) {
 
         if (values == null)

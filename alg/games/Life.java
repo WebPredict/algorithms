@@ -30,7 +30,7 @@ public class Life {
         return (board.length == 0 ? 0 : board.length);
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(rows * cols * g)", spaceComplexity = "O(1)")
     public void nextGeneration (int generations) {
 
         // TODO: is there a way to do this more efficiently, a la manhattan distance for image erode/dilate?

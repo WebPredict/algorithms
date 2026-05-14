@@ -42,7 +42,7 @@ public class LineSegment2D {
         return ((end.getY() - start.getY()) / (end.getX() - start.getY()));
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(1)", spaceComplexity = "O(1)")
     public Object       lineIntersect (Line2D other) {
         if (other == null)
             return (null);

@@ -14,7 +14,7 @@ public class StackWithMin<T extends Comparable> {
     public StackWithMin () {
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(1)", spaceComplexity = "O(1)")
     public T    min () {
         if (minIdxes.empty())
             throw new RuntimeException("Empty stack");
@@ -22,7 +22,7 @@ public class StackWithMin<T extends Comparable> {
         return (list.get(minIdxes.peek()));
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(1)", spaceComplexity = "O(1)")
     public T    pop () {
         int     size = list.size();
         if (size == 0)
@@ -36,7 +36,7 @@ public class StackWithMin<T extends Comparable> {
         return (value);
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(1)", spaceComplexity = "O(1)")
     public void push (T value) {
         if (minIdxes.empty())
             minIdxes.push(0);

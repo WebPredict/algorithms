@@ -28,7 +28,7 @@ public class Polygon {
     public Polygon () {
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(1)")
     public boolean  isConvex () {
         if (points == null || points.size() < 4)
             return (false);
@@ -53,7 +53,7 @@ public class Polygon {
         return (false);
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n log n)", spaceComplexity = "O(n)")
     public boolean  isSimple () {
         /**
          * approach: need to see if there are any intersecting line segments
@@ -70,12 +70,12 @@ public class Polygon {
         this.points = points;
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n log n)", spaceComplexity = "O(n)")
     public boolean  selfIntersects () {
         return (!isSimple());
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(n)")
     public boolean  containsPoint (Point2D point) {
         if (points == null || points.size() < 1)
             return (false);

@@ -2,8 +2,6 @@ package alg.misc;
 
 import alg.sort.SortUtils;
 import alg.strings.StringUtils;
-import alg.util.LinkNode;
-
 import java.util.List;
 import java.util.Random;
 import java.util.Stack;
@@ -17,7 +15,7 @@ import java.util.Stack;
  */
 public class MiscUtils {
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(1)")
     public static int fibonacci(int n) {
         if (n < 0)
             throw new IllegalArgumentException("Invalid fibonacci num: " + n);
@@ -43,224 +41,7 @@ public class MiscUtils {
             return (n);
 
         return (fibonacciRec(n - 1) + fibonacciRec(n - 2));
-    }
 
-
-    /**
-     * Removes all nodes in a linked list with a particular value
-     * @param start
-     * @param value
-     * @param <T>
-     * @return
-     */
-    @InterestingAlgorithm
-    public static <T> LinkNode removeValue (LinkNode start, T value) {
-        LinkNode ret = null;
-        LinkNode cur = ret;
-
-        LinkNode prev = null;
-        while (cur != null) {
-
-            if (cur.getValue().equals(value)) {
-
-                LinkNode next = cur.getNext();
-                if (prev != null)
-                    prev.setNext(next);
-            }
-            else {
-                if (ret == null)
-                    ret = cur;
-                prev = cur;
-            }
-            cur = cur.getNext();
-        }
-        return (ret);
-    }
-
-    /**
-     * Returns new head of list
-     * @param root
-     * @return
-     */
-    @InterestingAlgorithm
-    public static LinkNode reverseLinkedList (LinkNode root) {
-
-        if (root == null)
-            return (null);
-
-        LinkNode next = root.getNext();
-
-        /**
-         * A -> B -> C -> D
-         *
-         * next is B
-         * root is A
-         * We need:
-         * B -> A, save C
-         *
-         * tmp = next -> next
-         * next -> next = root
-         * next = tmp
-         */
-        root.setNext(null);
-        while (next != null) {
-            LinkNode tmp = next.getNext();
-
-            next.setNext(root);
-            root = next;
-
-            next = tmp;
-        }
-        return (root);
-    }
-
-    @InterestingAlgorithm
-    public static LinkNode reverseLinkedListBetween (LinkNode root, int fromIdxOneBased, int toIdxIncl) {
-        if (root == null)
-            return (null);
-
-        LinkNode next = root;
-
-        int ctr = 1;
-        LinkNode beforeNext = null;
-        while (ctr < fromIdxOneBased) {
-            ctr++;
-            beforeNext = next;
-            next = next.getNext();
-        }
-
-        LinkNode afterNewSection = next;
-        LinkNode newHead = next;
-        while (ctr <= toIdxIncl) {
-            LinkNode tmp = next.getNext();
-
-            next.setNext(newHead);
-            newHead = next;
-
-            next = tmp;
-            ctr++;
-        }
-        afterNewSection.setNext(next);
-        if (beforeNext == null)
-            return (newHead);
-
-        beforeNext.setNext(newHead);
-
-        return (root);
-    }
-
-    /**
-     * Returns beginning of cycle or null if none.
-     * @param root
-     * @return
-     */
-    @InterestingAlgorithm
-    public static LinkNode   detectCycle (LinkNode root) {
-        LinkNode cur = root;
-        LinkNode twiceCur = root;
-
-        while (twiceCur != null) {
-            cur = cur.getNext();
-
-            twiceCur = twiceCur.getNext();
-            if (twiceCur != null)
-                twiceCur = twiceCur.getNext();
-
-            if (twiceCur == cur)
-                return (cur);
-        }
-
-        return (null);
-    }
-
-    /**
-     * Returns intersecting node, or null if none.
-     * @param root1
-     * @param root2
-     * @return
-     */
-    @InterestingAlgorithm
-    public static LinkNode   detectIntersection (LinkNode root1, LinkNode root2) {
-
-        int lengthFirst = length(root1);
-        int lengthSecond = length(root2);
-
-        int diff = lengthFirst - lengthSecond;
-
-        LinkNode first = root1;
-        LinkNode second = root2;
-        if (diff > 0) {
-            while (diff-- > 0) {
-                 first = first.getNext();
-            }
-        }
-        else if (diff < 0) {
-            while (diff++ < 0) {
-                second = second.getNext();
-            }
-        }
-
-        while (first != null && second != null && first != second) {
-            first = first.getNext();
-            second = second.getNext();
-        }
-
-        return (first);
-    }
-
-    public static LinkNode  mergeTwoSortedLists (LinkNode l1, LinkNode l2) {
-        if (l1 == null)
-            return (l2);
-        else if (l2 == null)
-            return (l1);
-
-        LinkNode nextL1 = l1;
-        LinkNode nextL2 = l2;
-
-        LinkNode ret;
-        if (l1.getValue().compareTo(l2.getValue()) <= 0) {
-            ret = l1;
-            nextL1 = l1.getNext();
-        }
-        else {
-            ret = l2;
-            nextL2 = l2.getNext();
-        }
-
-        LinkNode cur = ret;
-        while (nextL1 != null || nextL2 != null) {
-            if (nextL1 != null && (nextL2 == null || nextL1.getValue().compareTo(nextL2.getValue()) <= 0)) {
-                cur.setNext(nextL1);
-                nextL1 = nextL1.getNext();
-            }
-            else {
-                cur.setNext(nextL2);
-                if (nextL2 != null)
-                    nextL2 = nextL2.getNext();
-            }
-            cur = cur.getNext();
-        }
-
-        return (ret);
-    }
-
-
-    /**
-     * Returns length of list
-     * @param root
-     * @return
-     */
-    @InterestingAlgorithm
-    public static int length (LinkNode root) {
-        int length = 0;
-
-        LinkNode next = root;
-        while (next != null) {
-            length++;
-            next = next.getNext();
-        }
-
-        return (length);
     }
 
     /**
@@ -278,7 +59,7 @@ public class MiscUtils {
      * @param index of column header (1 based)
      * @return Excel column header
      */
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(log n)", spaceComplexity = "O(log n)")
     public static String    excelColumnTitle (int index) {
         String ret = "";
         int curval = index;
@@ -302,7 +83,7 @@ public class MiscUtils {
      * @param title of column header (1 based)
      * @return Excel column index
      */
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(1)")
     public static int    excelColumnIndex (String title) {
         int ret = 0;
 
@@ -321,7 +102,7 @@ public class MiscUtils {
      * @param num   Non negative integers
      * @return
      */
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n * k)", spaceComplexity = "O(n)")
     public static int       maximumGap (int [] num) {
         if (num == null || num.length < 2)
             return (0);
@@ -354,7 +135,7 @@ public class MiscUtils {
      * @param v2
      * @return
      */
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(1)")
     public static int       compareVersions (String v1, String v2) {
 
         int curV1Idx = 0;
@@ -400,7 +181,7 @@ public class MiscUtils {
      * @param numbers
      * @return A peak element is higher than its neighbors. Returns first one or null if none.
      */
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(1)")
     public static Integer       findPeakElement (List<Integer> numbers) {
 
         if (numbers == null)

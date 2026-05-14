@@ -8,7 +8,7 @@ import alg.misc.InterestingAlgorithm;
 public class RedBlackTree<T> {
 
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(log n)", spaceComplexity = "O(1)")
     public void insert (T data) {
 
     }
@@ -17,7 +17,7 @@ public class RedBlackTree<T> {
         return (null); // TODO
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(log n)", spaceComplexity = "O(1)")
     public boolean delete (T data) {
         return (false); // TODO
     }

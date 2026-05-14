@@ -22,7 +22,7 @@ public class MathUtils {
      * @param expression
      * @return
      */
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(n)")
     public static double evaluateArithmeticExpression (String expression) throws Exception {
 
         EvalInfo info = evaluateArithmeticSubExpression(expression, false, null);
@@ -222,7 +222,7 @@ public class MathUtils {
      * All primes up to a certain number
      * random # generators
      */
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n log log n)", spaceComplexity = "O(n)")
    public static List<Integer> sieveOfEratosthenes (int allPrimesUpTo) {
        boolean [] possiblePrimes = new boolean[allPrimesUpTo];
 
@@ -254,7 +254,7 @@ public class MathUtils {
      * @param max
      * @return
      */
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(1)", spaceComplexity = "O(1)")
     public static int     generateRandom (int max) {
         int nextRandom = TWISTER.getNextRandom();
         return (nextRandom % max);
@@ -273,7 +273,7 @@ public class MathUtils {
      * @param n
      * @return  List of prime factors in n
      */
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(sqrt(n))", spaceComplexity = "O(log n)")
     public static List<Integer> primeFactors (int n) {
         double sqrt = Math.sqrt((double)n);
         int ceil = (int)Math.ceil(sqrt);
@@ -317,7 +317,7 @@ public class MathUtils {
      * @param n
      * @return
      */
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(1)")
     public static long   nthCatalan (int n) {
 
         long twoNChooseN = nChooseK(2 * n, n);
@@ -331,7 +331,7 @@ public class MathUtils {
      * @param k
      * @return
      */
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(1)")
     public static long   nChooseK (int n, int k) {
         /**
          * 8 7 6 5 4 3 2 1 / (3 2 1) (5 4 3 2 1)
@@ -366,14 +366,14 @@ public class MathUtils {
      * @param y
      * @return
      */
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(1)", spaceComplexity = "O(1)")
     public static double [] quadraticSolve (double a, double b, double y) {
         double first = (-b + Math.sqrt(b * b - 4 * a * y)) / (2d * a);
         double second = (-b - Math.sqrt(b * b - 4 * a * y)) / (2d * a);
         return (new double[] {first, second});
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(1)", spaceComplexity = "O(1)")
     public static double [] cubicSolve (double a, double b, double c, double y) {
         return (null); // TODO
     }
@@ -407,7 +407,7 @@ public class MathUtils {
      * @param numDigits
      * @return  Decimal computed to numDigits. Sort of a poor man's BigInt, using strings
      */
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(d)", spaceComplexity = "O(d)")
     public static String    fractionToDecimal (int numerator, int denominator, int numDigits) {
 
         int []  result = longDivisionWithRemainder(numerator, denominator);
@@ -426,7 +426,7 @@ public class MathUtils {
      * @param b
      * @return  a * b
      */
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(m * n)", spaceComplexity = "O(m + n)")
     public static String    multiplication (String a, String b) {
 
         /**
@@ -520,7 +520,7 @@ public class MathUtils {
      * @param dividend
      * @return  an answer of the form: 5 / 7 = 1 remainder 2 = [1, 2]
      */
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(d)", spaceComplexity = "O(d)")
     public static int []    longDivisionWithRemainder (int divisor, int dividend) {
         /**
          * example: 7 / 300 = 7 goes into 3? no, so try 30. 7 goes into 30? yes, 4 times. remainder
@@ -571,7 +571,7 @@ public class MathUtils {
      * @param dividend
      * @return  an answer of the form: 5 / 7 = 1 remainder 2 = [1, 2]
      */
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(d)", spaceComplexity = "O(d)")
     public static String    longDivision (int divisor, int dividend, int maxDigits) {
         /**
          * example: 7 / 300 = 7 goes into 3? no, so try 30. 7 goes into 30? yes, 4 times. remainder
@@ -637,7 +637,7 @@ public class MathUtils {
         return (result);
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n^2)", spaceComplexity = "O(n^2)")
     public static List<List<Integer>>  pascalsTriangle (int numRows) {
         if (numRows == 0)
             return (new ArrayList<List<Integer>>());
@@ -673,7 +673,7 @@ public class MathUtils {
      * @param k 1st row is row 0
      * @return
      */
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n^2)", spaceComplexity = "O(n)")
     public static List<Integer>  getRowInPascalsTriangle (int k) {
         ArrayList<Integer> previousRow = new ArrayList<Integer>();
         previousRow.add(1);
@@ -704,7 +704,7 @@ public class MathUtils {
         return (minSteps);
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(1)", spaceComplexity = "O(1)")
     public static double angleBetweenVectors2D (Vector v1, Vector v2) {
         double cross = v1.cross2d(v2);
         double normV1 = v1.norm();
@@ -719,7 +719,7 @@ public class MathUtils {
      * @param str String to convert.
      * @return
      */
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(1)")
     public static int  atoi (String str) {
         if (str == null)
             return (0);
@@ -761,7 +761,7 @@ public class MathUtils {
         return (int)(negate ? -total : total);
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(1)")
     public static double atod (String asciiNum) {
         if (asciiNum == null || asciiNum.length() == 0)
             throw new RuntimeException("atod undefined for: " + asciiNum);
@@ -797,7 +797,7 @@ public class MathUtils {
         return (negate ? -total : total);
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(log n)", spaceComplexity = "O(log n)")
     public static String itoa (int num) {
         if (num == 0)
             return ("0");
@@ -823,7 +823,7 @@ public class MathUtils {
      * @param num2
      * @return    greatest common divisor
      */
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(log(min(a,b)))", spaceComplexity = "O(log(min(a,b)))")
     public static int gcd (int num1, int num2) {
         if (num2 == 0)
             return (num1);
@@ -836,7 +836,7 @@ public class MathUtils {
      * @param num2
      * @return
      */
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(log(min(a,b)))", spaceComplexity = "O(1)")
     public static int lcm (int num1, int num2) {
          return (num1 * num2 / gcd(num1, num2));
     }

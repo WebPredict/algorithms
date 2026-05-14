@@ -23,7 +23,7 @@ public class StockUtils {
      * @param prices
      * @return
      */
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(n)")
     public static int [][]   getAllPeakAndValleyIndicesLeftToRight (int [] prices) {
         if (prices == null)
             return (null);
@@ -42,7 +42,7 @@ public class StockUtils {
      * @param prices
      * @return
      */
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(1)")
     public static double    computeVolatility (int [] prices) {
         return (StatUtils.stddev(prices));
     }
@@ -53,7 +53,7 @@ public class StockUtils {
      * @param n
      * @return
      */
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n log n)", spaceComplexity = "O(n)")
     public static int [][]  getTopNPeakAndValleyIndicesSorted (int [] prices, int n) {
         // TODO
         return (null);
@@ -64,7 +64,7 @@ public class StockUtils {
      * @param num
      * @return
      */
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(1)")
     public static int findPeakElementIdx(int[] num) {
 
         if (num == null || num.length < 2)
@@ -90,7 +90,7 @@ public class StockUtils {
      * @param prices
      * @return
      */
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(1)")
     public static int   maxProfitWithMaxTransactions (int [] prices) {
         if (prices == null)
             return (0);
@@ -124,7 +124,7 @@ public class StockUtils {
      * @param prices
      * @return
      */
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(1)")
     public static int   maxProfitWithAtMostTwoTransactions (int [] prices) {
         if (prices == null)
             return (0);
@@ -174,7 +174,7 @@ public class StockUtils {
      * @param prices
      * @return
      */
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(1)")
     public static int   maxProfitWithOneTransaction (int [] prices) {
         if (prices == null)
             return (0);
@@ -187,7 +187,7 @@ public class StockUtils {
      * @param prices
      * @return
      */
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(1)")
     public static int   maxProfitWithOneTransaction (int [] prices, int startIdx, int endIdx) {
         if (prices == null)
             return (0);

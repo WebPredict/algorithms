@@ -35,7 +35,7 @@ public class Keyboard {
         return (characterCoordinatesMap.get(c));
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(1)", spaceComplexity = "O(1)")
     public static int       getDistanceBetween (char c1, char c2) {
         Integer [] c1Coord = characterCoordinatesMap.get(c1);
 

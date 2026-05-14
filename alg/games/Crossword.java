@@ -31,7 +31,7 @@ public class Crossword {
         this.dictionary = dictionary;
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n * m)", spaceComplexity = "O(n * m)")
     public void generate () {
         // TODO
     }

@@ -187,7 +187,7 @@ public class FileUtils {
      * @return
      * @throws Exception
      */
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n * m)", spaceComplexity = "O(1)")
     public static boolean insertAfter (List<String> fileLines, String [] markerLines, String [] additionalLines, boolean onlyFirstInstance,
                                        boolean fromTheStart) throws Exception {
 
@@ -251,7 +251,7 @@ public class FileUtils {
      * @return
      * @throws Exception
      */
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n * m)", spaceComplexity = "O(1)")
     public static boolean insertBefore (List<String> fileLines, String [] markerLines, String [] additionalLines, boolean onlyFirstInstance,
                                        boolean fromTheStart) throws Exception {
         boolean matched = false;
@@ -303,7 +303,7 @@ public class FileUtils {
      * @return
      * @throws Exception
      */
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n * m)", spaceComplexity = "O(1)")
     public static boolean replace (List<String> fileLines, String [] markerLines, String [] additionalLines, boolean onlyFirstInstance,
                                         boolean fromTheStart) throws Exception {
         boolean matched = false;
@@ -345,18 +345,18 @@ public class FileUtils {
         return (false);
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n * m)", spaceComplexity = "O(1)")
     public static int []    patternOccurances (List<String> fileLines, String [] lookingForLines, String startMarkerRange, String endMarkerRange) throws Exception
     {
          return (null);
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(n)")
     public static String    formatAsJson (String data, int indent) {
          return (data); // TODO  move somewhere else
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(n)")
     public static String    formatAsXML (String data, int indent) {
         return (data); // TODO   move somewhere else
     }
@@ -434,7 +434,7 @@ public class FileUtils {
      * @param createSubdirsIfNeeded
      * @throws Exception
      */
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(1)")
     public static void      write (String buf, String file, boolean createSubdirsIfNeeded) throws Exception {
         PrintWriter pw = null;
 

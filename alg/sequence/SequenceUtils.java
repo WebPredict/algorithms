@@ -20,7 +20,7 @@ public class SequenceUtils {
      * TODO: Hirschberg's algorithm for optimal sequence alignment
      *
      */
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(1)")
     public static int hammingDistance (String s1, String s2) {
         int s1Len = s1 == null ? 0 : s1.length();
         int s2Len = s2 == null ? 0 : s2.length();
@@ -42,7 +42,7 @@ public class SequenceUtils {
          return (needlemanWunschScore(x, y, defaultCostComputer));
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(m * n)", spaceComplexity = "O(m * n)")
     public static int [] needlemanWunschScore (String x, String y, EditDistanceCostComputer costComputer) {
 
         int         xLen = x == null ? 0 : x.length();
@@ -77,7 +77,7 @@ public class SequenceUtils {
         return (lastLine);
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(m * n)", spaceComplexity = "O(min(m, n))")
     public static String []     hirschbergOptimalAlignment (String x, String y) {
         String []   ret = new String [] {"", ""};
         int         xLen = x == null ? 0 : x.length();
@@ -147,7 +147,7 @@ public class SequenceUtils {
         return (levenshteinDistanceRec(s1, s1 == null ? 0 : s1.length(), s2, s2 == null ? 0 : s2.length()));
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(3^(m+n))", spaceComplexity = "O(m + n)")
     public static int levenshteinDistanceRec (String s1, int s1Len, String s2, int s2Len) {
         if (s1Len == 0)
             return (s2Len);
@@ -173,7 +173,7 @@ public class SequenceUtils {
      * @param s2
      * @return
      */
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(m * n)", spaceComplexity = "O(n)")
     public static int levenshteinDistance (String s1, String s2) {
         if (MiscUtils.safeEquals(s1, s2))
             return (0);

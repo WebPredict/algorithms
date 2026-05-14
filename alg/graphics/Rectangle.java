@@ -74,7 +74,7 @@ public class Rectangle {
      * @param other
      * @return
      */
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(1)", spaceComplexity = "O(1)")
     public Rectangle intersect (Rectangle other) {
 
         Point2D otherLowerLeft = other.getLowerLeft();

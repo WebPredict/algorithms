@@ -41,7 +41,7 @@ public class Line2D {
     }
 
     // Could return a point or line or nothing if parallel
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(1)", spaceComplexity = "O(1)")
     public Object       lineIntersect (Line2D l1, Line2D l2) {
         if (l1 == null || l2 == null)
             return (null);

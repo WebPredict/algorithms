@@ -28,7 +28,7 @@ public class RubiksCube {
         BACK
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n^2)", spaceComplexity = "O(n^2)")
     public void rotate (Face face, int numTurnsClockwise) {
         // This one's a doozy
 

@@ -32,7 +32,7 @@ public class Reversi {
      * @param color
      * @return false if invalid move
      */
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(1)")
     public boolean  makeMove (int row, int col, int color) {
 
         // This method assumes a square board:

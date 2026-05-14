@@ -26,7 +26,7 @@ public class ProbUtils {
         return (probBGivenA * probA / probB);
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(n)")
     public static int []	randomIntegers (int [] list, int randomSize) {
     	// returns a random subset of size randomSize from list
 
@@ -45,7 +45,7 @@ public class ProbUtils {
     	return (randomList); 
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(n)", spaceComplexity = "O(1)")
     public static void  randomShuffleInPlace (Object [] objects) {
         if (objects == null)
             return;

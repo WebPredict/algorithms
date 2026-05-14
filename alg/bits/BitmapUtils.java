@@ -11,7 +11,7 @@ import alg.misc.InterestingAlgorithm;
  */
 public class BitmapUtils {
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(w * h)", spaceComplexity = "O(1)")
     public static Bitmap wipeOut(Bitmap bitmap, boolean toOnes) {
         int width = bitmap.getWidth();
         int height = bitmap.getHeight();
@@ -25,7 +25,7 @@ public class BitmapUtils {
         return (bitmap);
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(w * h)", spaceComplexity = "O(1)")
     public static Bitmap invert(Bitmap bitmap) {
         int width = bitmap.getWidth();
         int height = bitmap.getHeight();
@@ -39,7 +39,7 @@ public class BitmapUtils {
         return (bitmap);
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(w * h)", spaceComplexity = "O(w * h)")
     public static Bitmap diff (Bitmap b1, Bitmap b2) {
         if ((b1 == null && b2 != null) || (b2 == null && b1 != null) ||
                 b1.getHeight() != b2.getHeight() || b1.getWidth() != b2.getWidth())

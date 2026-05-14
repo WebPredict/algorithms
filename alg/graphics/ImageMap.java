@@ -70,7 +70,7 @@ public class ImageMap {
 
     public static final int TMP_SET_COLOR = -1;
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(rows * cols)", spaceComplexity = "O(1)")
     public  ImageMap erode () {
         // TODO: need to rewrite this to support multiple colors beyond B&W!
         for (int i = 0; i < rows; i++) {
@@ -100,7 +100,7 @@ public class ImageMap {
         return (this);
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(rows * cols)", spaceComplexity = "O(1)")
     public  ImageMap dilate () {
 
         // TODO: need to rewrite this to support multiple colors beyond B&W!
@@ -131,7 +131,7 @@ public class ImageMap {
         return (this);
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(rows * cols)", spaceComplexity = "O(1)")
     public ImageMap dilate (int k) {
         convertToManhattanDistance();
 
@@ -143,7 +143,7 @@ public class ImageMap {
         return (this);
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(k * rows * cols)", spaceComplexity = "O(1)")
     public ImageMap erode (int k) {
 
         // TODO: remove this inefficiency
@@ -164,7 +164,7 @@ public class ImageMap {
         return (copy);
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(rows * cols)", spaceComplexity = "O(1)")
     public ImageMap  convertToManhattanDistance () {
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
@@ -205,7 +205,7 @@ public class ImageMap {
         return (this);
     }
 
-    @InterestingAlgorithm
+    @InterestingAlgorithm(timeComplexity = "O(1)", spaceComplexity = "O(1)")
     public int      getAverageColorAround (int i, int j) {
 
         if (rows == 1 && cols == 1)

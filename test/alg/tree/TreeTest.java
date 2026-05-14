@@ -1,6 +1,6 @@
 package test.alg.tree;
 
-import alg.misc.MiscUtils;
+import alg.linkedlist.LinkedListUtils;
 import alg.trees.TreeUtils;
 import alg.util.BinaryNode;
 import alg.util.LinkNode;
@@ -24,7 +24,7 @@ public class TreeTest {
         LinkNode second = new LinkNode<Integer>();
         second.setValue(1);
 
-        LinkNode merged = MiscUtils.mergeTwoSortedLists(first, second);
+        LinkNode merged = LinkedListUtils.mergeTwoSortedLists(first, second);
 
         BinaryNode<Integer> integerBinaryNode = TreeTestUtils.createRandomBinaryIntTree(4, 0, 1000);
 
